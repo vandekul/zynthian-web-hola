@@ -3,8 +3,14 @@ title: AMSynth
 id: amsynth
 description: 'Analog Modelling Synthesizer that uses a traditional subtractive synthesis approach to sound design'
 taxonomy:
-    category: synthesizer
-    tag: [free-software,synth-sub,ucase-pr]
+    category:
+        - synthesizer
+    tag:
+        - free-software
+        - synth-sub
+        - ucase-pr
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Virtual Analog Synthesizer'
 splash:
@@ -12,6 +18,7 @@ splash:
     bg_image: amsynth-hero_small.png
 media_thumb: amsynth.png
 ---
+
 [div class="column column-2-3"]
 AmSynth, or Analog Modelling Synthesizer, developed and maintained by Nick Dowell, uses a traditional subtractive synthesis approach to sound design, and can be run either as a standalone instrument or as a DSSI or LV2 plug-in within a digital audio workstation such as Ardour or Qtractor.
 

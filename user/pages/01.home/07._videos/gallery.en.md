@@ -9,6 +9,7 @@ buttonText: 'Buy V5.1 KIT'
 buttonLink: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5&pk_vid=462c13278f5e30e41781257411b29b24'
 smallTitle: video
 cache_enable: false
+noHeader: '1'
 ---
 
 [div class="column column-3 text-center"] ![](circle-video.png)[/div]

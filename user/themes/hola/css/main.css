@@ -2562,6 +2562,7 @@ html.no-csstransitions .home-content__main {
   width: 100%;
 }
 
+
 .row .column.column-2 {
     flex: 0 0 50%;
     max-width: 50%;
@@ -2603,6 +2604,72 @@ html.no-csstransitions .home-content__main {
         max-width: 100%;
         padding: 0rem;
     }
+}
+
+
+/* ===================================================================
+ * # engine - (_site-layout.scss)
+ *
+ * ------------------------------------------------------------------- */
+.s-engine {
+    padding-top: 15rem;
+    padding-bottom: 9rem;
+    background-color: #0a0809;
+    position: relative;
+}
+
+#engines .product-card{
+    background: #d3d3d3;
+}
+
+#engines h1{
+    font-size: 4.8rem;
+    color: white;
+}
+
+#engines .header-lead{
+    color: rgb(255 255 254 / 50%);
+    font-family: var(--font-terminal);
+    font-size: 1.6rem;
+    line-height: 1.8;
+    margin-bottom: 3.6rem;
+}
+
+.engines-content__scroll a {
+    font-family: var(--font-base-extra-bold);
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    letter-spacing: .3rem;
+    color: #FFFFFF;
+    position: relative;
+    display: inline-block;
+    line-height: 3rem;
+    padding-right: 2rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+
+.engines-content__scroll a::after {
+    border-top: 2px solid #922424;
+    border-right: 2px solid #922424;
+    content: '';
+    display: block;
+    height: 8px;
+    width: 8px;
+    margin-top: -7px;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    -webkit-transform-origin: 66% 66%;
+    -ms-transform-origin: 66% 66%;
+    transform-origin: 66% 66%;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    -webkit-transition: all 0.15s ease-in-out;
+    transition: all 0.15s ease-in-out;
 }
 
 /* ===================================================================
@@ -5168,7 +5235,7 @@ font-size: 14px;
 }
 
 /* Tablet */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -5200,6 +5267,8 @@ font-size: 14px;
 }
 
 #modular-engines .row .row {
+    display: flex;
+    width: 100%;
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 3rem;

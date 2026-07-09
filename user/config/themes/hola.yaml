@@ -33,3 +33,8 @@ footer-social:
     socialIconText: Instagram
     socialIconLink: 'https://www.instagram.com/zynthian/'
 footer-additional-text: '<a href="/privacy">Privacity Policy </a>'
+header:
+  button1Text: 'Get your KIT'
+  button1Link: 'https://shop.zynthian.org'
+  button2Text: Community
+  button2Link: 'https://discourse.zynthian.org/?pk_vid=900c6e85f0bf66e41780669099b29b24'

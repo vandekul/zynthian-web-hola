@@ -10,6 +10,8 @@ taxonomy:
         - free-software
         - synth-sub
         - ucase-pr
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Virtual Analog Synthesizer'
 splash:

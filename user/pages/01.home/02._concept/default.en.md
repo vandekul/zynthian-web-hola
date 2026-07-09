@@ -7,7 +7,7 @@ visible: false
 lead: 'Zynthian is a compact, self-contained, music-making computer that can be used as a keyboard expander, audio effects unit, MIDI processor / router and groovebox / micro-DAW.'
 ---
 
-Zynthian is a [community-driven project](https://discourse.zynthian.org?target=_blank) and it's 100% open source. Free software on Open hardware. Completely configurable and fully hackable! **Free as in Freedom.** You can [build your zynthian from scratch or buy an official kit](#build-your-zynthian).<br>
+Zynthian is a [community-driven project](https://discourse.zynthian.org?target=_blank) and it's 100% open source. Free software on Open hardware. Completely configurable and fully hackable! **Free as in Freedom.** You can build your zynthian from scratch or buy an official kit.<br>
 <br>
 Zynthian's software includes:
 

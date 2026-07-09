@@ -11,6 +11,8 @@ taxonomy:
         - ucase-kb
         - ucase-pr
         - synth-emu
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Oberheim Emulator'
 splash:

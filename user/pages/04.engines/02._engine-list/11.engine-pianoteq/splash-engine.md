@@ -3,8 +3,15 @@ title: Pianoteq
 id: pianoteq
 description: 'Physical modeller capable of recreating accurately a wide range of acoustic & electro-acoustic pianos, vibraphones, clavichords, harpsichords, ...'
 taxonomy:
-    category: synthesizer
-    tag: [commercial-software,synth-emu,synth-phy,ucase-kb]
+    category:
+        - synthesizer
+    tag:
+        - ucase-kb
+        - synth-emu
+        - synth-phy
+        - commercial-software
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Physical Modeler'
 splash:
@@ -12,6 +19,7 @@ splash:
     bg_image: pianoteq-hero_small.jpg
 media_thumb: pianoteq6.jpg
 ---
+
 [div class="column column-2-3"]
 Pianoteq is a proprietary, award-winning virtual instrument capable of recreating the sound of a wide range of acoustic & electro-acoustic instruments. Zynthian software includes a limited demo version that can be upgraded to the licensed version.
 

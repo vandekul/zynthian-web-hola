@@ -21,6 +21,8 @@ taxonomy:
         - synth-pad
         - ucase-kb
         - ucase-pr
+    homepage:
+        - yes
 ---
 
 [div class="column column-2-3"]

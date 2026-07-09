@@ -34,6 +34,26 @@ form:
       description: Will be used instead of default logo `theme://images/grav-logo.svg`
       accept:
         - image/*
+    
+    button:
+      type: section
+      title: External links
+      underline: true
+    header.button1Text:
+      type: text
+      label: First External Link Text
+    
+    header.button1Link:
+      type: text
+      label: First External Link
+
+    header.button2Text:
+      type: text
+      label: Second External Link Text
+
+    header.button2Link:
+      type: text
+      label: Second External Link
 
     footer_section:
       type: section

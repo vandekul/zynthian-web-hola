@@ -54,6 +54,8 @@
         {% endif %}
     {% endfor %}
 
+
+
     {% for page in pages.children.visible %}
         {% set current_page = (page.active or page.activeChild) ? 'current' : '' %}
         <li class="{{ current_page }}">
@@ -65,4 +67,14 @@
             </a>
         </li>
     {% endfor %}
+    {% if theme_var('header.button1Text') %}
+        <li class=" {{ current_module }} ">
+            <a class="smoothscroll" href={{ theme_var('header.button1Link') }}>{{ theme_var('header.button1Text') }}</a>
+        </li>
+    {%endif%}
+    {% if theme_var('header.button2Text') %}
+        <li class=" {{ current_module }} ">
+            <a class="smoothscroll" href={{ theme_var('header.button2Link') }}>{{ theme_var('header.button2Text') }}</a>
+        </li>
+    {%endif%}
 </ul>

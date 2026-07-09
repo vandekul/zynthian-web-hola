@@ -6,6 +6,7 @@ author:
 taxonomies:
   - category
   - tag
+  - homepage
 metadata:
   description: 'Zynthian, the open music instrument'
 summary:

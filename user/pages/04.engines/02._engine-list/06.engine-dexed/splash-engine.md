@@ -12,6 +12,8 @@ taxonomy:
         - ucase-pr
         - synth-emu
         - synth-fm
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'FM Synthesizer'
 splash:
