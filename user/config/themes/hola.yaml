@@ -1,0 +1,35 @@
+enabled: true
+custom_logo:
+  user/themes/hola/images/logo/logo.png:
+    name: logo.png
+    type: image/png
+    size: 5238
+    path: user/themes/hola/images/logo/logo.png
+footer-text: '© Copyright Zynthian 2026'
+footer-design: '<a href="/cookies">Cookie Policy </a>'
+footer-social:
+  -
+    socialIconClass: 'fa fa-comment'
+    socialIconText: Discourse
+    socialIconLink: 'https://discourse.zynthian.org/'
+  -
+    socialIconClass: 'fa fa-github'
+    socialIconText: Github
+    socialIconLink: 'https://github.com/zynthian'
+  -
+    socialIconClass: 'fa fa-wikipedia-w'
+    socialIconText: Wiki
+    socialIconLink: 'https://wiki.zynthian.org/?pk_vid=900c6e85f0bf66e41780667829b29b24'
+  -
+    socialIconClass: 'fa fa-wordpress'
+    socialIconText: Blog
+    socialIconLink: 'https://blog.zynthian.org/?pk_vid=900c6e85f0bf66e41780667897b29b24'
+  -
+    socialIconClass: 'fa fa-youtube-play'
+    socialIconText: Youtube
+    socialIconLink: 'https://www.youtube.com/channel/UCc9Tv__HdwQjPjKUd5mIhaw'
+  -
+    socialIconClass: 'fa fa-instagram'
+    socialIconText: Instagram
+    socialIconLink: 'https://www.instagram.com/zynthian/'
+footer-additional-text: '<a href="/privacy">Privacity Policy </a>'

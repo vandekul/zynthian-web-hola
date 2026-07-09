@@ -1,0 +1,15 @@
+extends@: default
+
+form:
+  fields:
+    tabs:
+
+      fields:
+        holaSetings:
+          type: tab
+          title: Hola Settings
+
+          fields:
+            header.lead:
+              type: text
+              label: Lead

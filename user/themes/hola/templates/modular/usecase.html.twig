@@ -1,0 +1,45 @@
+<section id="{% if page.header.redirect %}{{ page.header.redirect }}{% else %}{{ page.menu|lower|replace({' ': ''}) }}{% endif %}" 
+   class="s-usecase target-section" >
+    <div class="usecase-content">
+        <div class="row narrow section-intro has-bottom-sep">
+            <div class="col-full text-center">
+                <h3>{{ page.header.smallTitle }}</h3>
+                <h1>{{ page.title }}</h1>
+                <p class="lead">{{ page.content|striptags }}</p>
+            </div>
+        </div>
+
+        {% for usecase in page.header.usecase %}        
+            <div class="usecase-target">
+                <div class="row usercase-image" style="background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.1)), 
+                url({{ page.media[usecase.background].url }}) no-repeat center center / cover">
+                    <div class="col-six">
+                        <div class="usecase-content__main">
+                            <div class="usecase-line">
+                                <div class="usecase-ico">
+                                    <i class="{{ usecase.icon }}"></i>
+                                </div>
+                            </div>
+                            <h3>{{ usecase.subtitle }}</h3>
+                            <h1> {{ usecase.title }} </h1>
+                            <p>{{ usecase.description |raw }}</p>
+                            {% if usecase.learnmoretext %}
+                                <div class="usecase-content__scroll">
+                                    <a href="{{ usecase.learnmorelink }}" class="scroll-link ">
+                                        <span>{{ usecase.learnmoretext }}</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-six" >
+                        <div class="usecase-content__play">
+                            {{ page.media[usecase.audiourl].preload('metadata')|raw }}
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end usecase-target -->
+        {% endfor %}
+
+    </div> <!-- end usecase-content -->    
+</section> <!-- end s-usecase -->

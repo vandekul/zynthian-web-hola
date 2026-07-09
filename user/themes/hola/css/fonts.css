@@ -1,0 +1,222 @@
+/* ===================================================================
+ * fonts.scss
+ *
+ * ------------------------------------------------------------------- */
+
+
+/*
+ * libre baskerville
+================================================================================ */
+
+@font-face {
+    font-family: "librebaskerville-regular";
+    src: url("../fonts/librebaskerville/librebaskerville-regular-webfont.woff2") format("woff2"), url("../fonts/librebaskerville/librebaskerville-regular-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "librebaskerville-italic";
+    src: url("../fonts/librebaskerville/librebaskerville-italic-webfont.woff2") format("woff2"), url("../fonts/librebaskerville/librebaskerville-italic-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "librebaskerville-bold";
+    src: url("../fonts/librebaskerville/librebaskerville-bold-webfont.woff2") format("woff2"), url("../fonts/librebaskerville/librebaskerville-bold-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+
+/*
+ * montserrat
+================================================================================ */
+
+@font-face {
+    font-family: "montserrat-black";
+    src: url("../fonts/montserrat/montserrat-black-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-black-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-extrabold";
+    src: url("../fonts/montserrat/montserrat-extrabold-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-extrabold-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-bold";
+    src: url("../fonts/montserrat/montserrat-bold-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-bold-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-semibold";
+    src: url("../fonts/montserrat/montserrat-semibold-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-semibold-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-medium";
+    src: url("../fonts/montserrat/montserrat-medium-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-medium-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-regular";
+    src: url("../fonts/montserrat/montserrat-regular-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-regular-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-light";
+    src: url("../fonts/montserrat/montserrat-light-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-light-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-extralight";
+    src: url("../fonts/montserrat/montserrat-extralight-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-extralight-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "montserrat-thin";
+    src: url("../fonts/montserrat/montserrat-thin-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-thin-webfont.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+}
+
+
+/*
+ * Space Grotesk
+================================================================================ */
+
+@font-face {
+    font-family: "space-grotesk-normal";
+    src: url("../fonts/spacegrotesk/static/SpaceGrotesk-Regular.ttf") format("ttf");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "space-grotesk-bold";
+    src: url("../fonts/spacegrotesk/static/SpaceGrotesk-Bold.ttf") format("ttf"), url("../fonts/spacegrotesk/static/SpaceGrotesk-Bold.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "space-grotesk-light";
+    src: url("../fonts/spacegrotesk/static/SpaceGrotesk-Light.ttf") format("ttf");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "space-grotesk-semibold";
+    src: url("../fonts/spacegrotesk/static/SpaceGrotesk-SemiBold.ttf") format("ttf");
+    font-style: normal;
+    font-weight: normal;
+}
+
+/*
+ * Inter
+================================================================================ */
+
+@font-face {
+    font-family: "inter-regular";
+    src: url("../fonts/inter/Inter-Regular.woff") format("woff"), url("../fonts/inter/Inter-Regular.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "inter-italic";
+    src: url("../fonts/inter/Inter-Italic.woff") format("woff"), url("../fonts/inter/Inter-Italic.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "inter-bold";
+    src: url("../fonts/inter/Inter-Bold.woff") format("woff"), url("../fonts/inter/Inter-Bold.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "inter-extra-bold";
+    src: url("../fonts/inter/Inter-ExtraBold.woff") format("woff"), url("../fonts/inter/Inter-ExtraBold.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+/*
+ * IBM Plex Mono
+================================================================================ */
+
+@font-face {
+    font-family: "ibm-plex-mono-regular";
+    src: url("../fonts/ibmplexmono/IBMPlexMono-Regular.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "ibm-plex-mono-thin";
+    src: url("../fonts/ibmplexmono/IBMPlexMono-Thin.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "ibm-plex-mono-extralight";
+    src: url("../fonts/ibmplexmono/IBMPlexMono-ExtraLight.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "ibm-plex-mono-medium";
+    src: url("../fonts/ibmplexmono/IBMPlexMono-Medium.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "ibm-plex-mono-bold";
+    src: url("../fonts/ibmplexmono/IBMPlexMono-Bold.woff2") format("woff2");
+    font-style: normal;
+    font-weight: normal;
+}
+
+
+/*
+###########################################################
+MINIMUM FONT PROPERTIES
+###########################################################
+*/
+
+html{
+  --font-terminal: 'ibm-plex-mono-regular', serif;
+  --font-terminal-medium: 'ibm-plex-mono-medium', serif;
+  --font-terminal-bold: 'ibm-plex-mono-bold', serif;
+  --font-titles: 'space-grotesk-normal',sans-serif;
+  --font-titles-bold: 'space-grotesk-bold',sans-serif;
+  --font-titles-light: 'space-grotesk-light',sans-serif;
+  --font-base: 'inter-regular', sans-serif;
+  --font-base-italic: 'inter-italic', sans-serif;  
+  --font-base-bold: 'inter-bold', sans-serif;
+  --font-base-extra-bold: 'inter-extra-bold', sans-serif;
+}
