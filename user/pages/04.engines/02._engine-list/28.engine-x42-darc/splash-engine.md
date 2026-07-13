@@ -1,10 +1,16 @@
 ---
-title: X42 Compressor
-media_order: 'x42-darc.png'
+title: 'X42 Compressor'
+media_order: x42-darc.png
 description: 'General Purpose Dynamic Audio Range Compressor'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-dynamics,ucase-pr,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - ucase-fx
+        - fx-dynamics
 content:
     items: '@self.modular'
 date: '17:38 24-04-2020'
@@ -13,8 +19,15 @@ splash:
     bg_image_landscape: x42-darc-hero_small.png
     bg_image: x42-darc-hero_small.png
 media_thumb: x42-darc.png
+urls:
+    -
+        urlLink: 'http://x42-plugins.com/x42/x42-compressor'
+        urlLabel: 'X42 Compressor''s Website'
+    -
+        urlLink: 'https://github.com/x42/darc.lv2'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 x42-compressor (aka darc.lv2) is a Dynamic Audio Range Compressor inspired by Adriaensen's zita-dc1. It is a very nice sounding downward compressor that focuses on workflow, exposing only a minimal set of controls. Compression responds to signal-power (RMS), loudness as perceived by humans, not medium related digital-peak.
 
 The compressor features auto makeup-gain, fixed at -10 dBFS/RMS. This maintains perceived loudness over a wide range of thresholds and ratio settings.
@@ -43,11 +56,3 @@ darc.lv2 is inspired by the algorithm and UI of Fons Adriaensen's zita-dc1.
 The horizontal meter at the bottom shows the gain that is applied to the signal. The display shows the min/max range in the last 50ms. Values to the left &lt; 0 means the signal is attenuated (input is louder than -10 dBFS/RMS).
 
 The graph at the top visualizes the input to output gain mapping in dB. When «Hold» is enabled the area where the gain is not releases is shaded blue. The display also shows the input signal level as shaded white area under the curve as well and the current output-level (50ms average) as dot.
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [X42 Compressor's Website](http://x42-plugins.com/x42/x42-compressor)
-+ [Source Code](https://github.com/x42/darc.lv2)
-[/div]
-

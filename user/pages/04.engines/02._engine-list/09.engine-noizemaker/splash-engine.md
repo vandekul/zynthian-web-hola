@@ -20,9 +20,68 @@ splash:
 media_thumb: noizemaker.png
 sitemap:
     lastmod: '07-05-2026 16:46'
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=0pl8qZN-vI8'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+urls:
+    -
+        urlLink: 'https://tal-software.com/products/tal-noisemaker'
+        urlLabel: 'Official Website'
+    -
+        urlLink: 'http://linuxsynths.com/TALNoizeM4k3r-BanksDemos/talnoizem4k3r.html'
+        urlLabel: 'LinuxSynths page'
+    -
+        urlLink: 'https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports-juce5/tal-noisemaker/source'
+        urlLabel: 'LV2 Source Code'
+audio:
+    -
+        type: local
+        local:
+            audioFile: armageddon.ogg
+            audioLabel: Armageddon
+    -
+        type: local
+        local:
+            audioFile: crazytriangle.ogg
+            audioLabel: 'Crazy Triangle'
+    -
+        type: local
+        local:
+            audioFile: gatedpad.ogg
+            audioLabel: 'Gated Pad'
+    -
+        type: local
+        local:
+            audioFile: luxurylead.ogg
+            audioLabel: 'Luxury Lead'
+    -
+        type: local
+        local:
+            audioFile: thxforthepeople.ogg
+            audioLabel: 'Thanks for the People'
+    -
+        type: local
+        local:
+            audioFile: arptwentyfiftypunk.ogg
+            audioLabel: 'Arp Twenty Fifty Punk'
+    -
+        type: local
+        local:
+            audioFile: lightstorm.ogg
+            audioLabel: 'Light Storm'
+    -
+        type: local
+        local:
+            audioFile: ontherun.ogg
+            audioLabel: 'On the Run'
 ---
 
-[div class="column column-2-3"]
 TAL-NoizeM4k3r is a subtractive type, mono/polyphonic synth with up to 6 voices per sound, developed by Togu Audio Line (TAL). Its structure is divided into two synth modules, although what is denominated "synth 1" actually controls the two oscillators and LFO 1, whereas _synth 2_ only controls LFO 2 and the filter and amplitude envelopes.
 
 TAL-NoizeM4k3r comes with 256 preset patches, divided into categories such as Lead, Pad, FX, Percussion, Bass. Oscillator 1 can select from among three waveforms: saw, pulse and noise. Oscillator 2 has four waveforms: saw, rectangle, triangle, sine. The "master" section controls polyphony, portamento, tuning, oscillator volume amounts, ring modulation, syncing and sub (LFO) volume.
@@ -30,8 +89,6 @@ TAL-NoizeM4k3r comes with 256 preset patches, divided into categories such as Le
 TAL-NoizeM4k3r is particularly powerful in creating bass, effects and arpeggiator-type sounds, very common in modern techno-dance music. It has four low-pass, high-pass, bandpass and notch filter types. The envelope editor allows manual configuration that can be applied to the oscillators, filters, etc. One-shot and multiple repetition of this envelope is possible, and an amount control is also provided.
 
 Another powerful section of the TAL-NoizeM4k3r is the control section, which includes two types of chorus, a bit crusher, reverb and delay. A very nice "vintage noise" effect is included, as well as a feedback knob and a filter drive control. There is a pitchwheel control area which allows the external pitchwheel to control the cutoff point and pitchbend amount.
-<br>
-<br>
 
 ## Features:
 + 3 Oscillators
@@ -67,38 +124,3 @@ Another powerful section of the TAL-NoizeM4k3r is the control section, which inc
 + Panic button.
 + Easy to use, no hidden panels.
 + 256 great presets (Presets by Frank "Xenox" Neumann / Particular - Sound, The Unshushable Coktor, Alexandra Sendy, TAL, Patrick Kunz).
-[/div]
-
-[div class="column column-1-3"]
-### Video
-[plugin:youtube](https://www.youtube.com/watch?v=0pl8qZN-vI8)
-<br>
-### Audio
-<small>Armageddon</small>
-![armageddon.ogg](armageddon.ogg)
-<small>Crazy Triangle</small>
-![crazytriangle.ogg](crazytriangle.ogg)
-<small>Gated Pad</small>
-![gatedpad.ogg](gatedpad.ogg)
-<small>Luxury Lead</small>
-![luxurylead.ogg](luxurylead.ogg)
-<small>Thanks for the People</small>
-![thxforthepeople.ogg](thxforthepeople.ogg)
-<small>Arp Twenty Fifty Punk</small>
-![arptwentyfiftypunk.ogg](arptwentyfiftypunk.ogg)
-<small>Light Storm</small>
-![lightstorm.ogg](lightstorm.ogg)
-<small>On the Run</small>
-![ontherun.ogg](ontherun.ogg)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [Official Website](https://tal-software.com/products/tal-noisemaker)
-+ [LinuxSynths page](http://linuxsynths.com/TALNoizeM4k3r-BanksDemos/talnoizem4k3r.html) 
-+ [LV2 Source Code](https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports-juce5/tal-noisemaker/source)
-[/div]
-
-

@@ -1,18 +1,55 @@
 ---
-title: ZAM Plugins
-media_order: 'redwave.jpg'
+title: 'ZAM Plugins'
+media_order: redwave.jpg
 description: 'A plugin collection for sound processing'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-mod,fx-delay,fx-eq,fx-filter,fx-dynamics,fx-distortion,fx-other,ucase-pr,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - fx-delay
+        - fx-mod
+        - fx-other
+        - ucase-fx
+        - fx-eq
+        - fx-filter
+        - fx-dynamics
+        - fx-distortion
 date: '17:38 24-04-2020'
 subtitle: 'Plugin Collection'
 splash:
     bg_image_landscape: redwave-hero.jpg
     bg_image: redwave-hero_small.jpg
 media_thumb: redwave.jpg
+audio:
+    -
+        type: local
+        local:
+            audioFile: angie-20141010_follow.ogg
+            audioLabel: 'Follow, by Angie Hudson (2013)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=MGErjKRu_dQ'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+urls:
+    -
+        urlLink: 'http://www.zamaudio.com/'
+        urlLabel: 'ZamAudio''s Website'
+    -
+        urlLink: 'http://github.com/zamaudio/zam-plugins'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 Zam-plugins is a collection of LV2/LADSPA/VST/JACK audio plugins for sound processing developed in-house at ZamAudio. The default settings and almost every slider is calibrated to standard ranges.
 
 A big thankyou to falktx for writing Distrho Plugin Framework. It has enabled me to make these GUIs for zam-plugins quickly and neatly. Also thanks to mira, nphilipp, adi, edogawa and Haskellfant who helped package the software for different distros!
@@ -64,25 +101,3 @@ Mono multiband compressor, with 3 adjustable bands.
 
 #### ZaMultiCompX2
 Flagship of zam-plugins: Stereo version of ZaMultiComp, with individual threshold controls for each band and real-time visualisation of comp curves.
-
-[/div]
-
-[div class="column column-1-3"]
-### Video
-[plugin:youtube](https://youtu.be/MGErjKRu_dQ)
-<br>
-<br>
-### Audio
-<small>Follow, by Angie Hudson (2013)</small>
-![angie-20141010_follow.ogg](angie-20141010_follow.ogg)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [ZamAudio's Website](http://www.zamaudio.com/)
-+ [Source Code](http://github.com/zamaudio/zam-plugins)
-[/div]
-
-

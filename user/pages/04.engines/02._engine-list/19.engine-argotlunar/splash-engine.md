@@ -1,18 +1,61 @@
 ---
 title: Argotlunar
-media_order: 'argotlunar.png'
+media_order: argotlunar.png
 description: 'A real-time delay-line granulator to create surreal transformations'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-delay,fx-mod,fx-other,ucase-pr,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - fx-delay
+        - fx-mod
+        - fx-other
+        - ucase-fx
 date: '17:38 24-04-2020'
-subtitle: 'Granulator'
+subtitle: Granulator
 splash:
     bg_image_landscape: argotlunar-hero.png
     bg_image: argotlunar-hero_small.png
 media_thumb: argotlunar.png
+audio:
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/t800infiltrator/argotlunar'
+            soundcloudLabel: 'Argotlunar, by t800infiltrator'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/ioflow/20110912a'
+            soundcloudLabel: '20110912, by ioflow'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/pneuman/rpm-2012-lagrange'
+            soundcloudLabel: 'RPM 2012: lagrange, by pneuman'
+urls:
+    -
+        urlLink: 'http://mourednik.github.io/argotlunar/)'
+        urlLabel: 'Argotlunar''s Website'
+    -
+        urlLink: 'https://www.kvraudio.com/product/argotlunar-by-michael-ourednik'
+        urlLabel: 'KVRAudio''s Page'
+    -
+        urlLink: 'https://github.com/mourednik/argotlunar'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 Argotlunar is a tool for creating surreal transformations of audio streams. Specifically, it is a real-time delay-line granulator. It disintegrates an audio stream into short samples (grains). Each grain can have random settings of amplitude, panning, duration, delay, pitch, glissando, filter and envelope. The output of all grains is mixed together into a stream which can be fed back into the main input.
 
 Time-related parameters can be synced to the host tempo, for rhythmic and pulsing textures. Pitch-related parameters can be quantized for harmonic and melodic effects. Feedback can create chaotic, densely layered, and distorted sounds.
@@ -33,22 +76,3 @@ Argotlunar is free software. Licensed under the GPL v2.
 + Transposition is spline-interpolated to reduce aliasing.
 + 12dB state variable filter (HP/BP/LP/Notch).
 + Comb filter.
-
-[/div]
-
-[div class="column column-1-3"]
-
-### Audio:
-![Argotlunar, by t800infiltrator](https://soundcloud.com/t800infiltrator/argotlunar)
-<br>
-![ 20110912, by ioflow](https://soundcloud.com/ioflow/20110912a)
-<br>
-![RPM 2012: lagrange, by pneuman](https://soundcloud.com/pneuman/rpm-2012-lagrange) 
-<br>
-![Internal Processing (disquiet0301) by plusch](https://soundcloud.com/plusch/internal-processing-disquiet0301)
-<br>
-### Links:
-+ [Argotlunar's Website](http://mourednik.github.io/argotlunar/)
-+ [KVRAudio's Page](https://www.kvraudio.com/product/argotlunar-by-michael-ourednik)
-+ [Source Code](https://github.com/mourednik/argotlunar)
-[/div]

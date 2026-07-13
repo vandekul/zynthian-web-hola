@@ -1,18 +1,67 @@
 ---
 title: Surge
-media_order: 'surge.png'
+media_order: surge.png
 description: 'Surge is a digital synthesizer and makes no bones about it. In its core beats a hybrid substractive engine with a powerful FX stack.'
 taxonomy:
-    category: synthesizer
-    tag: [free-software,synth-sub,ucase-kb,ucase-pr]
+    category:
+        - synthesizer
+    tag:
+        - free-software
+        - synth-sub
+        - ucase-kb
+        - ucase-pr
 date: '17:38 20-10-2020'
 subtitle: 'Hybrid Synthesizer'
 splash:
     bg_image_landscape: surge-hero.png
     bg_image: surge-hero_small.png
 media_thumb: surge.png
+audio:
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/user-589036812-258992427/surge-2237-ad'
+            soundcloudLabel: '2237 AD'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/user-589036812-258992427/surge-demo-001-microtonal-soundscape-1-x-surge'
+            soundcloudLabel: 'Microtonal Soundscape'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/theexponent/resurgence'
+            soundcloudLabel: Resurgence
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=2GLp6FD6oVE'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+urls:
+    -
+        urlLink: 'https://surge-synthesizer.github.io/'
+        urlLabel: 'Surge''s Website'
+    -
+        urlLink: 'https://surge-synthesizer.github.io/manual/'
+        urlLabel: 'Surge''s Manual'
+    -
+        urlLink: 'https://github.com/surge-synthesizer/surge'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 Surge uses a subtractive hybrid synthesis algorithm. Each patch contain two 'scenes' which are separate instances of the entire synthesis engine (except effects) that can be used for layering or split patches.
 
 It includes a rich library of factory sounds:
@@ -49,9 +98,7 @@ It includes a rich library of factory sounds:
 + 8 effect units arranged as 2 inserts per scene, 2 sends and 2 master effects.
 + 13 effect algorithms: EQ, Distortion, Conditioner (EQ, stereo image control and limiter), Frequency Shifter, Rotary Speaker, Ring Modulator, Vocoder, Chorus, Phaser, Flanger, Delay, Reverb 1, Reverb 2
 
-[/div]
 
-[div class="column column-1-3"]
 ### Video
 [plugin:youtube](https://www.youtube.com/watch?v=2GLp6FD6oVE)
 <!--[youtube="https://www.youtube.com/watch?v=ryOhX7xFZ8g"]
@@ -64,14 +111,6 @@ It includes a rich library of factory sounds:
 <br>
 ![Resurgence](https://soundcloud.com/theexponent/resurgence)
 <br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [Surge's Website](https://surge-synthesizer.github.io/)
-+ [Surge's Manual](https://surge-synthesizer.github.io/manual/)
-+ [Source Code](https://github.com/surge-synthesizer/surge)
-[/div]
+
 
 

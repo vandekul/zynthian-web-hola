@@ -1,5 +1,5 @@
 ---
-title: 'Hardware & Software'
+title: 'Hardware and Software'
 row:
     -
         firstColumnTitle: Hardware

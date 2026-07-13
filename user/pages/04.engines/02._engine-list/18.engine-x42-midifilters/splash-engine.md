@@ -1,18 +1,31 @@
 ---
-title: x42 MIDI-filters
-media_order: 'x42-midifilter.jpg'
+title: 'x42 MIDI-filters'
+media_order: x42-midifilter.jpg
 description: 'A powerful collection of simple MIDI filters & tools'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-midi,ucase-kb,ucase-pr]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-kb
+        - ucase-pr
+        - effect
+        - fx-midi
 date: '17:38 24-04-2020'
 subtitle: 'A powerful collection of simple MIDI filters & tools'
 splash:
     bg_image_landscape: x42-midifilter-hero.jpg
     bg_image: x42-midifilter-hero_small.jpg
 media_thumb: x42-midifilter.jpg
+urls:
+    -
+        urlLink: 'http://x42-plugins.com/x42/x42-midifilter'
+        urlLabel: 'x42 MIDI-filter''s Website'
+    -
+        urlLink: 'https://github.com/x42/x42-plugins'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 A collection of 25+ MIDI data filters in LV2 plugin format, developed and maintained by [Robin Gareus](http://x42-plugins.com). The filters follow these basic rules:
 + One MIDI input, one MIDI output (no generators, no synths)
 + No custom GUI, control inputs only
@@ -75,12 +88,3 @@ MIDI Monophonic Legato	Hold a note until the next note arrives. -- Play the same
 **MIDI Velocity-Range Filter:** Filter MIDI note-on events according to velocity. Note-on events outside the allowed range are discarded. If a Note-off is received for a note that was previously filtered, it is also not passed though. If the allowed range changes, note-off events are sent to currently active notes that end up outside the valid range.
 
 **MIDI Velocity Adjust:** Change the velocity of note events with separate controls for Note-on and Note-off. The input range 1 - 127 is mapped to the range between Min and Max. If Min is greater than Max, the range is reversed. The offsets value is added to the velocity event after mapping the Min/Max range.
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [x42 MIDI-filter's Website](http://x42-plugins.com/x42/x42-midifilter)
-+ [Source Code](https://github.com/x42/x42-plugins)
-[/div]
-
-

@@ -17,9 +17,69 @@ splash:
     bg_image_landscape: amsynth-hero.png
     bg_image: amsynth-hero_small.png
 media_thumb: amsynth.png
+audio:
+    -
+        type: local
+        local:
+            audioLabel: 'Particularly Two'
+            audioFile: particularlytwo.ogg
+    -
+        type: local
+        local:
+            audioLabel: 'Corg Two Six'
+            audioFile: corgtwosix.ogg
+    -
+        type: local
+        local:
+            audioLabel: 'Glass Bay'
+            audioFile: glassbay.ogg
+    -
+        type: local
+        local:
+            audioLabel: Partenza
+            audioFile: partenza.ogg
+    -
+        type: local
+        local:
+            audioLabel: 'Simple Life'
+            audioFile: simplelife.ogg
+    -
+        type: local
+        local:
+            audioLabel: 'End Game'
+            audioFile: endgame.ogg
+    -
+        type: local
+        local:
+            audioLabel: 'First Pew'
+            audioFile: firstpew.ogg
+    -
+        type: local
+        local:
+            audioLabel: Overpass
+            audioFile: overpass.ogg
+    -
+        type: local
+        local:
+            audioLabel: 'Soft Warning'
+            audioFile: softwarning.ogg
+    -
+        type: local
+        local:
+            audioLabel: 'Soft Warning'
+            audioFile: softwarning.ogg
+urls:
+    -
+        urlLink: 'https://amsynth.github.io'
+        urlLabel: 'Project''s Website'
+    -
+        urlLink: 'http://www.linuxsynths.com/amSynthdemos/amsynth.html'
+        urlLabel: 'LinuxSynths Page'
+    -
+        urlLink: 'https://github.com/amsynth/amsynth'
+        urlLabel: 'Source Code'
 ---
 
-[div class="column column-2-3"]
 AmSynth, or Analog Modelling Synthesizer, developed and maintained by Nick Dowell, uses a traditional subtractive synthesis approach to sound design, and can be run either as a standalone instrument or as a DSSI or LV2 plug-in within a digital audio workstation such as Ardour or Qtractor.
 
 AmSynth is a realtime, polyphonic/monophonic virtual synthesizer with touch-sensitivity and full MIDI control capability. It includes two oscillators, each capable of generating the classic waveforms: square-to-pulse, triangle-to-saw, sine, noise and sample-and-hold. Oscillator 2 can be synced to oscillator 1, and it can also be detuned: finetuning (plus or minus 4 semitones), coarse detuning (plus or minus 12 semitones) and octave detuning (minus three or plus four). Syncing the oscillators and adjusting the semitone detuning gives some interesting FM-like timbres. An oscillator mix knob allows control of the balance between the two, and turning it all the way to the left or right will isolate the one or the other. Ring modulation level knob is also provided.
@@ -35,8 +95,7 @@ Together with the main volume and drive (distortion) controls, amSynth includes 
 Fine-tune knob adjustments can be made by holding down the shift key as the knobs are moved.
 
 AmSynth has unlimited polyphony capability, although 16-note polyphony is usually sufficient. Pitchbend function can be selected in halfsteps, up to 2 octaves. Microtonal scalings are now loadable as well.
-<br>
-<br>
+
 
 ## Features:
 + Dual oscillators (sine / saw / square / noise) with hard sync
@@ -45,39 +104,3 @@ AmSynth has unlimited polyphony capability, although 16-note polyphony is usuall
 + Dual ADSR envelope generators (filter & amplitude)
 + LFO which can modulate the oscillators, filter, and amplitude
 + Distortion and reverb
-[/div]
-
-[div class="column column-1-3"]
-### Audio
-<small>Particularly Two</small>
-![particularlytwo.ogg](particularlytwo.ogg)
-<small>Corg Two Six</small>
-![corgtwosix.ogg](corgtwosix.ogg)
-<small>Glass Bay</small>
-![glassbay.ogg ](glassbay.ogg )
-<small>Partenza</small>
-![partenza.ogg](partenza.ogg)
-<small>Simple Life</small>
-![simplelife.ogg](simplelife.ogg)
-<small>End Game</small>
-![endgame.ogg](endgame.ogg)
-<small>First Pew</small>
-![firstpew.ogg](firstpew.ogg)
-<small>Overpass</small>
-![overpass.ogg](overpass.ogg)
-<small>Soft Warning</small>
-![softwarning.ogg](softwarning.ogg)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [Project's Website](https://amsynth.github.io)
-+ [LinuxSynths Page](http://www.linuxsynths.com/amSynthdemos/amsynth.html)
-+ [Source Code](https://github.com/amsynth/amsynth)
-[/div]
-
-
-
-

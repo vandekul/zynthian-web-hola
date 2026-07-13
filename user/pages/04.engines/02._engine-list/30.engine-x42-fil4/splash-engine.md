@@ -1,10 +1,15 @@
 ---
-title: X42 Equalizer
-media_order: 'x42-fil4.png'
+title: 'X42 Equalizer'
+media_order: x42-fil4.png
 description: '4 band parametric equalizer'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-filter,ucase-pr]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - fx-filter
 content:
     items: '@self.modular'
 date: '17:38 24-04-2020'
@@ -13,8 +18,15 @@ splash:
     bg_image_landscape: x42-fil4-hero_small.png
     bg_image: x42-fil4-hero_small.png
 media_thumb: x42-fil4.png
+urls:
+    -
+        urlLink: 'http://x42-plugins.com/x42/x42-eq'
+        urlLabel: 'X42 Equalizer''s Website'
+    -
+        urlLink: 'https://github.com/x42/fil4.lv2'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 x42-eq (aka fil4.lv2) is a 4 band parametric equalizer with additional low & high shelfing and high & low-pass filters. The equalizer is designed to match equivalent analog gain with zero latency and no phase-shift when approaching the Nyquist frequency. It does not have a cramped response which is often the referred to as digital sound. x42-eq features built-in realtime spectrum and spectrogram (waterfall) displays, a user resettable peak-hold display and an output gain control.
 
 fil4.lv2 is based on Fons Adriaensen's LADSPA fil-plugins.
@@ -52,12 +64,4 @@ High and Low pass are 2nd order resonant filters (-12dB/octave):
 + Quality 1.0: 0dB at cutoff (resonant)
 
 All filters are zero latency with correct equivalent analog gain at Nyquist (signal phase-shift at Nyquist frequency is zero).
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [X42 Equalizer's Website](http://x42-plugins.com/x42/x42-eq)
-+ [Source Code](https://github.com/x42/fil4.lv2)
-[/div]
-
 

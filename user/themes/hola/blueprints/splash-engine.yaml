@@ -32,14 +32,8 @@ form:
                           type: element
                           fields:
                             .audioFile:
-                              type: filepicker
-                              folder: '@self'
-                              label: Audio File
-                              accept:
-                                - .mp3
-                                - .ogg
-                                - .wav
-                                - .flac
+                              type: text
+                              label: Audio File Name
                             .audioLabel:
                               type: text
                               label: Audio Label

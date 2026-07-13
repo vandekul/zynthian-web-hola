@@ -1,18 +1,31 @@
 ---
-title: X42 Autotune
-media_order: 'x42-fat1.png'
+title: 'X42 Autotune'
+media_order: x42-fat1.png
 description: 'Auto-tuner plugin'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-other,ucase-pr,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - fx-other
+        - ucase-fx
 date: '17:38 24-04-2020'
 subtitle: 'Auto-tuner based on zita-at1 from Fons Adriaensens'
 splash:
     bg_image_landscape: x42-fat1-hero_small.png
     bg_image: x42-fat1-hero_small.png
 media_thumb: x42-fat1.png
+urls:
+    -
+        urlLink: 'http://x42-plugins.com/x42/x42-autotune'
+        urlLabel: 'X42 Autotune''s Website'
+    -
+        urlLink: 'https://github.com/x42/fat1.lv2'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 x42-autotune (aka fat1.lv2) is an auto-tuner based on Fons Adriaensen's zita-at1.
 
 AT1 is intended to correct the pitch of a voice singing (slightly) out of tune. It works by resampling and looping the signal and does not include formant correction, so it should be used to correct small errors only and not to really transpose a song. AT1 can probably be used on some instruments as well, but is primarily designed to cover the vocal range.
@@ -51,12 +64,3 @@ The following operation modes are supported:
 **Offset:** Adds an offset in the range of +/- two semitones to the pitch correction. With the Correction control set to zero the result is a constant pitch change.
 
 **Pitch error meter:** The bar below the keyboard indicates the pitch error of the input signal with respect to the current note. The range is +/- one semitone.
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [X42 Autotune's Website](http://x42-plugins.com/x42/x42-autotune)
-+ [Source Code](https://github.com/x42/fat1.lv2)
-[/div]
-
-

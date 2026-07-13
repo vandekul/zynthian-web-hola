@@ -19,34 +19,39 @@ splash:
 media_thumb: monique.jpg
 sitemap:
     lastmod: '07-05-2026 16:56'
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=naAmy840FAA'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=KmXA1HR-4V4'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+urls:
+    -
+        urlLink: 'https://surge-synth-team.org/monique/'
+        urlLabel: 'Monique''s Website'
+    -
+        urlLink: 'https://github.com/surge-synthesizer/monique-monosynth'
+        urlLabel: 'Source Code'
 ---
 
-[div class="column column-2-3"]
 Monique is a monophonic synth from Thomas Arndt which, in December 2021 became open source as part of the surge-synth-team family of products. 
 
 Monique is a very special girl with rare features and a deep and powerful sound that makes it a perfect match for deep basses and aggressive lead sounds. Her morphing feature allows you to combine up to 8 different programs in one. And she also loves jamming and live performances. You will enjoy playing with her!
 
 ##Features
-
 + Special free filter routing.
 + Continuous morphable oscillators.
 + Advanced modulation and automation possibilities.
 + Built-in effects.
 + Arpeggiator or Sequencer.
-[/div]
-
-[div class="column column-1-3"]
-### Video
-[plugin:youtube](https://youtu.be/naAmy840FAA)
-[plugin:youtube](https://youtu.be/KmXA1HR-4V4)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [Monique's Website](https://surge-synth-team.org/monique/)
-+ [Source Code](https://github.com/surge-synthesizer/monique-monosynth)
-[/div]
-
-

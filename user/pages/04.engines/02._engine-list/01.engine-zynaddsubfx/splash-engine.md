@@ -23,9 +23,60 @@ taxonomy:
         - ucase-pr
     homepage:
         - 'yes'
+audio:
+    -
+        type: local
+        local:
+            audioFile: MorningSunshineByJTunes.mp3
+            audioLabel: 'Morning Sunshine, by JTunes (Lead Pad)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: SpaceChoir1ByJTunes.mp3
+            audioLabel: 'Space Choir1, by JTunes'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: CosmicSynthGuitarByJTunes.mp3
+            audioLabel: 'Cosmic Synth Guitar, by JTunes'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: SmoothPillowByDhrupadiya.mp3
+            audioLabel: 'Smooth Pillow, by Dhrupadiya'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: RelaxingThemeByDhrupadiya.mp3
+            audioLabel: 'Relaxing Theme, by Dhrupadiya'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+urls:
+    -
+        urlLink: 'https://zynaddsubfx.sourceforge.io'
+        urlLabel: 'Project''s Website'
+    -
+        urlLink: 'http://www.linuxsynths.com/ZynaddsubfxBanksDemos/zynaddsubfx.html'
+        urlLabel: 'LinuxSynths Page'
+    -
+        urlLink: 'https://github.com/zynaddsubfx'
+        urlLabel: 'Source Code'
+audioFile: CosmicSynthGuitarByJTunes.mp3
 ---
 
-[div class="column column-2-3"]
 ZynAddSubFX is a realtime software synthesizer created by Paul Octavian Nasca in 2002. It is a realtime, polyphonic/monophonic, multitimbral, microtonal synthesizer capable of rescaling to up to 128 microtones per octave, as well as key mapping. Although it incorporates the traditional additive and subtractive methods of sound synthesis, as well as a PAD synth capability, it really is in a category of its own, because of how it expands, enriches and compresses harmonic spectrums, thereby obtaining extraordinarily rich sound timbres. It can be run standalone and also as an LV2 plugin.
 
 The "ADDsynth" section (which I oddly prefer to think of as the subtractive synthesis section) functions by adding voices together, each one provided with "traditional" features such as filters and LFOs, but also including morphing and modulation capability. Each voice has a waveform generator capable of reproducing up to 128 wave types. These waves can be reshaped, and Fourier synthesis is also provided.
@@ -39,8 +90,6 @@ All three sections above include envelope stages for amp, filter and pitch can b
 ZynAddSubFX is an advanced Virtual Analog Synthesizer capable of modelling the most amazing sounds you can conceive. Its warm and analogue-like sound will please the most exigent ears.
 
 It's a quite complex and very powerful tool that will satisfy the most experienced users. It also includes a  collection of more than 1000 presets organized in banks, so basic users will enjoy it from the first moment and advanced users have an excelent base for creating new presets.
-<br>
-<br>
 
 ## Features:
 + Polyphonic with support for legato and mono playing modes
@@ -57,27 +106,5 @@ It's a quite complex and very powerful tool that will satisfy the most experienc
 + Microtonal capabilities with any scale, up to 128 notes per octave, and key mapping
 + The graphical user interface can be completely disabled if the user need so
 + Over 1100 high quality instruments included
-[/p]
 
-[div class="column column-1-3"]
-### Audio
-<small>Morning Sunshine, by JTunes (Lead Pad)</small>
-![Morning Sunshine, by JTunes](MorningSunshineByJTunes.mp3)
-<small>Space Choir, by JTunes</small>
-![Space Choir1, by JTunes](SpaceChoir1ByJTunes.mp3)
-<small>Cosmic Synth Guitar, by JTunes</small>
-![Cosmic Synth Guitar, by JTunes ](CosmicSynthGuitarByJTunes.mp3)
-<small>Smooth Pillow, by Dhrupadiya (Multi-layer)</small>
-![Smooth Pillow, by Dhrupadiya](SmoothPillowByDhrupadiya.mp3)
-<small>Relaxing, by Dhrupadiya (Multi-layer)</small>
-![Relaxing Theme, by Dhrupadiya](RelaxingThemeByDhrupadiya.mp3)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [Project's Website](https://zynaddsubfx.sourceforge.io)
-+ [LinuxSynths Page](http://www.linuxsynths.com/ZynaddsubfxBanksDemos/zynaddsubfx.html)
-+ [Source Code](https://github.com/zynaddsubfx)
-[/div]
+

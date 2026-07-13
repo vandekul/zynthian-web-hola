@@ -1,18 +1,40 @@
 ---
 title: ArtyFX
-media_order: 'artyfx.png'
+media_order: artyfx.png
 description: 'A minimalistic but complete plugin collection'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-mod,fx-delay,fx-eq,fx-filter,fx-dynamics,fx-distortion,fx-other,ucase-kb,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-kb
+        - effect
+        - fx-delay
+        - fx-mod
+        - fx-other
+        - ucase-fx
+        - fx-eq
+        - fx-filter
+        - fx-dynamics
+        - fx-distortion
 date: '17:38 24-04-2020'
 subtitle: 'Minimalistic Plugin Collection'
 splash:
     bg_image_landscape: artyfx-hero.png
     bg_image: artyfx-hero_small.png
 media_thumb: artyfx.png
+urls:
+    -
+        urlLink: 'http://openavproductions.com/artyfx/'
+        urlLabel: 'ArtyFX''s Website'
+    -
+        urlLink: 'http://openavproductions.com/doc/artyfx.html'
+        urlLabel: 'ArtyFX''s Documentation'
+    -
+        urlLink: 'https://github.com/openAVproductions/openAV-ArtyFX'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 ArtyFX is a suite of minimalistic audio effects, which can be used standalone but is also built into many of OpenAV’s more complex projects like Fabla2, Sorcer and Luppp. Each effect can be used individually as an LV2 plugin.
 
 ArtyFX contains many different plugins - all of the “classic” effects like reverbs, delays and filters are present. The following sections detail each plugin individually, showing how it can be used, and making some suggestions on best practices.
@@ -101,13 +123,5 @@ Vihda is a stereo-enhancer, using a mid-side matrix.
 **The Width parameter** affects the amount of stereo content in the signal. Note that the the mid-side technique only enhances stereo: it does not create it!
 
 **The Invert button** inverts the right channel, which can cause a perceptual wider mix due to how the brain interprets audio. Try it and see if it sounds good.
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [ArtyFX's Website](http://openavproductions.com/artyfx/)
-+ [ArtyFX's Documentation](http://openavproductions.com/doc/artyfx.html)
-+ [Source Code](https://github.com/openAVproductions/openAV-ArtyFX)
-[/div]
 
 

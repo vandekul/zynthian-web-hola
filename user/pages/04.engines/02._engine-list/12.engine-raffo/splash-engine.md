@@ -19,35 +19,43 @@ splash:
 media_thumb: minimoog.jpg
 sitemap:
     lastmod: '07-05-2026 17:02'
+audio:
+    -
+        type: local
+        local:
+            audioFile: angrysweep.ogg
+            audioLabel: 'Angry Sweep'
+    -
+        type: local
+        local:
+            audioFile: quartet.ogg
+            audioLabel: Quartet
+    -
+        type: local
+        local:
+            audioFile: soloist.ogg
+            audioLabel: Soloist
+    -
+        type: local
+        local:
+            audioFile: sonataflair.ogg
+            audioLabel: 'Sonata Flair'
+    -
+        type: local
+        local:
+            audioFile: sonataflairsub.ogg
+            audioLabel: 'Sonata Flair Sub'
+urls:
+    -
+        urlLink: 'http://www.linuxsynths.com/RaffosynthPatchesDemos/raffosynth.html'
+        urlLabel: 'LinuxSynths Page'
+    -
+        urlLink: 'https://github.com/nicoroulet/RaffoSynth'
+        urlLabel: 'Source Code'
 ---
 
-[div class="column column-2-3"]
 Raffo Synth is a 4-oscillator subtractive software synthesizer emulator of the classic Minimoog, developed by Julián Palladino and Nicolas Roulet. It runs as an LV2 plug-in and is currently available with some audio-production linux distros.
 
 Monophonic in note input as well as audio output, Raffo Synth's four discretely-activated oscillators are independently detunable in stepped octaves (1-5) and smooth detuning plus or minus one octave. Each oscillator provides for triangle, saw, square and pulse waveform options. A single filter is provided, with cutoff and resonance settings. One ADSR-style envelope for filter and one for amplitude control.
 
 The glide control adjusts key-scaled portamento. Bipolar whole-tone pitchbend MIDI CC control is also provided.
-[/div]
-
-[div class="column column-1-3"]
-### Audio
-<small>Angry Sweep</small>
-![angrysweep.ogg](angrysweep.ogg)
-<small>Quartet</small>
-![quartet.ogg](quartet.ogg)
-<small>Soloist</small>
-![soloist.ogg](soloist.ogg)
-<small>Sonata Flair</small>
-![sonataflair.ogg](sonataflair.ogg)
-<small>Sonata Flair Sub</small>
-![sonataflairsub.ogg](sonataflairsub.ogg)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [LinuxSynths Page](http://www.linuxsynths.com/RaffosynthPatchesDemos/raffosynth.html)
-+ [Source Code](https://github.com/nicoroulet/RaffoSynth)
-[/div]
-

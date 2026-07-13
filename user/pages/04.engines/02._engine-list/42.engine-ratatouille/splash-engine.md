@@ -1,18 +1,31 @@
 ---
-title: Ratatouille - Dual Neural Modeler
-media_order: 'ratatouille.jpg'
+title: 'Ratatouille - Dual Neural Modeler'
+media_order: ratatouille.jpg
 description: 'Dual neural-network modeler. Blend 2 neural models + IRs'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-distortion,ucase-pr,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - ucase-fx
+        - fx-distortion
 date: '17:38 24-04-2020'
 subtitle: 'Blend 2 neural models and 2 IRs'
 splash:
     bg_image: ratatouille-hero.jpg
     bg_image_landscape: ratatouille-hero.jpg
 media_thumb: ratatouille.jpg
+urls:
+    -
+        urlLink: 'https://github.com/brummer10/Ratatouille.lv2'
+        urlLabel: 'Source Code'
+    -
+        urlLink: 'https://tonehunt.org'
+        urlLabel: 'Ratatouille''s Models in ToneHunt'
 ---
-[div class="column column-2-3"]
+
 Ratatouille is a Neural Model loader and mixer for Linux/Windows.
 It can load two models, which can be *.nam files (Neural Amp Modeler) or *.json / .aidax files (RTNeural) and use
 the "Blend" control to blend between the two models and mix them to simulate the specific tone you are looking for.
@@ -41,12 +54,4 @@ models and the IR Files may have different expectations regarding the sample rat
 #### Loading files
 
 From the zynthian-ui you can load model files easily. Simply move the knob assigned to the model control and the file selector will popup.
-
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [Source Code](https://github.com/brummer10/Ratatouille.lv2)
-+ [Ratatouille's Models in ToneHunt](https://tonehunt.org)
-[/div]
 

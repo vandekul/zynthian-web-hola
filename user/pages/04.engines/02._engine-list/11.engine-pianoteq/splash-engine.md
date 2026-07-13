@@ -18,9 +18,32 @@ splash:
     bg_image_landscape: pianoteq-hero.jpg
     bg_image: pianoteq-hero_small.jpg
 media_thumb: pianoteq6.jpg
+audio:
+    -
+        type: local
+        local:
+            audioFile: BodySoulByJoostRhodes.mp3
+            audioLabel: 'Body & Soul, by Joost (Pianoteq Fender Rhodes)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: PianoteqMidiDemoSteinweyD.mp3
+            audioLabel: 'Pianoteq MIDI demo (Steinwey Model D)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+urls:
+    -
+        urlLink: 'https://www.modartt.com/pianoteq'
+        urlLabel: 'Pianoteq''s Website'
+    -
+        urlLink: 'https://www.modartt.com/pianoteq_audio_demos'
+        urlLabel: 'Pianoteq''s Audio Demos'
 ---
 
-[div class="column column-2-3"]
 Pianoteq is a proprietary, award-winning virtual instrument capable of recreating the sound of a wide range of acoustic & electro-acoustic instruments. Zynthian software includes a limited demo version that can be upgraded to the licensed version.
 
 What makes Pianoteq superior to other virtual instruments is that the instruments are physically modelled and thus can simulate the playability and complex behaviour of real acoustic instruments. By omitting usage of samples, the file size is just a tiny fraction of that offered by other virtual instruments, perfect for use on any modern laptop.
@@ -59,8 +82,6 @@ Steinway & Sons have approved the sound and playability of the Pianoteq virtual 
 + Extremely small file size (less than 50 MB)
 + Extended key range (105 keys = 8+2/3 octaves) for the grand pianos Steinway D and K2
 + Mac OS X 10.7 or later, Windows 7 or later, Linux (x86 and ARM) 
-<br>
-<br>
 
 ## Instruments
 #### Steinway Model D grand piano
@@ -130,21 +151,4 @@ Each instrument is provided with one preset faithful to the original instrument 
 #### Free instruments
 In addition to the instruments above, Modartt offers to Pianoteq users a rich set of free instruments, including piano predecessors such as cimbalom, harpsichord and clavichord, an electro-acoustic piano CP-80, bells, tubular bells, etc.
 
-[/div]
-
-[div class="column column-1-3"]
-### Audio
-<small>Body & Soul, by Joost (Fender Rhodes Mark II)</small>
-![Body & Soul, by Joost (Pianoteq Fender Rhodes)](BodySoulByJoostRhodes.mp3)
-<small>Blues Demo (Steinwey Model D)</small>
-![Pianoteq MIDI demo (Steinwey Model D)](PianoteqMidiDemoSteinweyD.mp3)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [Pianoteq's Website](https://www.modartt.com/pianoteq)
-+ [Pianoteq's Audio Demos](https://www.modartt.com/pianoteq_audio_demos)
-[/div]
 

@@ -1,18 +1,105 @@
 ---
-title: LSP - Linux Studio Plugins
-media_order: 'lsp.jpg'
+title: 'LSP - Linux Studio Plugins'
+media_order: lsp.jpg
 description: 'A plugin collection for sound processing'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-mod,fx-delay,fx-eq,fx-filter,fx-dynamics,fx-distortion,fx-other,ucase-pr,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - fx-delay
+        - fx-mod
+        - fx-other
+        - ucase-fx
+        - fx-eq
+        - fx-filter
+        - fx-dynamics
+        - fx-distortion
 date: '17:38 24-04-2020'
 subtitle: 'Plugin Collection'
 splash:
     bg_image: lsp-hero_small.jpg
     bg_image_landscape: lsp-hero.jpg
 media_thumb: lsp.jpg
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=SSQaXDN9yXI'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=-mJ0fQqwAy4'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=_0VjhooWRBQ'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=7GOAM1O_RdY'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=J-ruYw9TwCE&t'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=_WD9GndORQA'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=wb8QnU4yRF0'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=jWO6FrCrbdw'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+urls:
+    -
+        urlLink: 'https://lsp-plug.in/'
+        urlLabel: 'LSP''s Website'
+    -
+        urlLink: 'https://lsp-plug.in/?page=manuals'
+        urlLabel: 'LSP''s Manuals'
+    -
+        urlLink: 'https://github.com/sadko4u/lsp-plugins/)'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 LSP (Linux Studio Plugins) is a collection of open-source plugins designed to fill the lack of good and useful plugins under the GNU/Linux platform.
 
 After some contributions to other open source projects the decision was made to implement an independent plugin distribution.
@@ -94,36 +181,4 @@ Currently the project is developed and maintained by the LSP Project Team with t
 + Send
 + Surge Filter
 + Trigger
-
-[/div]
-
-[div class="column column-1-3"]
-### Video
-[plugin:youtube](https://youtu.be/SSQaXDN9yXI)
-<br>
-[plugin:youtube](https://youtu.be/-mJ0fQqwAy4)
-<br>
-[plugin:youtube](https://youtu.be/_0VjhooWRBQ)
-<br>
-[plugin:youtube](https://youtu.be/7GOAM1O_RdY)
-<br>
-[plugin:youtube](https://youtu.be/J-ruYw9TwCE)
-<br>
-[plugin:youtube](https://youtu.be/_WD9GndORQA)
-<br>
-[plugin:youtube](https://youtu.be/wb8QnU4yRF0)
-<br>
-[plugin:youtube](https://youtu.be/jWO6FrCrbdw)
-<br>
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [LSP's Website](https://lsp-plug.in/)
-+ [LSP's Manuals](https://lsp-plug.in/?page=manuals)
-+ [Source Code](https://github.com/sadko4u/lsp-plugins/)
-[/div]
-
 

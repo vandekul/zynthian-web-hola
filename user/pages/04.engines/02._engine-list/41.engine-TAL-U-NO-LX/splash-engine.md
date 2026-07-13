@@ -15,9 +15,97 @@ splash:
     bg_image_landscape: TAL-U-NO-LX-hero.jpg
     bg_image: TAL-U-NO-LX-hero_small.jpg
 media_thumb: TAL-U-NO-LX.jpg
+audio:
+    -
+        type: soundcloud
+        local:
+            audioFile: 'https://tal-software.com//downloads/mp3/TAL-U-No-LX-demo-fmr.mp3'
+            audioLabel: 'Demo by Fernando Manuel Rodrigues (FMR)'
+        soundcloud:
+            audioLink: 'https://soundcloud.com/the-unfinished/sets/uno-lx-lunox-demo-tracks'
+            soundcloudLabel: 'Uno LX Lunox Demo Tracks'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/app-sound/tal-u-no-lx-cosmic-synth'
+            soundcloudLabel: 'TAL-U-No-LX Cosmic Synth'
+    -
+        type: soundcloud
+        local:
+            audioFile: '![Opulenta Plus Demo](https://soundcloud.com/saif_sameer/opulenta-plus-demo)'
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/saif_sameer/opulenta-plus-demo'
+            soundcloudLabel: 'Opulenta Plus Demo'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/pierre-olivier-haas-340667960/coming-back'
+            soundcloudLabel: 'Coming Back - P.O Haas'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/alexandros-music/alexandros-juno-breath'
+            soundcloudLabel: 'ALEXANDROS-JUNO BREATH'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/solidtrax/solidtrax-tal-u-no-lx-20'
+            soundcloudLabel: 'Solidtrax - Twenthy (TAL-U-NO-LX Demo)'
+    -
+        type: soundcloud
+        local:
+            audioFile: ''
+            audioLabel: ''
+        soundcloud:
+            audioLink: 'https://soundcloud.com/tal-togu-audio-line/juno-60-vs-tal-u-no-lx'
+            soundcloudLabel: 'Juno 60 vs TAL-U-NO-LX'
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=keXGZdIgCQc'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=Q88XxFJKTOk'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: vimeo
+        youtube:
+            youtubeLink: ''
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: 'https://vimeo.com/989420290'
+            vimeoLabel: ''
+urls:
+    -
+        urlLink: 'https://tal-software.com/products/tal-u-no-lx'
+        urlLabel: 'TAL-U-NO-LX''s Website'
+    -
+        urlLink: 'https://tal-software.com/products/tal-u-no-lx#presets'
+        urlLabel: 'TAL-U-NO-LX''s Presets'
 ---
 
-[div class="column column-2-3"]
 TAL-U-NO-LX is a synthesizer plug-in that faithfully recreates the iconic sound of the analog Juno 60 synth. Each
 oscillator, filter, and envelope has been painstakingly modeled to capture the essence of the original hardware,
 delivering an unparalleled level of authenticity.
@@ -84,35 +172,3 @@ It offers additional features that enhance your creative potential:
 + Original hardware "Factory Bank A" included.
 + Microtuning support (tun file import and MTS Client).
 + MPE support (+-48 semitones, MIDI channel 1 = master).
-
-[/div]
-
-[div class="column column-1-3"]
-### Video
-[plugin:youtube](https://youtu.be/keXGZdIgCQc)
-[plugin:youtube](https://youtu.be/Q88XxFJKTOk)
-[plugin:vimeo](https://vimeo.com/989420290)
-<br>
-### Audio
-<small>Demo by Fernando Manuel Rodrigues (FMR)</small>
-![Demo by Fernando Manuel Rodrigues (FMR)](https://tal-software.com//downloads/mp3/TAL-U-No-LX-demo-fmr.mp3)
-![Uno LX Lunox Demo Tracks](https://soundcloud.com/the-unfinished/sets/uno-lx-lunox-demo-tracks)
-![TAL-U-No-LX Cosmic Synth](https://soundcloud.com/app-sound/tal-u-no-lx-cosmic-synth)
-![Opulenta Plus Demo](https://soundcloud.com/saif_sameer/opulenta-plus-demo)
-![Coming Back - P.O Haas](https://soundcloud.com/pierre-olivier-haas-340667960/coming-back)
-![ALEXANDROS-JUNO BREATH](https://soundcloud.com/alexandros-music/alexandros-juno-breath)
-![Solidtrax - Twenthy (TAL-U-NO-LX Demo)](https://soundcloud.com/solidtrax/solidtrax-tal-u-no-lx-20)
-![Juno 60 vs TAL-U-NO-LX](https://soundcloud.com/tal-togu-audio-line/juno-60-vs-tal-u-no-lx)
-<br>
-
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [TAL-U-NO-LX's Website](https://tal-software.com/products/tal-u-no-lx)
-+ [TAL-U-NO-LX's Presets](https://tal-software.com/products/tal-u-no-lx#presets)
-
-[/div]
-
-

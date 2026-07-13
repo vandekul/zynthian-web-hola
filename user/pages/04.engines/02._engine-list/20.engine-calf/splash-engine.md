@@ -1,18 +1,109 @@
 ---
-title: Calf Studio Gear
-media_order: 'calf.jpg'
+title: 'Calf Studio Gear'
+media_order: calf.jpg
 description: 'A plugin collection designed to give you a professional production environment'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-mod,fx-delay,fx-eq,fx-filter,fx-dynamics,fx-distortion,fx-other,ucase-pr]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-pr
+        - effect
+        - fx-delay
+        - fx-mod
+        - fx-other
+        - fx-eq
+        - fx-filter
+        - fx-dynamics
+        - fx-distortion
 date: '17:38 24-04-2020'
 subtitle: 'Plugin Collection'
 splash:
-    bg_image_landscape: calf-hero.jpg
+    bg_image_landscape: calf_screenshot.jpg
     bg_image: calf-hero_small.jpg
 media_thumb: calf.jpg
+audio:
+    -
+        type: local
+        local:
+            audioFile: Compressor-DrySignal.ogg
+            audioLabel: 'Compressor Dry Signal'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Compressor.ogg
+            audioLabel: Compressor
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Guitar-Dry.ogg
+            audioLabel: 'Guitar Dry'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Guitar-Filter.ogg
+            audioLabel: 'Guitar Filter'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Guitar-Multichorus.ogg
+            audioLabel: 'Guitar Multichorus'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Guitar-Phaser.ogg
+            audioLabel: 'Guitar Phaser'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Guitar-Saturator.ogg
+            audioLabel: 'Guitar Saturator'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Guitar-Vintagedelay.ogg
+            audioLabel: 'Guitar Vintage Delay'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: Reverb.ogg
+            audioLabel: Reverb
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+urls:
+    -
+        urlLink: 'https://calf-studio-gear.org/'
+        urlLabel: 'Calf''s Website'
+    -
+        urlLink: 'https://github.com/calf-studio-gear/calf'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 Calf studio gear is designed to give you a professional production environment for your open source operating system. It's focused on high-quality sound processing and a highly usable interface. 
 
 Play your SF2 sample banks, create filthy organs, fatten your sounds with phasers, delays, reverbs and other FX, process your recordings with gates, compressors, deesser and finally master your stuff with multiband dynamics.
@@ -248,37 +339,3 @@ The X-Over series in Calf provides a comfortable and flexible way to split a sig
 The X-Over series in Calf provides a comfortable and flexible way to split a signal in different frequency bands for feeding dedicated speaker setups or building your own multiband effects setups. This device separates the signal into four different frequency bands.
 
 **Development:** Markus Schmidt
-[/div]
-
-[div class="column column-1-3"]
-### Audio
-<small>Compressor Dry Signal</small>
-![Compressor-DrySignal.ogg](Compressor-DrySignal.ogg)
-<small>Compressor</small>
-![Compressor.ogg](Compressor.ogg)
-<small>Guitar Dry</small>
-![Guitar-Dry.ogg](Guitar-Dry.ogg)
-<small>Guitar Filter</small>
-![Guitar-Filter.ogg](Guitar-Filter.ogg)
-<small>Guitar Multichorus</small>
-![Guitar-Multichorus.ogg](Guitar-Multichorus.ogg)
-<small>Guitar Phaser</small>
-![Guitar-Phaser.ogg](Guitar-Phaser.ogg)
-<small>Guitar Saturator</small>
-![Guitar-Saturator.ogg](Guitar-Saturator.ogg)
-<small>Guitar Vintage Delay</small>
-![Guitar-Vintagedelay.ogg](Guitar-Vintagedelay.ogg)
-<small>Reverb</small>
-![Reverb.ogg](Reverb.ogg)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-
-### Links:
-+ [Calf's Website](https://calf-studio-gear.org/)
-+ [Source Code](https://github.com/calf-studio-gear/calf)
-[/div]
-
-

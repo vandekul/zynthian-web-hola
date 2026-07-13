@@ -1,18 +1,32 @@
 ---
 title: dRowAudio
-media_order: 'redwave.jpg'
+media_order: redwave.jpg
 description: 'JUCE-based plugin collection'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-mod,fx-delay,fx-distortion,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - effect
+        - fx-delay
+        - fx-mod
+        - ucase-fx
+        - fx-distortion
 date: '17:38 24-04-2020'
 subtitle: 'Plugin Collection'
 splash:
     bg_image: redwave-hero_small.jpg
     bg_image_landscape: redwave-hero.jpg
 media_thumb: redwave.jpg
+urls:
+    -
+        urlLink: 'http://www.drowaudio.co.uk/products.php'
+        urlLabel: 'dRowAudio''s Website'
+    -
+        urlLink: 'https://github.com/drowaudio/drowaudio'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 dRowAudio - A JUCE module for high level audio application development.
 
 dRowAudio is a 3rd party JUCE module designed for rapid audio application development. It contains classes for audio processing and gui elements. Additionally there are several wrappers around 3rd party libraries including cURL, FFTReal and SoundTouch. dRowAudio is written in the strict JUCE style, closely following the style guide set out at JUCE Coding Standards.
@@ -35,10 +49,3 @@ This is a stereo flanger effect. It large intensity range and adjustable feedbac
 
 #### Distortion
 This is a simple distortion effect can be used in either a mono or stereo mode. It has controls for pre and post distortion filtering as well as a colour control for adjusting the waveshape.
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [dRowAudio's Website](http://www.drowaudio.co.uk/products.php)
-+ [Source Code](https://github.com/drowaudio/drowaudio)
-[/div]

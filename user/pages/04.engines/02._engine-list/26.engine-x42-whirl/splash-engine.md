@@ -1,18 +1,31 @@
 ---
-title: X42 Whirl Speaker
-media_order: 'x42-whirl.png'
+title: 'X42 Whirl Speaker'
+media_order: x42-whirl.png
 description: 'Rotary Speaker Simulator'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-mod,ucase-kb,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-kb
+        - effect
+        - fx-mod
+        - ucase-fx
 date: '17:38 24-04-2020'
 subtitle: 'Plugin Collection'
 splash:
     bg_image_landscape: x42-whirl-hero.png
     bg_image: x42-whirl-hero_small.png
 media_thumb: x42-whirl.png
+urls:
+    -
+        urlLink: 'http://x42-plugins.com/x42/x42-whirl'
+        urlLabel: 'Whirl Speaker''s Website'
+    -
+        urlLink: 'https://github.com/pantherb/setBfree'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 x42-whirl is designed to imitate the sound and properties of the electromechanical rotating speaker device that brought world-wide fame to the name and products of Don Leslie.
 
 It is a standalone version of the effect that came to be with the setBfree synth. Rather than simulating the net effect of the electromechanical device, x42-whirl physically models the properties, which results in very accurate representation of the sound of the real device.
@@ -38,10 +51,3 @@ Per default the plugin uses settings corresponding to a Model 44 (rotational spe
 The horn's off-center position is accounted for in the cabinet reflections calculation, however the microphones are positioned symmetrical at an equal distance to the rotor's center. Increasing the radii increases the Doppler frequency modulation, increasing the microphone distance subtly changes the spectrum due to different signal runtime length for each of the reflection and speaker positions.
 
 All distances are measured from the center of each rotor. The plugin allows for some impossible real-world configurations (e.g. move the mic pickup inside of the rotating device). Those cases only account for distance and angle calculations and will not correspond to whatever you may hear if it was possible to do so mechanically. While the maxim is to closely model the device as realistically as possible, they are kept in the plugin because it can lead to interesting sounds, which at the end of the day is what this is all about.
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [Whirl Speaker's Website](http://x42-plugins.com/x42/x42-whirl)
-+ [Source Code](https://github.com/pantherb/setBfree)
-[/div]

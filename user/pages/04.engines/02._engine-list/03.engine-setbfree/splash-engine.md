@@ -19,12 +19,53 @@ splash:
 media_thumb: setbfree.jpg
 sitemap:
     lastmod: '07-05-2026 14:23'
+urls:
+    -
+        urlLink: 'http://setbfree.org'
+        urlLabel: 'Project''s Website'
+    -
+        urlLink: 'http://www.linuxsynths.com/SetBfreePatchesDemos/setbfree.html'
+        urlLabel: 'LinuxSynths Page'
+    -
+        urlLink: 'https://github.com/pantherb/setBfree'
+        urlLabel: 'Source Code'
+video:
+    -
+        type: vimeo
+        youtube:
+            youtubeLink: ''
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: 'https://vimeo.com/130633814'
+            vimeoLabel: 'A rendition of Jimmy Smith''s The Cat'
+audio:
+    -
+        type: local
+        local:
+            audioFile: georgia_on_my_waltzin_mind.ogg
+            audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
+            audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: RhodesHammondByHumi.mp3
+            audioLabel: 'Rhodes & Hammond, by Humi'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
 ---
 
-[div class="column column-2-3"]
 setBfree is a MIDI-controlled software synthesizer designed to imitate the sound and properties of the electromechanical organs and sound modification devices that brought world-wide fame to the names and products of Laurens Hammond and Don Leslie.
-<br>
-<br>
 
 ## Features:
 setBfree is a _Tonewheel Organ Construction Kit_, a physical model with over 1000 configurable parameters. Like a real B3 one can 'open it' and tweak parameters from mint'53 condition (default) to dusty tube 80's run-down.
@@ -45,28 +86,5 @@ On zynthian, setBfree also offers 4 types of waveform for the tone-wheel generat
 + **Sawtooth:** Combo organ sound
 
 All controls can be assigned to MIDI-CC as needed via the MIDI-learn mechanism.
-[/div]
 
-[div class="column column-1-3"]
-### Video
-<small>A rendition of Jimmy Smith's The Cat</small>
-[plugin:vimeo](https://vimeo.com/130633814)
-<br>
 
-### Audio
-<small>Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)</small>
-![Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)](georgia_on_my_waltzin_mind.ogg?preload=metadata)
-<small>Drawbars Manipulations, by Baggypants</small>
-![Hammond Drawbars Manipulations, by Baggypants (setBfree)](setBfreeDrawbarsManipulationByBaggypants.mp3)
-<small>Rhodes & Hammond, by Humi</small>
-![Rhodes & Hammond, by Humi](RhodesHammondByHumi.mp3)
-<br>
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more video/audio demos...</a>
-</p>
-<br>
-### Links:
-+ [Project's Website](http://setbfree.org)
-+ [LinuxSynths Page](http://www.linuxsynths.com/SetBfreePatchesDemos/setbfree.html)
-+ [Source Code](https://github.com/pantherb/setBfree)
-[/div]

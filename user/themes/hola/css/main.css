@@ -2588,7 +2588,7 @@ html.no-csstransitions .home-content__main {
 }
 
 .left-side{
-    background: #f1f1f1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .2);
     padding: 5%;
 }
 
@@ -5131,7 +5131,7 @@ font-size: 14px;
 
 .product-card {
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,.2);
     display: flex;
     flex-direction: column;
 }
@@ -5276,4 +5276,13 @@ font-size: 14px;
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 3rem;
+}
+
+#default audio{
+    width: 100%
+}
+
+#default audio::-webkit-media-controls-panel{
+    background-color: #888888;
+    border-color: #000000;
 }

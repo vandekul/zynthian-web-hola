@@ -1,18 +1,39 @@
 ---
 title: Dragonfly
-media_order: 'dragonfly.png'
+media_order: dragonfly.png
 description: 'Reverb Plugin Suit'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-delay,fx-reverb,ucase-kb,ucase-pr,ucase-fx]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-kb
+        - ucase-pr
+        - effect
+        - fx-delay
+        - ucase-fx
+        - fx-reverb
 date: '17:38 24-04-2020'
 subtitle: 'Reverb Plugin Suit'
 splash:
     bg_image: dragonfly-hero_small.png
     bg_image_landscape: dragonfly-hero_small.png
 media_thumb: dragonfly.png
+urls:
+    -
+        urlLink: 'https://michaelwillis.github.io/dragonfly-reverb/'
+        urlLabel: 'Dragonfly''s Website'
+    -
+        urlLink: 'https://michaelwillis.github.io/dragonfly-reverb/manuals.html'
+        urlLabel: 'Dragonfly''s Documentation'
+    -
+        urlLink: 'https://www.kvraudio.com/product/dragonfly-reverb-by-dragonfly-reverb'
+        urlLabel: 'KVRAudio Page'
+    -
+        urlLink: 'https://github.com/michaelwillis/dragonfly-reverb'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 Dragonfly Reverb is a bundle of free audio effect plugins (LV2 and VST) for Linux, MacOS, and Windows.
 
 **Dragonfly Hall Reverb** is a free stereo-to-stereo reverb effect. It is primarily intended for use as a concert hall reverb. It also has numerous smaller presets representing rooms, studios, and chambers. It is based on Hibiki Reverb from Freeverb3VST, which uses Moorer's early reflection model and a modified FDN allpass Zita reverb.
@@ -22,12 +43,3 @@ Dragonfly Reverb is a bundle of free audio effect plugins (LV2 and VST) for Linu
 **Dragonfly Plate** is a free mono-to-stereo reverb plugin based on NVerb and STRev from Freeverb3 VST.
 
 **Dragonfly Early Reflections** is a free stereo-to-stereo reverb effect based on Moorer's early reflection model as implemented in Freeverb3 VST. This is the same algorithm used in Dragonfly Hall and Dragonfly Room, but without any late reverberation algorithm. 
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [Dragonfly's Website](https://michaelwillis.github.io/dragonfly-reverb/)
-+ [Dragonfly's Documentation](https://michaelwillis.github.io/dragonfly-reverb/manuals.html)
-+ [KVRAudio Page](https://www.kvraudio.com/product/dragonfly-reverb-by-dragonfly-reverb)
-+ [Source Code](https://github.com/michaelwillis/dragonfly-reverb)
-[/div]

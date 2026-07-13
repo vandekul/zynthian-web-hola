@@ -1,18 +1,27 @@
 ---
 title: Arpeggiator
-media_order: 'arpeggiator.jpg'
+media_order: arpeggiator.jpg
 description: 'A simple MIDI arpeggiator and MIDI pattern plugin'
 taxonomy:
-    category: effect
-    tag: [free-software,effect,fx-midi,ucase-kb]
+    category:
+        - effect
+    tag:
+        - free-software
+        - ucase-kb
+        - effect
+        - fx-midi
 date: '17:38 24-04-2020'
 subtitle: 'A simple arpeggiator & MIDI pattern plugin'
 splash:
     bg_image_landscape: arpeggiator-hero.jpg
     bg_image: arpeggiator-hero_small.jpg
 media_thumb: arpeggiator.jpg
+urls:
+    -
+        urlLink: 'https://github.com/BramGiesen/arpeggiator_LV2'
+        urlLabel: 'Source Code'
 ---
-[div class="column column-2-3"]
+
 Arpeggiator and a MIDI-pattern plugin developed for the MOD platform by Bram Giesen.
 
 ####Arpeggiator
@@ -35,9 +44,3 @@ The arpeggiator has octave spread control. The arpeggiator can iterate the incom
 
 ####MIDI-pattern
 The MIDI-pattern plugin can be used to create rhythmic patterns. The plugins takes the incoming note and replaces the velocity of the note by a value which is set by one of the faders of the plugin. Because the plugin iterates through the faders it generates a sort of rhythmic sequence. The CV control of the plugin can be used to retrigger the sequence.
-[/div]
-
-[div class="column column-1-3"]
-### Links:
-+ [Source Code](https://github.com/BramGiesen/arpeggiator_LV2)
-[/div]
