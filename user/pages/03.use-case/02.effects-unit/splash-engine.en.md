@@ -12,9 +12,61 @@ limit_reveal: '0'
 media_order: 'always-with-me-always-with-you.wav,CleanGuitarByRodrigoAmaral.mp3,CrunchGuitarByRodrigoAmaral.mp3,ElectroKalimbaMisteryForestDreamByJofemodo.mp3,LeadGuitarByRodrigoAmaral.mp3,ui_screenshots_sl.png,use-cases-2-new.jpg,_DSC4534_01_web_use_case_fx_unit.jpg'
 subtitle: 'Would you like a custom FX-chain for every song?'
 background: _DSC4534_01_web_use_case_fx_unit.jpg
+audio:
+    -
+        type: local
+        local:
+            audioFile: always-with-me-always-with-you.wav
+            audioLabel: 'Always with me, always with you (Joe Satriani, played by Stojos)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: CleanGuitarByRodrigoAmaral.mp3
+            audioLabel: 'Clean Guitar, by Rodrigo Amaral'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: ' CrunchGuitarByRodrigoAmaral.mp3'
+            audioLabel: 'Crunch Guitar, by Rodrigo Amaral'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: LeadGuitarByRodrigoAmaral.mp3
+            audioLabel: 'Lead Guitar, by Rodrigo Amaral'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: ElectroKalimbaMisteryForestDreamByJofemodo.mp3
+            audioLabel: 'Kalimba Mistery Forest Dream, by Jofemodo'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=QPQT5gviZbo'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+media_thumb: _DSC4534_01_web_use_case_fx_unit.jpg
+splash:
+    bg_image_landscape: _DSC4534_01_web_use_case_fx_unit.jpg
 ---
 
-[div class="column column-2-3"]
 Zynthian can be used as a powerful Audio Effects unit allowing creation off a customized effect-chain for every available audio input.
 
 Official Zynthian Kits have 2 balanced audio-inputs with independent gain-control ranging from -12db to 32dB. Read the full specifications [here](/technical-specifications). You can directly connect a wide rage of input devices, like dynamic microphones, electric & acoustic guitars, piezos, line-in, etc.
@@ -30,28 +82,3 @@ If you like looping, Sooper Looper engine is fully integrated, allowing to contr
 The MIDI-learning workflow is quick & easy. You can adjust the parameters you want from your favorite MIDI controller. Buttons can be assigned to presets (program-change), and knobs/faders to parameters (CC).
 
 Default latency and jitter is low enough for most players, but if you are looking for extra-low latency, audio configuration can be tweaked.
-[/div]
-
-[div class="column column-1-3"]
-
-### Video
-[plugin:youtube](https://youtu.be/QPQT5gviZbo)
-<br>
-
-### Audio
-<small></small>
-<small>Always with me, always with you (Joe Satriani, by Stojos)</small>
-![Always with me, always with you (Joe Satriani, played by Stojos)](always-with-me-always-with-you.wav?preload=metadata)
-<small>Clean Guitar, by Rodrigo Amaral</small>
-![CleanGuitarByRodrigoAmaral.mp3](CleanGuitarByRodrigoAmaral.mp3?preload=metadata)
-<small>Crunch Guitar, by Rodrigo Amaral</small>
-![CrunchGuitarByRodrigoAmaral.mp3](CrunchGuitarByRodrigoAmaral.mp3?preload=metadata)
-<small>Lead Guitar, by Rodrigo Amaral</small>
-![LeadGuitarByRodrigoAmaral.mp3](LeadGuitarByRodrigoAmaral.mp3?preload=metadata)
-<small>Kalimba Mistery Forest Dream, by Jofemodo</small>
-![ElectroKalimbaMisteryForestDreamByJofemodo.mp3](ElectroKalimbaMisteryForestDreamByJofemodo.mp3?preload=metadata)
-
-[div class="text-right link-extrademos"]
-<a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">[More Demos]</a>
-[/div]
-[/div]

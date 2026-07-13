@@ -12,9 +12,105 @@ body_classes: 'use-case custom-list'
 limit_reveal: '0'
 background: _DSC4481_02_web_use_case_production.jpg
 subtitle: 'Let your fingers play the sound you want'
+splash:
+    bg_image_landscape: _DSC4481_02_web_use_case_production.jpg
+media_thumb: _DSC4481_02_web_use_case_production.jpg
+audio:
+    -
+        type: local
+        local:
+            audioFile: georgia_on_my_waltzin_mind.ogg
+            audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: night_track.ogg
+            audioLabel: 'Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: RadioheadByTkc-SalamanderGrandPianoV3.mp3
+            audioLabel: 'Everything In Its Right Place, by Radiohead. Solo rendition by tkc.(Salamander Grand Piano V3 + Zynreverb Room)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: BodySoulByJoostRhodes.mp3
+            audioLabel: 'Body & Soul, by Joost (Pianoteq Fender Rhodes)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: IfIAintGotYou.mp3
+            audioLabel: 'If I Aint Got You, by Alicia Keys. Solo rendition by TKC (Salamander Grand Piano V3 + Dragonfly Hall Reverb'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: PianoteqMidiDemoSteinweyD.mp3
+            audioLabel: 'Pianoteq MIDI demo (Steinwey D)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: SalamanderGrandPianoDemoByHumi.mp3
+            audioLabel: 'Salamander Grand Piano demo, by Humi'
+    -
+        type: local
+        local:
+            audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
+            audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
+    -
+        type: local
+        local:
+            audioFile: RhodesHammondByHumi.mp3
+            audioLabel: 'Rhodes & Hammond, by Humi'
+    -
+        type: local
+        local:
+            audioFile: MorningSunshineByJTunes.mp3
+            audioLabel: 'Morning Sunshine, by JTunes'
+    -
+        type: local
+        local:
+            audioFile: SpaceChoir1ByJTunes.mp3
+            audioLabel: 'Space Choir1, by JTunes'
+    -
+        type: local
+        local:
+            audioFile: CosmicSynthGuitarByJTunes.mp3
+            audioLabel: 'Cosmic Synth Guitar, by JTunes'
+    -
+        type: local
+        local:
+            audioFile: PatMathenyByMauroBorgadelloRhodesStrings.mp3
+            audioLabel: 'Pat Metheny, by Mauro Borgadello (Rhodes+Strings)'
+    -
+        type: local
+        local:
+            audioFile: LovelornManFracescoNutiByMauroBorgadello.mp3
+            audioLabel: 'Lovelorn Man (Francesco Nuti), by Mauro Bordello'
+    -
+        type: local
+        local:
+            audioFile: RelaxingThemeByDhrupadiya.mp3
+            audioLabel: 'Relaxing Theme, by Dhrupadiya'
 ---
 
-[div class="column column-2-3"]
 Zynthian is a great tool for keyboardist wanting to expand their playing possibilities without having to carry heavy and expensive hardware.
 
 Zynthian includes more than 30 synth-engines, hundreds of effects and thousands of presets. You can play the music style you want, recreating vintage instruments or exploring new sounds and textures. You can combine several engines and presets, adjust synth parameters and add effects and filters.
@@ -36,47 +132,3 @@ The _MIDI-clone_ feature is the key to combining several layers for creating lay
 The web configuration tool allows you to add new presets, manage your snaphot library, download your recordings and much more! You can also configure your zynthian to be totally controlled from your keyboard. Every UI action can be mapped to MIDI events.
 
 Default latency and jitter is low enough for most players, but if you are looking for extra-low latency, audio configuration can be tweaked too.
-[/div]
-
-[div class="column column-1-3"]
-
-### Audio
-
-<small>Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)</small>
-![Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)](georgia_on_my_waltzin_mind.ogg?preload=metadata)
-<small>Night Track, by tkc (MDA EPiano + ZASFX + SooperLooper)</small>
-![Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper)](night_track.ogg?preload=metadata)
-<small>Everything In Its Right Place, by Radiohead. Solo rendition by tkc.
-(Salamander Grand Piano V3 + Zynreverb Room)</small>
-![Everything In Its Right Place, by Radiohead. Solo rendition by tkc.(Salamander Grand Piano V3 + Zynreverb Room)](RadioheadByTkc-SalamanderGrandPianoV3.mp3?preload=metadata)
-<small>Body & Soul, by Joost (Rhodes - Pianoteq)</small>
-![Body & Soul, by Joost (Pianoteq Fender Rhodes)](BodySoulByJoostRhodes.mp3?preload=metadata)
-<small>If I Aint Got You, by Alicia Keys. Solo rendition by tkc.
-(Salamander Grand Piano V3 + Dragonfly Hall Reverb)</small>
-![If I Aint Got You, by Alicia Keys. Solo rendition by TKC (Salamander Grand Piano V3 + Dragonfly Hall Reverb)](IfIAintGotYou.mp3?preload=metadata)
-<small>Blues Demo (Steinwey D - Pianoteq)</small>
-![Pianoteq MIDI demo (Steinwey D)](PianoteqMidiDemoSteinweyD.mp3?preload=metadata)
-<small>Demo by Humi (Salamander Grand Piano V2 - LS)</small>
-![Salamander Grand Piano demo, by Humi](SalamanderGrandPianoDemoByHumi.mp3?preload=metadata)
-<small>Hammond Demo, by Baggypants (setBfree)</small>
-![Hammond Drawbars Manipulations, by Baggypants (setBfree)](setBfreeDrawbarsManipulationByBaggypants.mp3?preload=metadata)
-<small>Rhodes & Hammond, by Humi (LS & setBfree)</small>
-![Rhodes & Hammond, by Humi](RhodesHammondByHumi.mp3?preload=metadata)
-<small>Morning Sunshine, by JTunes (ZynAddSubFX)</small>
-![Morning Sunshine, by JTunes](MorningSunshineByJTunes.mp3?preload=metadata)
-<small>Space Choir, by JTunes (ZynAddSubFX)</small>
-![Space Choir1, by JTunes](SpaceChoir1ByJTunes.mp3?preload=metadata)
-<small>Cosmic Synth Guitar, by JTunes (ZynAddSubFX)</small>
-![Cosmic Synth Guitar, by JTunes ](CosmicSynthGuitarByJTunes.mp3?preload=metadata)
-<small>Metheny, by M.Borgadello (Rhodes + Strings)</small>
-![Pat Metheny, by Mauro Borgadello (Rhodes+Strings)](PatMathenyByMauroBorgadelloRhodesStrings.mp3?preload=metadata)
-<small>Lovelorn Man (DX7 EP + Strings + Pad)</small>
-![Lovelorn Man (Francesco Nuti), by Mauro Bordello](LovelornManFracescoNutiByMauroBorgadello.mp3?preload=metadata)
-<small>Relaxing, by Dhrupadiya (Multi-layer)</small>
-![Relaxing Theme, by Dhrupadiya](RelaxingThemeByDhrupadiya.mp3?preload=metadata)
-<!--<small>Smooth Pillow, by Dhrupadiya (Multi-layer)</small>
-![Smooth Pillow, by Dhrupadiya](SmoothPillowByDhrupadiya.mp3?preload=metadata)-->
-<p align="right">
- <a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more demos...</a>
-</p>
-[/div]

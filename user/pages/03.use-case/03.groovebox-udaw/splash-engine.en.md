@@ -12,9 +12,130 @@ limit_reveal: '0'
 media_order: 'BlueBoxIsRoughlyGreatByNicolaz.mp3,ElectroByHumi.mp3,EpicEnteRByRomanGeneralov.mp3,FirstRealSynthByCanTrell.mp3,ForWyleuByHumi.mp3,MonsieurTheActorByRomanGeneralov.mp3,MrTchaikovskyBySm7x7.mp3,OfCourseMyLordByRomanGeneralov.mp3,PPG13ByCanTrell.mp3,RTPMidiCelebrationByJTunes.mp3,TheWeightByBaggyPants.mp3,TripJazzdemoByHumi.mp3,ui_screenshots_sp.png,v5_mixer.png,VasculabCOMPDByCanTrell.mp3,xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3,xcontest23-02-Inneremerald_by_Aethermind.mp3,xcontest23-03-westernbrassband_by_ivaneo.mp3,zcontest23-01-Zynesthesia_by_kosro.mp3,zcontest23-02-Origin_by_danielwine.mp3,zcontest23-03-Everything_must_flow_by_Nicolaz.mp3,zynseq_combined.png,ZynthianicTranceByJtunes.mp3,use-cases-3-new.jpg,_DSC4578_02_web_use_case_production.jpg'
 subtitle: 'A powerful production tool in a small container'
 background: _DSC4578_02_web_use_case_production.jpg
+video:
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=4wJpog5Z5qQ'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=vpkRrzg_h-Q'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=3arcgoKu9T4'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+    -
+        type: youtube
+        youtube:
+            youtubeLink: 'https://www.youtube.com/watch?v=-4YbrNM4zRo'
+            youtubeLabel: ''
+        vimeo:
+            vimeoLink: ''
+            vimeoLabel: ''
+audio:
+    -
+        type: local
+        local:
+            audioFile: zcontest23-01-Zynesthesia_by_kosro.mp3
+            audioLabel: 'Zynesthesia, by Kosro'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: zcontest23-02-Origin_by_danielwine.mp3
+            audioLabel: 'Origin, by Daniel Wine'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3
+            audioLabel: 'The Seas of Mars, by Nicolaz'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: xcontest23-02-Inneremerald_by_Aethermind.mp3
+            audioLabel: 'Inneremerald, by Aethermind'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: zcontest23-03-Everything_must_flow_by_Nicolaz.mp3
+            audioLabel: 'Everything must flow, by Nicolaz'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: xcontest23-03-westernbrassband_by_ivaneo.mp3
+            audioLabel: 'Western Brass Band, by Ivaneo'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: ZynthianicTranceByJtunes.mp3
+            audioLabel: 'Zynthianic Trance, by JTunes'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: PPG13ByCanTrell.mp3
+            audioLabel: 'PPG13, by Can Trell'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: TheWeightByBaggyPants.mp3
+            audioLabel: 'The Weight, by BaggyPants'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: MonsieurTheActorByRomanGeneralov.mp3
+            audioLabel: 'Monsieur The Actor, by R.Generalov'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
+    -
+        type: local
+        local:
+            audioFile: VasculabCOMPDByCanTrell.mp3
+            audioLabel: 'Vasculab COMPD, by Can Trell'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
 ---
 
-[div class="column column-2-3"]
 Zynthian is a powerful tool for live-production and fast song-prototyping. It includes more than 30 synth-engines, hundreds of effects and thousands of presets. It's fully multitimbral, being able to manage up to 16 independent chains including synthesizers, midi processors and audio effects. It supports the LV2-plugin standard, so the list of engines FXs & processors is ever growing.
 
 [figure class=""]![Zynthian UI](v5_mixer.png)[/figure]
@@ -33,32 +154,7 @@ Zynthian can also be controlled from DAWs and external sequencers. It has standa
 Default latency and jitter is low enough for most use-cases, but if you are looking for extra-low latency, audio configuration can be tweaked.
 
 Read the full specifications [here](/technical-specifications).
-[/div]
 
-[div class="column column-1-3"]
-### Audio
-<small>Zynesthesia, by Kosro</small>
-![zcontest23-01-Zynesthesia_by_kosro.mp3](zcontest23-01-Zynesthesia_by_kosro.mp3?preload=metadata)
-<small>Origin, by Daniel Wine</small>
-![zcontest23-02-Origin_by_danielwine.mp3](zcontest23-02-Origin_by_danielwine.mp3?preload=metadata)
-<small>The Seas of Mars, by Nicolaz</small>
-![xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3](xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3?preload=metadata)
-<small>Inneremerald, by Aethermind</small>
-![xcontest23-02-Inneremerald_by_Aethermind.mp3](xcontest23-02-Inneremerald_by_Aethermind.mp3?preload=metadata)
-<small>Everything must flow, by Nicolaz</small>
-![zcontest23-03-Everything_must_flow_by_Nicolaz.mp3](zcontest23-03-Everything_must_flow_by_Nicolaz.mp3?preload=metadata)
-<small>Western Brass Band, by Ivaneo</small>
-![xcontest23-03-westernbrassband_by_ivaneo.mp3](xcontest23-03-westernbrassband_by_ivaneo.mp3?preload=metadata)
-<small>Zynthianic Trance, by JTunes</small>
-![ZynthianicTranceByJtunes.mp3](ZynthianicTranceByJtunes.mp3?preload=metadata)
-<small>PPG13, by Can Trell</small>
-![PPG13ByCanTrell.mp3](PPG13ByCanTrell.mp3?preload=metadata)
-<small>The Weight, by BaggyPants</small>
-![TheWeightByBaggyPants.mp3](TheWeightByBaggyPants.mp3?preload=metadata)
-<small>Monsieur The Actor, by R.Generalov</small>
-![MonsieurTheActorByRomanGeneralov.mp3](MonsieurTheActorByRomanGeneralov.mp3?preload=metadata)
-<small>Vasculab COMPD, by Can Trell</small>
-![VasculabCOMPDByCanTrell.mp3](VasculabCOMPDByCanTrell.mp3?preload=metadata)
 <!--
 <small>Trip Jazz Demo, by Humi</small>
 ![TripJazzdemoByHumi.mp3](TripJazzdemoByHumi.mp3?preload=metadata)
@@ -79,11 +175,5 @@ Read the full specifications [here](/technical-specifications).
 <small>For Wyleu, by Humi</small>
 ![ForWyleuByHumi.mp3](ForWyleuByHumi.mp3)
 -->
-<p align="right"><a href="https://wiki.zynthian.org/index.php/Zynthian_Sound_Demos" target="_blank">more demos...</a></p>
-[/div]
 
-[div class="column column-2"] [plugin:youtube](https://youtu.be/4wJpog5Z5qQ) [/div]
-[div class="column column-2"] [plugin:youtube](https://youtu.be/vpkRrzg_h-Q) [/div]
-[div class="column column-2"]  [plugin:youtube](https://youtu.be/3arcgoKu9T4) [/div]
-[div class="column column-2"] [plugin:youtube](https://youtu.be/-4YbrNM4zRo) [/div]
 
