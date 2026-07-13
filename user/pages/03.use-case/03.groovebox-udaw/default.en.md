@@ -9,9 +9,9 @@ margin_bottom: none
 role: default
 body_classes: 'use-case custom-list'
 limit_reveal: '0'
-media_order: 'BlueBoxIsRoughlyGreatByNicolaz.mp3,ElectroByHumi.mp3,EpicEnteRByRomanGeneralov.mp3,FirstRealSynthByCanTrell.mp3,ForWyleuByHumi.mp3,MonsieurTheActorByRomanGeneralov.mp3,MrTchaikovskyBySm7x7.mp3,OfCourseMyLordByRomanGeneralov.mp3,PPG13ByCanTrell.mp3,RTPMidiCelebrationByJTunes.mp3,TheWeightByBaggyPants.mp3,TripJazzdemoByHumi.mp3,ui_screenshots_sp.png,v5_mixer.png,VasculabCOMPDByCanTrell.mp3,xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3,xcontest23-02-Inneremerald_by_Aethermind.mp3,xcontest23-03-westernbrassband_by_ivaneo.mp3,zcontest23-01-Zynesthesia_by_kosro.mp3,zcontest23-02-Origin_by_danielwine.mp3,zcontest23-03-Everything_must_flow_by_Nicolaz.mp3,zynseq_combined.png,ZynthianicTranceByJtunes.mp3,use-cases-3-new.jpg'
+media_order: 'BlueBoxIsRoughlyGreatByNicolaz.mp3,ElectroByHumi.mp3,EpicEnteRByRomanGeneralov.mp3,FirstRealSynthByCanTrell.mp3,ForWyleuByHumi.mp3,MonsieurTheActorByRomanGeneralov.mp3,MrTchaikovskyBySm7x7.mp3,OfCourseMyLordByRomanGeneralov.mp3,PPG13ByCanTrell.mp3,RTPMidiCelebrationByJTunes.mp3,TheWeightByBaggyPants.mp3,TripJazzdemoByHumi.mp3,ui_screenshots_sp.png,v5_mixer.png,VasculabCOMPDByCanTrell.mp3,xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3,xcontest23-02-Inneremerald_by_Aethermind.mp3,xcontest23-03-westernbrassband_by_ivaneo.mp3,zcontest23-01-Zynesthesia_by_kosro.mp3,zcontest23-02-Origin_by_danielwine.mp3,zcontest23-03-Everything_must_flow_by_Nicolaz.mp3,zynseq_combined.png,ZynthianicTranceByJtunes.mp3,use-cases-3-new.jpg,_DSC4578_02_web_use_case_production.jpg'
 subtitle: 'A powerful production tool in a small container'
-background: use-cases-3-new.jpg
+background: _DSC4578_02_web_use_case_production.jpg
 ---
 
 [div class="column column-2-3"]

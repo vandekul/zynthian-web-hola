@@ -1,6 +1,6 @@
 ---
 title: Zynthian
-media_order: 'zynthian-bg.jpg,hero-bg.jpg,_DSC4398_01_web.jpg'
+media_order: 'zynthian-bg.jpg,hero-bg.jpg,_DSC4398_01_web.jpg,_DSC4362_01_web_use_case_kb_expander.jpg'
 redirect: home
 visible: false
 background: _DSC4398_01_web.jpg

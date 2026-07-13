@@ -1,7 +1,7 @@
 ---
 title: 'Many tools. One instrument.'
 subtitle: 'Expand your sound'
-media_order: use-cases-1-new.jpg
+media_order: 'use-cases-1-new.jpg,use-cases-3-new.jpg,always-with-me-always-with-you.wav,use-cases-2-new.jpg,BodySoulByJoostRhodes.mp3,CrunchGuitarByRodrigoAmaral.mp3,night_track.ogg,zcontest23-01-Zynesthesia_by_kosro.mp3,_DSC4481_02_web_use_case_production.jpg,_DSC4578_02_web_use_case_production.jpg,_DSC4534_01_web_use_case_fx_unit.jpg,_DSC4362_01_web_use_case_kb_expander.jpg'
 background: use-cases-1-new.jpg
 bannerOpacity: '0.2'
 music: night_track.ogg
@@ -23,7 +23,7 @@ usecase:
         learnmoretext: 'Learn more'
         learnmorelink: /use-case/keyboard-expander
         audiourl: night_track.ogg
-        background: use-cases-1-new.jpg
+        background: _DSC4481_02_web_use_case_production.jpg
     -
         icon: 'fa fa-sliders'
         subtitle: 'Shape your sound'
@@ -32,7 +32,7 @@ usecase:
         learnmoretext: 'Learn More'
         learnmorelink: /use-case/effects-unit
         audiourl: CrunchGuitarByRodrigoAmaral.mp3
-        background: use-cases-2-new.jpg
+        background: _DSC4534_01_web_use_case_fx_unit.jpg
     -
         icon: 'fa fa-th'
         subtitle: 'Make Music'
@@ -41,7 +41,7 @@ usecase:
         learnmoretext: 'Learn more'
         learnmorelink: /use-case/groovebox-udaw
         audiourl: zcontest23-01-Zynesthesia_by_kosro.mp3
-        background: use-cases-3-new.jpg
+        background: _DSC4578_02_web_use_case_production.jpg
 ---
 
 Zynthian adapts to the way you create.

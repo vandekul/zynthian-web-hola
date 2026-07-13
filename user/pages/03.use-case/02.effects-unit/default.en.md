@@ -9,9 +9,9 @@ margin_bottom: none
 role: default
 body_classes: 'use-case custom-list'
 limit_reveal: '0'
-media_order: 'always-with-me-always-with-you.wav,CleanGuitarByRodrigoAmaral.mp3,CrunchGuitarByRodrigoAmaral.mp3,ElectroKalimbaMisteryForestDreamByJofemodo.mp3,LeadGuitarByRodrigoAmaral.mp3,ui_screenshots_sl.png,use-cases-2-new.jpg'
+media_order: 'always-with-me-always-with-you.wav,CleanGuitarByRodrigoAmaral.mp3,CrunchGuitarByRodrigoAmaral.mp3,ElectroKalimbaMisteryForestDreamByJofemodo.mp3,LeadGuitarByRodrigoAmaral.mp3,ui_screenshots_sl.png,use-cases-2-new.jpg,_DSC4534_01_web_use_case_fx_unit.jpg'
 subtitle: 'Would you like a custom FX-chain for every song?'
-background: use-cases-2-new.jpg
+background: _DSC4534_01_web_use_case_fx_unit.jpg
 ---
 
 [div class="column column-2-3"]

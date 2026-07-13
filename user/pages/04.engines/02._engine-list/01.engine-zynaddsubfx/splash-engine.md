@@ -22,7 +22,7 @@ taxonomy:
         - ucase-kb
         - ucase-pr
     homepage:
-        - yes
+        - 'yes'
 ---
 
 [div class="column column-2-3"]
@@ -57,7 +57,7 @@ It's a quite complex and very powerful tool that will satisfy the most experienc
 + Microtonal capabilities with any scale, up to 128 notes per octave, and key mapping
 + The graphical user interface can be completely disabled if the user need so
 + Over 1100 high quality instruments included
-[/div]
+[/p]
 
 [div class="column column-1-3"]
 ### Audio

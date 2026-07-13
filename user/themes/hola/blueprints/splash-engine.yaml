@@ -5,8 +5,105 @@ form:
     tabs:
       type: tabs
       active: 1
-
       fields:
+        holaSetings:
+          type: tab
+          title: Hola Settings
+          fields:  
+            audio:
+              type: section
+              title: Audio 
+              underline: true
+              fields:
+                header.audio:
+                  type: list
+                  style: vertical
+                  fields:
+                    .type:
+                      type: elements
+                      label: Audio Type
+                      size: small
+                      default: local
+                      options:
+                        local: Local audio file
+                        soundcloud: Soundcloud Link
+                      fields:
+                        .local:
+                          type: element
+                          fields:
+                            .audioFile:
+                              type: filepicker
+                              folder: '@self'
+                              label: Audio File
+                              accept:
+                                - .mp3
+                                - .ogg
+                                - .wav
+                                - .flac
+                            .audioLabel:
+                              type: text
+                              label: Audio Label
+                        .soundcloud:
+                          type: element
+                          fields:
+                            .audioLink:
+                              type: text
+                              label: Audio Link
+                            .soundcloudLabel:
+                              type: text
+                              label: Audio Label                              
+            video:
+              type: section
+              title: Video               
+              underline: true
+              fields:
+                header.video:
+                  type: list
+                  style: vertical
+                  fields:
+                    .type:
+                      type: elements
+                      label: Video Type
+                      size: small
+                      default: youtube
+                      options:
+                        youtube: Youtube Link
+                        vimeo: Vimeo Link
+                      fields:
+                        youtube:
+                          type: element
+                          fields:
+                            .youtubeLink:
+                              type: text
+                              label: Video Link
+                            .youtubeLabel:
+                              type: text
+                              label: Video Label                            
+                        vimeo:
+                          type: element
+                          fields:
+                            .vimeoLink:
+                              type: text
+                              label: Video Link         
+                            .vimeoLabel:
+                              type: text
+                              label: Video Label
+            urls:
+              type: section
+              title: Links 
+              underline: true
+              fields:
+                header.urls:
+                  type: list
+                  style: vertical
+                  fields:
+                    .urlLink:
+                      type: text
+                      label: Link         
+                    .urlLabel:
+                        type: text
+                        label: Link Label  
+                                               
         engineHeader:
           type: tab
           title: Engine Heading
