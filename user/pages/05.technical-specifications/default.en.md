@@ -10,7 +10,8 @@ descCol2: "* [V5.1 MainBoard](https://shop.zynthian.org)\r\n    * Balanced audio
 background: default.jpg
 ---
 
-[div class="column column-2"]
+[div class="row basic-content"]
+[div class="col-six tab-full left"]
 ## Features
 * Real-time audio processing: low latency & jitter
 * Multi-engine & multi-timbral
@@ -45,7 +46,7 @@ background: default.jpg
 * PureData patches
 * and much more ...
 [/div]
-[div class="column column-2"]
+[div class="col-six tab-full right"]
 ## Hardware (kit v5.1)
 * [V5.1 MainBoard](https://shop.zynthian.org)
     * Balanced audio output (2 channels)
@@ -84,4 +85,5 @@ background: default.jpg
 * [Enclosure](https://shop.zynthian.org)
     * Black anodized aluminum case
     * Laser engraved printings
+[/div]
 [/div]

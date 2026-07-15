@@ -10,14 +10,15 @@ buttonLink: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5&pk_
 smallTitle: video
 cache_enable: false
 noHeader: '1'
+media_order: 'circle-video.png,video.png'
 ---
 
-[div class="column column-3 text-center"] ![](circle-video.png)[/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/dtdIqBiWdjk)    [/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/TWmrk6LlEyg)    [/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/4wJpog5Z5qQ)    [/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/3arcgoKu9T4)    [/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/-4YbrNM4zRo)    [/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/QPQT5gviZbo) [/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/hiCLN25199M)    [/div]
-[div class="column column-3"] [plugin:youtube](https://youtu.be/T3izkId4KS0)    [/div]
+[div class="col-four text-center"] ![](circle-video.png?resize=500,200)[/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/dtdIqBiWdjk)    [/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/TWmrk6LlEyg)    [/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/4wJpog5Z5qQ)    [/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/3arcgoKu9T4)    [/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/-4YbrNM4zRo)    [/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/QPQT5gviZbo) [/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/hiCLN25199M)    [/div]
+[div class="col-four"] [plugin:youtube](https://youtu.be/T3izkId4KS0)    [/div]

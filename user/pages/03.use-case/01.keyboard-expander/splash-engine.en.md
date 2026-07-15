@@ -69,46 +69,73 @@ audio:
         local:
             audioFile: SalamanderGrandPianoDemoByHumi.mp3
             audioLabel: 'Salamander Grand Piano demo, by Humi'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
             audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: RhodesHammondByHumi.mp3
             audioLabel: 'Rhodes & Hammond, by Humi'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: MorningSunshineByJTunes.mp3
             audioLabel: 'Morning Sunshine, by JTunes'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: SpaceChoir1ByJTunes.mp3
             audioLabel: 'Space Choir1, by JTunes'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: CosmicSynthGuitarByJTunes.mp3
             audioLabel: 'Cosmic Synth Guitar, by JTunes'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: PatMathenyByMauroBorgadelloRhodesStrings.mp3
             audioLabel: 'Pat Metheny, by Mauro Borgadello (Rhodes+Strings)'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: LovelornManFracescoNutiByMauroBorgadello.mp3
             audioLabel: 'Lovelorn Man (Francesco Nuti), by Mauro Bordello'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
     -
         type: local
         local:
             audioFile: RelaxingThemeByDhrupadiya.mp3
             audioLabel: 'Relaxing Theme, by Dhrupadiya'
+        soundcloud:
+            audioLink: ''
+            soundcloudLabel: ''
 ---
 
 Zynthian is a great tool for keyboardist wanting to expand their playing possibilities without having to carry heavy and expensive hardware.

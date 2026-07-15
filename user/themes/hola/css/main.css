@@ -4059,8 +4059,8 @@ footer a:hover, footer a:focus {
  * ------------------------------------------------------------------- */
  .s-default{
     background-color: #ffffff;
-    padding-top: 9.6rem;
-    padding-bottom: 10.2rem;
+    padding-top: 4%;
+    padding-bottom: 10%;
     position: relative;
 }
 .s-default .section-intro{
@@ -5163,6 +5163,7 @@ font-size: 14px;
 #engines_filter_cat{
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start;
 }
 
@@ -5238,11 +5239,18 @@ font-size: 14px;
   border: #862121;
 }
 
+
+
+
 /* Tablet */
 @media (max-width: 1024px) {
     .grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    #engines_filter_cat, #engines_filter_tag{
+        justify-content: center;
+    }
+
 }
 
 /* Mòbil */
@@ -5251,32 +5259,9 @@ font-size: 14px;
         grid-template-columns: 1fr;
     }
 
-
 }
 
-@media only screen and (min-width: 768px) {
-    .row .column.column-3 {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
 
-    .row .column.column-9 {
-        flex: 0 0 75%;
-        max-width: 75%;
-    }
-}
-
-#modular-engines .row .column.column-3 {
-    padding: 0;
-}
-
-#modular-engines .row .row {
-    display: flex;
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    margin-bottom: 3rem;
-}
 
 #default audio{
     width: 100%

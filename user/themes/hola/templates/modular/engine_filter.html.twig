@@ -2,15 +2,16 @@
 {% block javascripts %}
     {% do assets.addJs('theme://js/engines_filter.js', { group: 'bottom' }) %}
 {% endblock %}
-<div class="row">
-    <div class="column column-3">
+
+<div class="row basic-content">
+    <div class="col-four tab-full">
         <div id="engines_filter_cat">
             <label><input type="radio" name="engine_cat" id="cat" value="synthesizer" checked="checked"><span class="btn btn--stroke">Synthesizers</span></label>
             <label><input type="radio" name="engine_cat" id="cat" value="effect"><span class="btn btn--stroke">Effects</span></label>
         </div>
     </div>
 
-    <div class="column column-9">
+    <div class="col-eight tab-full">
         <div id="engines_filter_tag">
             <label class="synth fx"><input type="radio" name="tag" id="tag" value="" checked="checked"><span class=" label-name">all</span></label>
             <label class="synth"><input type="radio" name="tag" id="tag" value="synth-mono"><span class=" label-name">monophonic</span></label>
