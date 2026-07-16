@@ -27,7 +27,7 @@
                     <p class="lead">{{ column.secondColumnContent|markdown }}
                     </p>
                     {% for button in column.secondColumnButtons %}
-                        <a class="btn btn--primary full-width" href="#0">{{ button.textButton }}</a>
+                        <a class="{{ button.styleButton }}" href="#0">{{ button.textButton }}</a>
                     {% endfor %}
                 </div>
             </div>

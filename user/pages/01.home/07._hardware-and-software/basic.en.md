@@ -21,6 +21,7 @@ row:
                 linkButton: 'https://os.zynthian.org/zynthianos-last-stable.zip'
                 styleButton: 'btn btn--primary'
 smallTitle: 'Open by design'
+published: false
 ---
 
 Zynthian is built on open hardware and open software.

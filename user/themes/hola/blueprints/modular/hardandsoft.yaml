@@ -40,6 +40,21 @@ form:
                   accept:
                     - .png
                     - .jpg
+                .button:
+                  type: list
+                  label: Add Buttons with link, text and style 
+                  style: vertical
+                  fields:
+                    .textButton:
+                      type: text
+                      label: Text Button
+                    .linkButton:
+                      type: text
+                      label: Link Button                     
+                    .styleButton:
+                      type: text
+                      label: Style Button
+                      description: btn (required) [empty | btn--primary | btn--primary] full-width (optional)                     
             header.software:
               type: section
               title: Software Features
@@ -66,4 +81,19 @@ form:
                   preview_images: true
                   accept:
                     - .png
-                    - .jpg                                  
+                    - .jpg
+                .button:
+                  type: list
+                  label: Add Buttons with link, text and style 
+                  style: vertical
+                  fields:
+                    .textButton:
+                      type: text
+                      label: Text Button
+                    .linkButton:
+                      type: text
+                      label: Link Button                     
+                    .styleButton:
+                      type: text
+                      label: Style Button
+                      description: btn (required) [empty | btn--primary | btn--primary] full-width (optional)                                                     
