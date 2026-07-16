@@ -134,6 +134,9 @@ audio:
         soundcloud:
             audioLink: ''
             soundcloudLabel: ''
+media_thumb: ''
+splash:
+    bg_image_landscape: _DSC4578_02_web_use_case_production.jpg
 ---
 
 Zynthian is a powerful tool for live-production and fast song-prototyping. It includes more than 30 synth-engines, hundreds of effects and thousands of presets. It's fully multitimbral, being able to manage up to 16 independent chains including synthesizers, midi processors and audio effects. It supports the LV2-plugin standard, so the list of engines FXs & processors is ever growing.
