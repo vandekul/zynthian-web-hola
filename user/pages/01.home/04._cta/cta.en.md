@@ -5,7 +5,7 @@ titleLink: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5&pk_v
 buttonText: 'Buy V5.1 KIT'
 buttonLink: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5&pk_vid=462c13278f5e30e41781257411b29b24'
 lead: 'The latest official Zynthian V5 is available as a DIY kit or fully assembled and ready to use. Up to you!'
-subtitle: 'KIT 5.1'
+subtitle: 'KIT v5.1'
 visible: false
 ---
 

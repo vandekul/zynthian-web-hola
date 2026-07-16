@@ -1,5 +1,5 @@
 ---
-title: Zynthian
+title: 'The Open Music Instrument'
 media_order: 'zynthian-bg.jpg,hero-bg.jpg,_DSC4398_01_web.jpg,_DSC4362_01_web_use_case_kb_expander.jpg'
 redirect: home
 visible: false
@@ -38,4 +38,4 @@ social:
         socialIconLink: 'https://www.instagram.com/zynthian/'
 ---
 
-The Open Music Instrument. Any sound, driven by community.
+Any sound you dreamed of in the palm of your hand.
