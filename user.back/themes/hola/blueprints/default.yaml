@@ -1,0 +1,26 @@
+extends@: default
+
+form:
+  fields:
+    tabs:
+      fields:
+        advanced:
+          fields:
+            columns:
+              fields:
+                column1:
+                   fields:
+                     header.body_classes:
+                       markdown: true
+            header.subtitle:
+              type: text
+              label: Subtitle
+            header.background:
+              type: filepicker
+              folder: '@self'
+              label: Select Picture Background
+              description: Best Experience With Dimensions - 3000x2000px.
+              preview_images: true
+              accept:
+                - .png
+                - .jpg

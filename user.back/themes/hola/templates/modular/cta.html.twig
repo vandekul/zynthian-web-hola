@@ -1,0 +1,28 @@
+<section id="{% if page.header.redirect %}{{ page.header.redirect }}{% else %}{{ page.menu|lower|replace({' ': ''}) }}{% endif %}"
+         class="s-cta {{ page.header.sectionBackground }} target-section">
+
+    <div class="row narrow cta section-intro has-bottom-sep">
+
+        <div class="col-full cta__content">
+
+            <h3>{{ page.header.subtitle }}</h3>
+            <h1><a href="{{ page.header.titleLink }}">{{ page.title }}</a></h1>
+
+            <p class="lead"> {{ page.header.lead }} </p>
+            
+
+        </div>
+
+    </div> <!-- end cta -->
+
+    <div class="row narrow  cta__content">
+        <div style="text-align:left">
+            <p> {{ content|raw }} </p>
+        </div>
+
+        <div class="cta__action">
+            <a class="btn btn--primary full-width" href="{{ page.header.buttonLink }}">{{ page.header.buttonText }}</a>
+        </div>
+    </div>
+
+</section>

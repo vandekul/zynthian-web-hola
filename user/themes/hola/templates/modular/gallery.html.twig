@@ -3,15 +3,15 @@
     {% if not(page.header.noHeader) %}
         <div class="row narrow section-intro has-bottom-sep">
             <div class="col-full">
-                <h3>{{ page.header.smallTitle }}</h3>
-                <h1>{{ page.title }}</h1>
-                <p class="lead">{{ page.header.lead }}</p>
+                <h3>{{ page.header.smallTitle | raw }}</h3>
+                <h1>{{ page.title | raw }}</h1>
+                <p class="lead">{{ page.header.lead | raw }}</p>
             </div>
         </div>
     {%endif%}
     <div class="row masonry-wrap">
         <div class="row">        
-            {{ page.content }}
+            {{ page.content | raw }}
         </div>
     </div>
 </section> <!-- end gallery -->

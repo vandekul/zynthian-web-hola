@@ -1,0 +1,33 @@
+<section id="engines"
+        class=" gray-section s-engine {{ page.header.sectionBackground }} target-section">
+    {% if not(page.header.noHeader) %}
+        <div class="row narrow section-intro has-bottom-sep">
+            <div class="col-full">
+                <h3>{{ page.header.smallTitle }}</h3>
+                <h1>{{ page.title }}</h1>
+                <div class="header-lead">{{ page.header.lead }}</div>
+                <div class="engines-content__scroll">
+                    <a href="/engines" class="scroll-link ">
+                        <span>Learn more</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {%endif%}
+
+    <div class="row masonry-wrap">
+        <div class="grid">
+                {% for engine in page.collection('homepage').shuffle() %}
+                    <article class="product-card" data-cat="{{ engine.header.taxonomy.category|join(',') }}" data-tag="{{ engine.header.taxonomy.tag|join(',') }}">
+                        <a class="product-card__link" href="{{ engine.url }}">
+                            {{ engine.media[engine.header.media_thumb].forceResize(375, 375).html()|raw }}
+                            <div class="content">
+                                <h3> {{ engine.title }} </h3>
+                                <p class = "lead"> {{ engine.header.description }} </p>
+                            </div>
+                        </a>
+                    </article>
+                {% endfor %}
+        </div>
+    </div>
+</section> <!-- end engine -->

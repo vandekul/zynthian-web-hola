@@ -1,0 +1,20 @@
+title: 'The Open Music Instrument'
+default_lang: en
+author:
+  name: null
+  email: info@zynthian.org
+taxonomies:
+  - category
+  - tag
+  - homepage
+metadata:
+  description: 'Zynthian, the open music instrument'
+summary:
+  enabled: true
+  format: short
+  size: 300
+  delimiter: '==='
+redirects: null
+routes: null
+blog:
+  route: /blog

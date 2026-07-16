@@ -1,0 +1,9 @@
+version: '1.2'
+timestamp: 1780655548
+count: 1
+index:
+  vande:
+    storage_key: vande
+    storage_timestamp: 1780655548
+    key: vande
+    email: susanna@zynthian.org

@@ -8,4 +8,10 @@ access:
     super: true
   site:
     login: true
+  api:
+    login: true
+    super: true
 hashed_password: $2y$12$sICk139u6ZOBHc.RCjjv0.ivGT/oYEClrlkKOGLSrbSDE.feP3gcK
+admin_next:
+  preferences:
+    editorMode: normal

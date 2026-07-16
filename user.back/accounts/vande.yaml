@@ -1,0 +1,11 @@
+state: enabled
+email: susanna@zynthian.org
+fullname: Susanna
+title: Administrator
+access:
+  admin:
+    login: true
+    super: true
+  site:
+    login: true
+hashed_password: $2y$12$sICk139u6ZOBHc.RCjjv0.ivGT/oYEClrlkKOGLSrbSDE.feP3gcK

@@ -1,3 +1,15 @@
+# v9.1.12
+## 07/14/2026
+
+1. [](#bugfix)
+    * Captcha validation, the `timestamp` and `ip` process actions, and YAML `save` no longer fatal with "Call to a member function on array" — five call sites still treated `Form::value()` as a Data object after the 9.1.11 sandbox fix changed it to return a plain array
+
+# v9.1.11
+## 07/13/2026
+
+1. [](#bugfix)
+    * Form `redirect` and `message` values that use Twig with submitted form data (such as `{{ form.value.email }}`) now resolve again under the content sandbox instead of passing through unevaluated
+
 # v9.1.10
 ## 07/02/2026
 

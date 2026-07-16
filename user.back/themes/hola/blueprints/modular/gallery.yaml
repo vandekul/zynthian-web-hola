@@ -1,0 +1,24 @@
+extends@: default
+
+form:
+  fields:
+    tabs:
+
+      fields:
+        holaSetings:
+          type: tab
+          title: Hola Settings
+
+          fields:
+            header.noHeader:
+                type: checkbox
+                label: Hide header in this section
+                description: Check this field if you want to hide Title, smallTitle and Description
+            header.smallTitle:
+                type: text
+                label: Small Title
+                description: Small Title, text up of title.
+            header.lead:
+                type: text
+                label: Lead Text
+                   

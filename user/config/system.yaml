@@ -129,8 +129,6 @@ twig:
   debug: false
   auto_reload: true
   autoescape: false
-  undefined_functions: true
-  undefined_filters: true
   safe_functions: {  }
   safe_filters: {  }
   umask_fix: false

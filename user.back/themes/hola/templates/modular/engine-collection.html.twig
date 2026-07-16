@@ -1,0 +1,15 @@
+{% block modular_content %}
+<div class="grid">
+    {% for engine in page.collection() %}
+        <article class="product-card" data-cat="{{ engine.header.taxonomy.category|join(',') }}" data-tag="{{ engine.header.taxonomy.tag|join(',') }}">
+            <a class="product-card__link" href="{{ engine.url }}">
+                {{ engine.media[engine.header.media_thumb].forceResize(375, 375).html()|raw }}
+                <div class="content">
+                    <h3> {{ engine.title }} </h3>
+                    <p class = "lead"> {{ engine.header.description }} </p>
+                </div>
+            </a>
+        </article>
+    {% endfor %}
+</div>
+{% endblock %}
