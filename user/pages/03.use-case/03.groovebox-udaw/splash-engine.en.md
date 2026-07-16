@@ -139,22 +139,80 @@ splash:
     bg_image_landscape: _DSC4578_02_web_use_case_production.jpg
 ---
 
-Zynthian is a powerful tool for live-production and fast song-prototyping. It includes more than 30 synth-engines, hundreds of effects and thousands of presets. It's fully multitimbral, being able to manage up to 16 independent chains including synthesizers, midi processors and audio effects. It supports the LV2-plugin standard, so the list of engines FXs & processors is ever growing.
+Zynthian is also a powerful tool for production. It includes more than 30 synth-engines, hundreds of effects and thousands of presets.
 
-[figure class=""]![Zynthian UI](v5_mixer.png)[/figure]
+[figure class=""]![zui_vangelis_add_chain](zui_vangelis_add_chain.png "zui_vangelis_add_chain")[/figure]
 
-It features a step-sequencer with live-performing and song composing modes. The pads interface allows to launch and stop sequences in real-time, having several syncing modes, one-time, loops, etc. The arranger interface manages linear composing.
+It's fully multitimbral, being able to manage up to 16 instrument chains and any number of audio effects, midi processors and mixbuses. It supports the LV2-plugin standard, so the list of available processors is huge and ever growing.
 
-[figure class=""]![Zynthian UI](zynseq_combined.png)[/figure]
+[figure class=""]![01-zui_vangelis_mixerer](01-zui_vangelis_mixerer.png "01-zui_vangelis_mixerer")[/figure]
+[figure class=""]![05-zui_vangelis_chainman](05-zui_vangelis_chainman.png "05-zui_vangelis_chainman")[/figure]
 
-Super-easy midi-learning, rule-based midi-filter, multi-track audio recorder, audio sampler, midi file recorder & player, customized audio & midi routing. PureData & MOD-UI are integrated too.
+It features a powerful step-sequencer with live-performing and song-composing features:
 
-A growing list of supported midi controllers can be used to control zynthian without configuration, totally plug & play:
-[Novation Launchpad, Akai APC, Akai MIDI Mix, ...](https://wiki.zynthian.org/index.php/Supported_MIDI_controllers)<br>
++ high resolution (1920 ppqn)
++ pattern editor (events & blocks)
++ copy/paste & transpose blocks
++ copy/paste patterns
++ live capture
++ undo/redo
++ advanced stutter options:  speed, duration, volume-fade, speed-ramp
++ repeat & randomization options: play/skip chance, play/skip frequency, etc. 
++ parameter automation
++ much more!
 
-Zynthian can also be controlled from DAWs and external sequencers. It has standard MIDI-IN/OUT/THRU connectors, 4 USB ports, WIFI and wired networks, supporting MIDI over network: Apple/RTP-MIDI, IP-multicast and TouchOSC protocols. 
+[figure class=""]![zui_vangelis_pated_stuter](zui_vangelis_pated_stuter.png "zui_vangelis_pated_stuter")[/figure]
 
-Default latency and jitter is low enough for most use-cases, but if you are looking for extra-low latency, audio configuration can be tweaked.
+It also features an advanced audio clip player capable of loading any audio file format, time-stretch and synchronize audio samples, etc.
+
+[figure class=""]![zui_vangelis_clippy](zui_vangelis_clippy.png "zui_vangelis_clippy")[/figure]
+
+The launcher view allows to combine step sequencer patterns and audio clips, starting and stopping them in a synced way, allowing different modes  for one-time, loops, etc. Phrases allows you to structure your songs, automating tempo & time signature changes, defining loops and CODA sections, etc.
+
+[figure class=""]![02-zui_vangelis_launcher](02-zui_vangelis_launcher.png "02-zui_vangelis_launcher")[/figure]
+
+A growing list of midi controllers are supported and can be used to control zynthian without extra configuration, totally plug & play:
+
++ **Novation:** LaunchPad Mini / Pro / X. LaunchKey Mini, etc.
++ **Akai:** APC Key-25, APC 40, MPK mini, MIDI Mix
++ **Korg:** nanoKONTROL
++ **Behringer:** Motör 61 / 49
++ **Arturia:** Keylab 61
++ **Teenage Engeneering:** OP1
++ **Worlde:** Mini
++ **Foxtex:** Mixtab
++ **Mackie (MCU)**
++ etc.
+
+[Here](https://wiki.zynthian.org/index.php/Supported_MIDI_controllers) you can check the list of supported MIDI controllers.<br>
+
+Zynthian can also be controlled from DAWs and external sequencers. It's plenty of connection options:
+
++ legacy MIDI DIN-5 connectors (IN / OUT / THRU)
++ 4 x USB-A ports (host)
++ 1 x USB-B ports (device)
++ Ethernet and WIFI network connectivity
+  
+Supporting several _MIDI over network_ protocols:
+
++ NetUMP (MIDI 2.0)
++ RTP (Apple MIDI)
++ QMidiNet (IP-multicast)
++ TouchOSC (tablet as MIDI controller)
++ etc.
+
+And there is a lot more:
+
++ easy midi-learning with value range and scaling
++ flexible audio & midi routing
++ mixbuses
++ multi-track audio recorder
++ midi recorder and player
++ rule-based midi-filter
++ PureData & Organelle patches
++ MOD-UI integration
+
+Regarding latency and jitter, the default configuration (<10ms) is enough for most players, but if you are looking for extra-low latency, audio configuration can be tweaked.
 
 Read the full specifications [here](/technical-specifications).
 
