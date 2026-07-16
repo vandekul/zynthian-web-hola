@@ -1750,6 +1750,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     }
 }
 
+
 /* -------------------------------------------------------------------
  * ## usecase content - (_site-layout.scss)
  * ------------------------------------------------------------------- */
@@ -5271,3 +5272,6 @@ font-size: 14px;
     background-color: #888888;
     border-color: #000000;
 }
+
+
+/* ---------- HARD & SOFT ---------- */

@@ -1,4 +1,4 @@
-last_checked: 1784191521
+last_checked: 1784196996
 data:
   feed:
     -
@@ -107,7 +107,7 @@ data:
       location:
         - feed
       icon: 🎖
-      message: "Don't forget to star Grav on GitHub!"
+      message: 'Don''t forget to star Grav on GitHub!'
       link: 'https://github.com/getgrav/grav'
   dashboard:
     -

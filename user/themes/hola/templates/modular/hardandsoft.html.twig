@@ -1,0 +1,52 @@
+<section id="hardandsoft"class="s-usecase target-section" >
+    <div class="usecase-content">
+        <div class="row narrow section-intro has-bottom-sep">
+            <div class="col-full text-center">
+                <h3>{{ page.header.smallTitle }}</h3>
+                <h1>{{ page.title }}</h1>
+                <p class="lead">{{ page.content|striptags }}</p>
+            </div>
+        </div>
+        <div>
+            <div class="col-six">
+                <div class="usecase-target">
+                    <div class="row usercase-image" style="background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.1)), 
+                    url({{ page.media[page.header.hardware.background].url }}) no-repeat center center / cover">
+                        <div class="col-full">
+                            <div class="usecase-content__main">
+                                <div class="usecase-line">
+                                    <div class="usecase-ico">
+                                        <i class="fa {{ page.header.hardware.icon }}"></i>
+                                    </div>
+                                </div>
+                                <h3>{{ page.header.hardware.subtitle }}</h3>
+                                <h1> {{ page.header.hardware.title }} </h1>
+                                <p>{{ page.header.hardware.description |markdown }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end usecase-target -->
+            </div>
+            <div class="col-six">
+                <div class="usecase-target">
+                    <div class="row usercase-image" style="background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.1)), 
+                    url({{ page.media[page.header.software.background].url }}) no-repeat center center / cover">
+                        <div class="col-full">
+                            <div class="usecase-content__main">
+                                <div class="usecase-line">
+                                    <div class="usecase-ico">
+                                        <i class="fa {{ page.header.software.icon }}"></i>
+                                    </div>
+                                </div>
+                                <h3>{{ page.header.software.subtitle }}</h3>
+                                <h1> {{ page.header.software.title }} </h1>
+                                <p>{{ page.header.software.description |markdown }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end usecase-target -->
+            </div>
+        </div>
+
+    </div> <!-- end usecase-content -->    
+</section> <!-- end s-usecase -->

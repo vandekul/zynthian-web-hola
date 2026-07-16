@@ -1,0 +1,69 @@
+extends@: default
+
+form:
+  fields:
+    tabs:
+      fields:
+        holaSetings:
+          type: tab
+          title: Hola Settings
+
+          fields:
+            header.smallTitle:
+                type: text
+                label: Small Title
+                description: Small Title, text up of title.             
+            header.hardware:
+              type: section
+              title: Hardware Features
+              text: Include information for Hardware Features
+              underline: true
+              fields:
+                .icon:
+                  type: iconpicker
+                  label: Icon
+                .subtitle:
+                  type: text
+                  label: Subtitle
+                .title:
+                  type: text
+                  label: Title
+                .description:
+                  type: textarea
+                  label: Description
+                .background:
+                  type: filepicker
+                  folder: '@self'
+                  label: Select Picture Background
+                  description: Best Experience With Dimensions - 3000x2000px.
+                  preview_images: true
+                  accept:
+                    - .png
+                    - .jpg
+            header.software:
+              type: section
+              title: Software Features
+              text: Include information for Software Features
+              underline: true
+              fields:
+                .icon:
+                  type: iconpicker
+                  label: Icon
+                .subtitle:
+                  type: text
+                  label: Subtitle
+                .title:
+                  type: text
+                  label: Title
+                .description:
+                  type: textarea
+                  label: Description
+                .background:
+                  type: filepicker
+                  folder: '@self'
+                  label: Select Picture Background
+                  description: Best Experience With Dimensions - 3000x2000px.
+                  preview_images: true
+                  accept:
+                    - .png
+                    - .jpg                                  
