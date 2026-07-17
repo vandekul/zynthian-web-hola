@@ -15,6 +15,7 @@ subtitle: 'Let your fingers play the sound you want'
 splash:
     bg_image_landscape: _DSC4481_02_web_use_case_production.jpg
 media_thumb: _DSC4481_02_web_use_case_production.jpg
+tag: ucase-kb
 audio:
     -
         type: local
@@ -136,6 +137,8 @@ audio:
         soundcloud:
             audioLink: ''
             soundcloudLabel: ''
+noHeader: true
+engines: true
 ---
 
 Zynthian is a great tool for keyboardist wanting to expand their playing possibilities without having to carry heavy and expensive hardware.

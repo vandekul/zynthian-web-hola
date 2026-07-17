@@ -115,7 +115,12 @@ form:
             header.description:
               type: text
               label: Short Description
-
+            header.engines:
+              type: checkbox
+              label: Show Engines?
+            header.tag:
+              type: text
+              label: Tag for Engines (only if show engines is true)        
             header.date:
                 type: datetime
                 label: Data

@@ -14,4 +14,4 @@ access:
 hashed_password: $2y$12$sICk139u6ZOBHc.RCjjv0.ivGT/oYEClrlkKOGLSrbSDE.feP3gcK
 admin_next:
   preferences:
-    editorMode: expert
+    editorMode: normal

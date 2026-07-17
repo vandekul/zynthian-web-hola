@@ -65,6 +65,8 @@ video:
 media_thumb: _DSC4534_01_web_use_case_fx_unit.jpg
 splash:
     bg_image_landscape: _DSC4534_01_web_use_case_fx_unit.jpg
+engines: true
+tag: ucase-fx
 ---
 
 Zynthian can be used as a powerful Audio Effects unit allowing creation of a customized effect-chain for every available audio input.

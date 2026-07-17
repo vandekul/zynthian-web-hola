@@ -137,6 +137,8 @@ audio:
 media_thumb: ''
 splash:
     bg_image_landscape: _DSC4578_02_web_use_case_production.jpg
+engines: true
+tag: ucase-pr
 ---
 
 Zynthian is also a powerful tool for production. It includes more than 30 synth-engines, hundreds of effects and thousands of presets.
