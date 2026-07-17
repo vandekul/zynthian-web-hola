@@ -24,7 +24,7 @@
                                 <p>{{ page.header.hardware.description |markdown }}</p>
 
                                 {% for button in page.header.hardware.button %}
-                                    <a class="{{ button.styleButton }}" href="#0">{{ button.textButton }}</a>
+                                    <a class="{{ button.styleButton }}" href={{ button.linkButton }}>{{ button.textButton }}</a>
                                 {% endfor %}
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                                 <h1> {{ page.header.software.title }} </h1>
                                 <p>{{ page.header.software.description |markdown }}</p>
                                 {% for button in page.header.software.button %}
-                                    <a class="{{ button.styleButton }}" href="#0">{{ button.textButton }}</a>
+                                    <a class="{{ button.styleButton }}" href={{ button.linkButton }}>{{ button.textButton }}</a>
                                 {% endfor %}
                             </div>
                         </div>

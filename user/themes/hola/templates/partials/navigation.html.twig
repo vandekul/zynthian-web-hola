@@ -36,12 +36,12 @@
         {% if module.header.visible %}
             {% if page.slug == 'home' and module.modular_link %}
                 <li class=" {{ current_module }} ">
-                    <a class="smoothscroll"
+                    <a 
                        href="#{% if module.redirect %}{{ module.redirect }}{% else %}{{ module.modular_link|lower }}{% endif %}">{{ module.item_name }}</a>
                 </li>
             {% elseif page.slug == 'home' and not module.modular_link %}
                 <li class=" {{ current_module }} ">
-                    <a class="smoothscroll"
+                    <a 
                        href="#{% if module.redirect %}{{ module.redirect }}{% else %}{{ (module.menu)|lower|replace({' ': ''}) }}{% endif %}">{{ module.menu }}</a>
                 </li>
             {% else %}
@@ -69,12 +69,12 @@
     {% endfor %}
     {% if theme_var('header.button1Text') %}
         <li class=" {{ current_module }} ">
-            <a class="smoothscroll" href={{ theme_var('header.button1Link') }}>{{ theme_var('header.button1Text') }}</a>
+            <a href={{ theme_var('header.button1Link') }}>{{ theme_var('header.button1Text') }}</a>
         </li>
     {%endif%}
     {% if theme_var('header.button2Text') %}
         <li class=" {{ current_module }} ">
-            <a class="smoothscroll" href={{ theme_var('header.button2Link') }}>{{ theme_var('header.button2Text') }}</a>
+            <a href={{ theme_var('header.button2Link') }}>{{ theme_var('header.button2Text') }}</a>
         </li>
     {%endif%}
 </ul>
