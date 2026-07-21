@@ -25,45 +25,25 @@ taxonomy:
         - 'yes'
 audio:
     -
-        type: local
-        local:
-            audioFile: MorningSunshineByJTunes.mp3
-            audioLabel: 'Morning Sunshine, by JTunes (Lead Pad)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: MorningSunshineByJTunes.mp3
+        audioLabel: 'Morning Sunshine, by JTunes (Lead Pad)'
     -
-        type: local
-        local:
-            audioFile: SpaceChoir1ByJTunes.mp3
-            audioLabel: 'Space Choir1, by JTunes'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: SpaceChoir1ByJTunes.mp3
+        audioLabel: 'Space Choir1, by JTunes'
     -
-        type: local
-        local:
-            audioFile: CosmicSynthGuitarByJTunes.mp3
-            audioLabel: 'Cosmic Synth Guitar, by JTunes'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: CosmicSynthGuitarByJTunes.mp3
+        audioLabel: 'Cosmic Synth Guitar, by JTunes'
     -
-        type: local
-        local:
-            audioFile: SmoothPillowByDhrupadiya.mp3
-            audioLabel: 'Smooth Pillow, by Dhrupadiya'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: SmoothPillowByDhrupadiya.mp3
+        audioLabel: 'Smooth Pillow, by Dhrupadiya'
     -
-        type: local
-        local:
-            audioFile: RelaxingThemeByDhrupadiya.mp3
-            audioLabel: 'Relaxing Theme, by Dhrupadiya'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RelaxingThemeByDhrupadiya.mp3
+        audioLabel: 'Relaxing Theme, by Dhrupadiya'
 urls:
     -
         urlLink: 'https://zynaddsubfx.sourceforge.io'

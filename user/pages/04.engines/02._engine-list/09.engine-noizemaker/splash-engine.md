@@ -22,13 +22,8 @@ sitemap:
     lastmod: '07-05-2026 16:46'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=0pl8qZN-vI8'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=0pl8qZN-vI8'
 urls:
     -
         urlLink: 'https://tal-software.com/products/tal-noisemaker'
@@ -41,45 +36,37 @@ urls:
         urlLabel: 'LV2 Source Code'
 audio:
     -
-        type: local
-        local:
-            audioFile: armageddon.ogg
-            audioLabel: Armageddon
+        audioType: local
+        audioFile: armageddon.ogg
+        audioLabel: Armageddon
     -
-        type: local
-        local:
-            audioFile: crazytriangle.ogg
-            audioLabel: 'Crazy Triangle'
+        audioType: local
+        audioFile: crazytriangle.ogg
+        audioLabel: 'Crazy Triangle'
     -
-        type: local
-        local:
-            audioFile: gatedpad.ogg
-            audioLabel: 'Gated Pad'
+        audioType: local
+        audioFile: gatedpad.ogg
+        audioLabel: 'Gated Pad'
     -
-        type: local
-        local:
-            audioFile: luxurylead.ogg
-            audioLabel: 'Luxury Lead'
+        audioType: local
+        audioFile: luxurylead.ogg
+        audioLabel: 'Luxury Lead'
     -
-        type: local
-        local:
-            audioFile: thxforthepeople.ogg
-            audioLabel: 'Thanks for the People'
+        audioType: local
+        audioFile: thxforthepeople.ogg
+        audioLabel: 'Thanks for the People'
     -
-        type: local
-        local:
-            audioFile: arptwentyfiftypunk.ogg
-            audioLabel: 'Arp Twenty Fifty Punk'
+        audioType: local
+        audioFile: arptwentyfiftypunk.ogg
+        audioLabel: 'Arp Twenty Fifty Punk'
     -
-        type: local
-        local:
-            audioFile: lightstorm.ogg
-            audioLabel: 'Light Storm'
+        audioType: local
+        audioFile: lightstorm.ogg
+        audioLabel: 'Light Storm'
     -
-        type: local
-        local:
-            audioFile: ontherun.ogg
-            audioLabel: 'On the Run'
+        audioType: local
+        audioFile: ontherun.ogg
+        audioLabel: 'On the Run'
 ---
 
 TAL-NoizeM4k3r is a subtractive type, mono/polyphonic synth with up to 6 voices per sound, developed by Togu Audio Line (TAL). Its structure is divided into two synth modules, although what is denominated "synth 1" actually controls the two oscillators and LFO 1, whereas _synth 2_ only controls LFO 2 and the filter and amplitude envelopes.

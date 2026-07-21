@@ -23,10 +23,10 @@
                         {% if page.header.video %} 
                             <h2> Video </h2>
                             {% for video in page.header.video %}
-                                {% if video.type == 'youtube' %}
-                                    <small> {{ video.youtube.youtubeLabel }} </small>
+                                <small> {{ video.videoLabel }} </small>
+                                {% if video.videoType == 'youtube' %}
                                     {# Divide la cadena en un máximo de 2 partes #}
-                                    {% set params = video.youtube.youtubeLink|split('v=', 2) %}
+                                    {% set params = video.videoLink|split('v=', 2) %}
 
                                     {% if params[1] is defined %}
                                         {# Extrae hasta el siguiente '&' si lo hay #}
@@ -35,9 +35,8 @@
                                     {% endif %}
                                     <iframe width="100%" src={{ url_embed }} frameborder="0" allowfullscreen></iframe>
                                 {% endif %}
-                                {% if video.type == 'vimeo' %}
-                                    {% set url_embed = "https://player.vimeo.com/video/" ~  video.vimeo.vimeoLink | split('/') | last  %}
-                                    <small> {{ video.vimeo.vimeoLabel }} </small>
+                                {% if video.videoType == 'vimeo' %}
+                                    {% set url_embed = "https://player.vimeo.com/video/" ~  video.videoLink | split('/') | last  %}
                                     <iframe width="100%" src={{ url_embed }} frameborder="0" allowfullscreen></iframe>
                                 {% endif %}
                             {% endfor %}
@@ -46,14 +45,13 @@
                         {% if page.header.audio %} 
                             <h2> Audio </h2>                            
                             {% for audio in page.header.audio %}
-                                {% if audio.type == 'local' %}
-                                    <small> {{ audio.local.audioLabel }} </small>
-                                    {{ page.media[ audio.local.audioFile ].html()|raw }}
+                                <small> {{ audio.audioLabel }} </small>
+                                {% if audio.audioType == 'local' %}
+                                    {{ page.media[ audio.audioFile ].html()|raw }}
                                 {% endif %}
-                                {% if audio.type == 'soundcloud' %}
-                                    <small> {{ audio.soundcloud.soundcloudLabel }} </small>
+                                {% if audio.audioType == 'soundcloud' %}
                                     {# La teva variable amb l'adreça de SoundCloud #}
-                                    {% set url_soundcloud = audio.soundcloud.audioLink %}
+                                    {% set url_soundcloud = audio.audioLink %}
 
                                     {# Concatenem i codifiquem la URL correctament #}
                                     {% set url_embed = "https://w.soundcloud.com/player/?url=" ~ url_soundcloud|url_encode %}

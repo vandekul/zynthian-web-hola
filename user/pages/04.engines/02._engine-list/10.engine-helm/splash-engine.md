@@ -32,45 +32,37 @@ urls:
         urlLabel: 'Source Code'
 audio:
     -
-        type: local
-        local:
-            audioFile: bitofbrush.ogg
-            audioLabel: 'Bit of Brush'
+        audioType: local
+        audioFile: bitofbrush.ogg
+        audioLabel: 'Bit of Brush'
     -
-        type: local
-        local:
-            audioFile: cassiopeiaone.ogg
-            audioLabel: 'Cassiopeia One'
+        audioType: local
+        audioFile: cassiopeiaone.ogg
+        audioLabel: 'Cassiopeia One'
     -
-        type: local
-        local:
-            audioFile: girandoone.ogg
-            audioLabel: 'Girando One'
+        audioType: local
+        audioFile: girandoone.ogg
+        audioLabel: 'Girando One'
     -
-        type: local
-        local:
-            audioFile: supersawmodified.ogg
-            audioLabel: 'Super Saw Modified'
+        audioType: local
+        audioFile: supersawmodified.ogg
+        audioLabel: 'Super Saw Modified'
     -
-        type: local
-        local:
-            audioFile: dripping.ogg
-            audioLabel: Dripping
+        audioType: local
+        audioFile: dripping.ogg
+        audioLabel: Dripping
     -
-        type: local
-        local:
-            audioFile: cassiopeiatwo.ogg
-            audioLabel: 'Cassiopeia Two'
+        audioType: local
+        audioFile: cassiopeiatwo.ogg
+        audioLabel: 'Cassiopeia Two'
     -
-        type: local
-        local:
-            audioFile: expresstwo.ogg
-            audioLabel: 'Express Two'
+        audioType: local
+        audioFile: expresstwo.ogg
+        audioLabel: 'Express Two'
     -
-        type: local
-        local:
-            audioFile: pensivealientwo.ogg
-            audioLabel: 'Pensive Alien Two'
+        audioType: local
+        audioFile: pensivealientwo.ogg
+        audioLabel: 'Pensive Alien Two'
 ---
 
 Helm is an open-source realtime monophonic/polyphonic softsynth developed by Matthew Tytel at Tytel.org. It comes in both 32-bit and 64-bit versions, and can be run as an LV2 plugin or as a standalone instrument. It also includes cross-platform patch loading and saving capability.

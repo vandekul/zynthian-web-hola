@@ -14,126 +14,62 @@ subtitle: 'A powerful production tool in a small container'
 background: _DSC4578_02_web_use_case_production.jpg
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=4wJpog5Z5qQ'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=4wJpog5Z5qQ'
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=vpkRrzg_h-Q'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=vpkRrzg_h-Q'
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=3arcgoKu9T4'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=3arcgoKu9T4'
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=-4YbrNM4zRo'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=-4YbrNM4zRo'
 audio:
     -
-        type: local
-        local:
-            audioFile: zcontest23-01-Zynesthesia_by_kosro.mp3
-            audioLabel: 'Zynesthesia, by Kosro'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: zcontest23-01-Zynesthesia_by_kosro.mp3
+        audioLabel: 'Zynesthesia, by Kosro'
     -
-        type: local
-        local:
-            audioFile: zcontest23-02-Origin_by_danielwine.mp3
-            audioLabel: 'Origin, by Daniel Wine'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: zcontest23-02-Origin_by_danielwine.mp3
+        audioLabel: 'Origin, by Daniel Wine'
     -
-        type: local
-        local:
-            audioFile: xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3
-            audioLabel: 'The Seas of Mars, by Nicolaz'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3
+        audioLabel: 'The Seas of Mars, by Nicolaz'
     -
-        type: local
-        local:
-            audioFile: xcontest23-02-Inneremerald_by_Aethermind.mp3
-            audioLabel: 'Inneremerald, by Aethermind'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: xcontest23-02-Inneremerald_by_Aethermind.mp3
+        audioLabel: 'Inneremerald, by Aethermind'
     -
-        type: local
-        local:
-            audioFile: zcontest23-03-Everything_must_flow_by_Nicolaz.mp3
-            audioLabel: 'Everything must flow, by Nicolaz'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: zcontest23-03-Everything_must_flow_by_Nicolaz.mp3
+        audioLabel: 'Everything must flow, by Nicolaz'
     -
-        type: local
-        local:
-            audioFile: xcontest23-03-westernbrassband_by_ivaneo.mp3
-            audioLabel: 'Western Brass Band, by Ivaneo'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: xcontest23-03-westernbrassband_by_ivaneo.mp3
+        audioLabel: 'Western Brass Band, by Ivaneo'
     -
-        type: local
-        local:
-            audioFile: ZynthianicTranceByJtunes.mp3
-            audioLabel: 'Zynthianic Trance, by JTunes'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: ZynthianicTranceByJtunes.mp3
+        audioLabel: 'Zynthianic Trance, by JTunes'
     -
-        type: local
-        local:
-            audioFile: PPG13ByCanTrell.mp3
-            audioLabel: 'PPG13, by Can Trell'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: PPG13ByCanTrell.mp3
+        audioLabel: 'PPG13, by Can Trell'
     -
-        type: local
-        local:
-            audioFile: TheWeightByBaggyPants.mp3
-            audioLabel: 'The Weight, by BaggyPants'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: TheWeightByBaggyPants.mp3
+        audioLabel: 'The Weight, by BaggyPants'
     -
-        type: local
-        local:
-            audioFile: MonsieurTheActorByRomanGeneralov.mp3
-            audioLabel: 'Monsieur The Actor, by R.Generalov'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: MonsieurTheActorByRomanGeneralov.mp3
+        audioLabel: 'Monsieur The Actor, by R.Generalov'
     -
-        type: local
-        local:
-            audioFile: VasculabCOMPDByCanTrell.mp3
-            audioLabel: 'Vasculab COMPD, by Can Trell'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: VasculabCOMPDByCanTrell.mp3
+        audioLabel: 'Vasculab COMPD, by Can Trell'
 media_thumb: ''
 splash:
     bg_image_landscape: _DSC4578_02_web_use_case_production.jpg

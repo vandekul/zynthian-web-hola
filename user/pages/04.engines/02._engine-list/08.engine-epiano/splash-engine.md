@@ -20,29 +20,17 @@ sitemap:
     lastmod: '07-05-2026 16:22'
 audio:
     -
-        type: local
-        local:
-            audioFile: georgia_on_my_waltzin_mind.ogg
-            audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: georgia_on_my_waltzin_mind.ogg
+        audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
     -
-        type: local
-        local:
-            audioFile: night_track.ogg
-            audioLabel: 'Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: night_track.ogg
+        audioLabel: 'Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper)'
     -
-        type: local
-        local:
-            audioFile: DemoEPianoByBaggyPants.ogg
-            audioLabel: 'Demo MDA-ePiano, by Baggypants'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: DemoEPianoByBaggyPants.ogg
+        audioLabel: 'Demo MDA-ePiano, by Baggypants'
 urls:
     -
         urlLink: 'https://gitlab.com/drobilla/mda-lv2'

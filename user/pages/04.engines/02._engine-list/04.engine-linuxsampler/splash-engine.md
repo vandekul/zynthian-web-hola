@@ -19,45 +19,25 @@ sitemap:
     lastmod: '07-05-2026 14:59'
 audio:
     -
-        type: local
-        local:
-            audioFile: RadioheadByTkc-SalamanderGrandPianoV3.mp3
-            audioLabel: 'Everything In Its Right Place, by Radiohead. Solo rendition by tkc.(Salamander Grand Piano V3 + Zynreverb Room)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RadioheadByTkc-SalamanderGrandPianoV3.mp3
+        audioLabel: 'Everything In Its Right Place, by Radiohead. Solo rendition by tkc.(Salamander Grand Piano V3 + Zynreverb Room)'
     -
-        type: local
-        local:
-            audioFile: IfIAintGotYou.mp3
-            audioLabel: 'If I Aint Got You, by Alicia Keys. Solo rendition by TKC (Salamander Grand Piano V3 + Dragonfly Hall Reverb'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: IfIAintGotYou.mp3
+        audioLabel: 'If I Aint Got You, by Alicia Keys. Solo rendition by TKC (Salamander Grand Piano V3 + Dragonfly Hall Reverb'
     -
-        type: local
-        local:
-            audioFile: OrionsBelt.ogg
-            audioLabel: 'Orion''s Belt, MIDI Sequenced'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: OrionsBelt.ogg
+        audioLabel: 'Orion''s Belt, MIDI Sequenced'
     -
-        type: local
-        local:
-            audioFile: SalamanderGrandPianoDemoByHumi.mp3
-            audioLabel: 'Demo, by Humi (Salamander Grand Piano SFZ)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: SalamanderGrandPianoDemoByHumi.mp3
+        audioLabel: 'Demo, by Humi (Salamander Grand Piano SFZ)'
     -
-        type: local
-        local:
-            audioFile: RhodesHammondByHumi.mp3
-            audioLabel: 'Too many EPs, by Humi (Straight Rhodes SFZ)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RhodesHammondByHumi.mp3
+        audioLabel: 'Too many EPs, by Humi (Straight Rhodes SFZ)'
 urls:
     -
         urlLink: 'https://linuxsampler.org'

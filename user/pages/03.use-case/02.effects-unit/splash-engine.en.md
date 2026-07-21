@@ -14,54 +14,30 @@ subtitle: 'Would you like a custom FX-chain for every song?'
 background: _DSC4534_01_web_use_case_fx_unit.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: always-with-me-always-with-you.wav
-            audioLabel: 'Always with me, always with you (Joe Satriani, played by Stojos)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: always-with-me-always-with-you.wav
+        audioLabel: 'Always with me, always with you (Joe Satriani, played by Stojos)'
     -
-        type: local
-        local:
-            audioFile: CleanGuitarByRodrigoAmaral.mp3
-            audioLabel: 'Clean Guitar, by Rodrigo Amaral'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: CleanGuitarByRodrigoAmaral.mp3
+        audioLabel: 'Clean Guitar, by Rodrigo Amaral'
     -
-        type: local
-        local:
-            audioFile: ' CrunchGuitarByRodrigoAmaral.mp3'
-            audioLabel: 'Crunch Guitar, by Rodrigo Amaral'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: ''
+        audioLabel: 'Crunch Guitar, by Rodrigo Amaral'
     -
-        type: local
-        local:
-            audioFile: LeadGuitarByRodrigoAmaral.mp3
-            audioLabel: 'Lead Guitar, by Rodrigo Amaral'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: LeadGuitarByRodrigoAmaral.mp3
+        audioLabel: 'Lead Guitar, by Rodrigo Amaral'
     -
-        type: local
-        local:
-            audioFile: ElectroKalimbaMisteryForestDreamByJofemodo.mp3
-            audioLabel: 'Kalimba Mistery Forest Dream, by Jofemodo'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: ElectroKalimbaMisteryForestDreamByJofemodo.mp3
+        audioLabel: 'Kalimba Mistery Forest Dream, by Jofemodo'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=QPQT5gviZbo'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=QPQT5gviZbo'
+        videoLabel: ''
 media_thumb: _DSC4534_01_web_use_case_fx_unit.jpg
 splash:
     bg_image_landscape: _DSC4534_01_web_use_case_fx_unit.jpg

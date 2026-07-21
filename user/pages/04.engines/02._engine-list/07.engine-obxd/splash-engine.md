@@ -23,62 +23,33 @@ sitemap:
     lastmod: '07-05-2026 16:19'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=NdfcgiLsp88'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=NdfcgiLsp88'
 audio:
     -
-        type: local
-        local:
-            audioFile: OBXdLoveByHumi.mp3
-            audioLabel: 'Oberheim Love, by Humi'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: OBXdLoveByHumi.mp3
+        audioLabel: 'Oberheim Love, by Humi'
     -
-        type: local
-        local:
-            audioFile: chirpybellstwo.ogg
-            audioLabel: 'Chirpy Bells 2'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: chirpybellstwo.ogg
+        audioLabel: 'Chirpy Bells 2'
     -
-        type: local
-        local:
-            audioFile: lotshappenin.ogg
-            audioLabel: 'Lots Happenin'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: lotshappenin.ogg
+        audioLabel: 'Lots Happenin'
     -
-        type: local
-        local:
-            audioFile: madderthan.ogg
-            audioLabel: Madderthan
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: madderthan.ogg
+        audioLabel: Madderthan
     -
-        type: local
-        local:
-            audioFile: saladdressing.ogg
-            audioLabel: 'Salad Dressing'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: saladdressing.ogg
+        audioLabel: 'Salad Dressing'
     -
-        type: local
-        local:
-            audioFile: withair.ogg
-            audioLabel: Withair
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: withair.ogg
+        audioLabel: Withair
 urls:
     -
         urlLink: 'http://www.linuxsynths.com/ObxdPatchesDemos/obxd.html'

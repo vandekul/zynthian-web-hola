@@ -37,22 +37,13 @@ urls:
         urlLabel: 'Yamaha DX7 Info'
 audio:
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/starling-studios/mmoncur-hexed-osc74'
-            soundcloudLabel: 'mmoncur - Hexed (OSC74)'
+        audioLink: 'https://soundcloud.com/starling-studios/mmoncur-hexed-osc74'
+        audioLabel: 'mmoncur - Hexed (OSC74)'
+        audioType: soundcloud
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=wSs1-020nNY'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=wSs1-020nNY'
 ---
 
 Dexed is a FM-type softsynth developed by Pascal Gauthier of Digital Suburban. It is an ideal application for importing, playing and editing/managing sysex patches from both the classic Yamaha DX7 synthesizer and the TX7.

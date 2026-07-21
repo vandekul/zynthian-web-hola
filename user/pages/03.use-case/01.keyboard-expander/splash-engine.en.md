@@ -18,125 +18,67 @@ media_thumb: _DSC4481_02_web_use_case_production.jpg
 tag: ucase-kb
 audio:
     -
-        type: local
-        local:
-            audioFile: georgia_on_my_waltzin_mind.ogg
-            audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: georgia_on_my_waltzin_mind.ogg
+        audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
     -
-        type: local
-        local:
-            audioFile: night_track.ogg
-            audioLabel: 'Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: night_track.ogg
+        audioLabel: 'Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper'
+
     -
-        type: local
-        local:
-            audioFile: RadioheadByTkc-SalamanderGrandPianoV3.mp3
-            audioLabel: 'Everything In Its Right Place, by Radiohead. Solo rendition by tkc.(Salamander Grand Piano V3 + Zynreverb Room)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RadioheadByTkc-SalamanderGrandPianoV3.mp3
+        audioLabel: 'Everything In Its Right Place, by Radiohead. Solo rendition by tkc.(Salamander Grand Piano V3 + Zynreverb Room)'
     -
-        type: local
-        local:
-            audioFile: BodySoulByJoostRhodes.mp3
-            audioLabel: 'Body & Soul, by Joost (Pianoteq Fender Rhodes)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: BodySoulByJoostRhodes.mp3
+        audioLabel: 'Body & Soul, by Joost (Pianoteq Fender Rhodes)'
     -
-        type: local
-        local:
-            audioFile: IfIAintGotYou.mp3
-            audioLabel: 'If I Aint Got You, by Alicia Keys. Solo rendition by TKC (Salamander Grand Piano V3 + Dragonfly Hall Reverb'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: IfIAintGotYou.mp3
+        audioLabel: 'If I Aint Got You, by Alicia Keys. Solo rendition by TKC (Salamander Grand Piano V3 + Dragonfly Hall Reverb'
     -
-        type: local
-        local:
-            audioFile: PianoteqMidiDemoSteinweyD.mp3
-            audioLabel: 'Pianoteq MIDI demo (Steinwey D)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: PianoteqMidiDemoSteinweyD.mp3
+        audioLabel: 'Pianoteq MIDI demo (Steinwey D)'
     -
-        type: local
-        local:
-            audioFile: SalamanderGrandPianoDemoByHumi.mp3
-            audioLabel: 'Salamander Grand Piano demo, by Humi'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: SalamanderGrandPianoDemoByHumi.mp3
+        audioLabel: 'Salamander Grand Piano demo, by Humi'
     -
-        type: local
-        local:
-            audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
-            audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
+        audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
     -
-        type: local
-        local:
-            audioFile: RhodesHammondByHumi.mp3
-            audioLabel: 'Rhodes & Hammond, by Humi'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RhodesHammondByHumi.mp3
+        audioLabel: 'Rhodes & Hammond, by Humi'
     -
-        type: local
-        local:
-            audioFile: MorningSunshineByJTunes.mp3
-            audioLabel: 'Morning Sunshine, by JTunes'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: MorningSunshineByJTunes.mp3
+        audioLabel: 'Morning Sunshine, by JTunes'
     -
-        type: local
-        local:
-            audioFile: SpaceChoir1ByJTunes.mp3
-            audioLabel: 'Space Choir1, by JTunes'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: SpaceChoir1ByJTunes.mp3
+        audioLabel: 'Space Choir1, by JTunes'
     -
-        type: local
-        local:
-            audioFile: CosmicSynthGuitarByJTunes.mp3
-            audioLabel: 'Cosmic Synth Guitar, by JTunes'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: CosmicSynthGuitarByJTunes.mp3
+        audioLabel: 'Cosmic Synth Guitar, by JTunes'
     -
-        type: local
-        local:
-            audioFile: PatMathenyByMauroBorgadelloRhodesStrings.mp3
-            audioLabel: 'Pat Metheny, by Mauro Borgadello (Rhodes+Strings)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: PatMathenyByMauroBorgadelloRhodesStrings.mp3
+        audioLabel: 'Pat Metheny, by Mauro Borgadello (Rhodes+Strings)'
     -
-        type: local
-        local:
-            audioFile: LovelornManFracescoNutiByMauroBorgadello.mp3
-            audioLabel: 'Lovelorn Man (Francesco Nuti), by Mauro Bordello'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: LovelornManFracescoNutiByMauroBorgadello.mp3
+        audioLabel: 'Lovelorn Man (Francesco Nuti), by Mauro Bordello'
     -
-        type: local
-        local:
-            audioFile: RelaxingThemeByDhrupadiya.mp3
-            audioLabel: 'Relaxing Theme, by Dhrupadiya'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RelaxingThemeByDhrupadiya.mp3
+        audioLabel: 'Relaxing Theme, by Dhrupadiya'
+
 noHeader: true
 engines: true
 ---

@@ -19,37 +19,21 @@ splash:
 media_thumb: aeolus.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: Franck-bv.ogg
-            audioLabel: 'Prelude, by C. Franck'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Franck-bv.ogg
+        audioLabel: 'Prelude, by C. Franck'
     -
-        type: local
-        local:
-            audioFile: BWV564b-mn.ogg
-            audioLabel: 'J.S. Bach, Adagio BWV564, by Matthias Nagorni'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: BWV564b-mn.ogg
+        audioLabel: 'J.S. Bach, Adagio BWV564, by Matthias Nagorni'
     -
-        type: local
-        local:
-            audioFile: Triosonata.ogg
-            audioLabel: 'J.S. Bach, Trisonata, by Matthias Nagorni'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Triosonata.ogg
+        audioLabel: 'J.S. Bach, Trisonata, by Matthias Nagorni'
     -
-        type: local
-        local:
-            audioFile: BWV650-bv.ogg
-            audioLabel: 'J.S. Bach, Kommst Du nun, by Bert Visser'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: BWV650-bv.ogg
+        audioLabel: 'J.S. Bach, Kommst Du nun, by Bert Visser'
 urls:
     -
         urlLink: ' https://kokkinizita.linuxaudio.org/linuxaudio/aeolus/index.html'

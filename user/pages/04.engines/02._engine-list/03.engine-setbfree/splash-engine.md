@@ -31,38 +31,22 @@ urls:
         urlLabel: 'Source Code'
 video:
     -
-        type: vimeo
-        youtube:
-            youtubeLink: ''
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: 'https://vimeo.com/130633814'
-            vimeoLabel: 'A rendition of Jimmy Smith''s The Cat'
+        videoType: vimeo
+        videoLink: 'https://vimeo.com/130633814'
+        videoLabel: 'A rendition of Jimmy Smith''s The Cat'
 audio:
     -
-        type: local
-        local:
-            audioFile: georgia_on_my_waltzin_mind.ogg
-            audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: georgia_on_my_waltzin_mind.ogg
+        audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
     -
-        type: local
-        local:
-            audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
-            audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
+        audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
     -
-        type: local
-        local:
-            audioFile: RhodesHammondByHumi.mp3
-            audioLabel: 'Rhodes & Hammond, by Humi'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RhodesHammondByHumi.mp3
+        audioLabel: 'Rhodes & Hammond, by Humi'
 ---
 
 setBfree is a MIDI-controlled software synthesizer designed to imitate the sound and properties of the electromechanical organs and sound modification devices that brought world-wide fame to the names and products of Laurens Hammond and Don Leslie.

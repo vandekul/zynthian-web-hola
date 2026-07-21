@@ -18,13 +18,8 @@ sitemap:
     lastmod: '29-10-2024 12:40'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=zwLBSVSFxVg'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=zwLBSVSFxVg'
 urls:
     -
         urlLink: 'https://fluidsynth.org'
@@ -34,23 +29,17 @@ urls:
         urlLabel: 'Source Code'
 audio:
     -
-        type: local
-        local:
-            audioFile: 01-MCW-EmergentMusics.mp3
-            audioLabel: 'Emergent Musics 01, by Mark Conway Wirt'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: 01-MCW-EmergentMusics.mp3
+        audioLabel: 'Emergent Musics 01, by Mark Conway Wirt'
     -
-        type: local
-        local:
-            audioFile: 02-MCW-EmergentMusics.mp3
-            audioLabel: 'Emergent Musics 02, by Mark Conway Wirt'
+        audioType: local
+        audioFile: 02-MCW-EmergentMusics.mp3
+        audioLabel: 'Emergent Musics 02, by Mark Conway Wirt'
     -
-        type: local
-        local:
-            audioFile: 09-MCW-EmergentMusics.mp3
-            audioLabel: 'Emergent Musics 09, by Mark Conway Wirt'
+        audioType: local
+        audioFile: 09-MCW-EmergentMusics.mp3
+        audioLabel: 'Emergent Musics 09, by Mark Conway Wirt'
 ---
 
 FluidSynth is a real-time software synthesizer based on the SoundFont-2 specifications and has reached widespread distribution. FluidSynth itself does not have a graphical user interface, but due to its powerful API several applications utilize it and it has even found its way onto embedded systems and is used in some mobile apps.
