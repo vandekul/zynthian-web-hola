@@ -25,50 +25,41 @@ urls:
         urlLabel: 'MDA-LV2 Source Code'
 audio:
     -
-        type: local
-        local:
-            audioFile: fifthsweeppad.ogg
-            audioLabel: 'Fifth Sweep Pad'
+        audioType: local
+        audioFile: fifthsweeppad.ogg
+        audioLabel: 'Fifth Sweep Pad'
     -
-        type: local
-        local:
-            audioFile: hardlead.ogg
-            audioLabel: 'Hard Lead'
+        audioType: local
+        audioFile: hardlead.ogg
+        audioLabel: 'Hard Lead'
     -
-        type: local
-        local:
-            audioFile: solidbacking.ogg
-            audioLabel: 'Solid Backing'
+        audioType: local
+        audioFile: solidbacking.ogg
+        audioLabel: 'Solid Backing'
     -
-        type: local
-        local:
-            audioFile: detunedsynbrass.ogg
-            audioLabel: 'Detuned Syn-Brass'
+        audioType: local
+        audioFile: detunedsynbrass.ogg
+        audioLabel: 'Detuned Syn-Brass'
     -
-        type: local
-        local:
-            audioFile: sawbass.ogg
-            audioLabel: 'Saw Bass'
+        audioType: local
+        audioFile: sawbass.ogg
+        audioLabel: 'Saw Bass'
     -
-        type: local
-        local:
-            audioFile: touchyfellow.ogg
-            audioLabel: 'Touchy Fellow'
+        audioType: local
+        audioFile: touchyfellow.ogg
+        audioLabel: 'Touchy Fellow'
     -
-        type: local
-        local:
-            audioFile: helicopter.ogg
-            audioLabel: Helicopter
+        audioType: local
+        audioFile: helicopter.ogg
+        audioLabel: Helicopter
     -
-        type: local
-        local:
-            audioFile: wobblebass.ogg
-            audioLabel: 'Wobble Bass'
+        audioType: local
+        audioFile: wobblebass.ogg
+        audioLabel: 'Wobble Bass'
     -
-        type: local
-        local:
-            audioFile: filterdemo.ogg
-            audioLabel: 'Filter Demo'
+        audioType: local
+        audioFile: filterdemo.ogg
+        audioLabel: 'Filter Demo'
 ---
 
 MDA JX-10 is a substractive soft-synth inspired by some Roland machines from the 80s. It consumes very little resources and the sound quality is great.

@@ -25,22 +25,13 @@ splash:
 media_thumb: redwave.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: angie-20141010_follow.ogg
-            audioLabel: 'Follow, by Angie Hudson (2013)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: angie-20141010_follow.ogg
+        audioLabel: 'Follow, by Angie Hudson (2013)'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=MGErjKRu_dQ'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=MGErjKRu_dQ'
 urls:
     -
         urlLink: 'http://www.zamaudio.com/'

@@ -21,30 +21,25 @@ sitemap:
     lastmod: '07-05-2026 17:02'
 audio:
     -
-        type: local
-        local:
-            audioFile: angrysweep.ogg
-            audioLabel: 'Angry Sweep'
+        audioType: local
+        audioFile: angrysweep.ogg
+        audioLabel: 'Angry Sweep'
     -
-        type: local
-        local:
-            audioFile: quartet.ogg
-            audioLabel: Quartet
+        audioType: local
+        audioFile: quartet.ogg
+        audioLabel: Quartet
     -
-        type: local
-        local:
-            audioFile: soloist.ogg
-            audioLabel: Soloist
+        audioType: local
+        audioFile: soloist.ogg
+        audioLabel: Soloist
     -
-        type: local
-        local:
-            audioFile: sonataflair.ogg
-            audioLabel: 'Sonata Flair'
+        audioType: local
+        audioFile: sonataflair.ogg
+        audioLabel: 'Sonata Flair'
     -
-        type: local
-        local:
-            audioFile: sonataflairsub.ogg
-            audioLabel: 'Sonata Flair Sub'
+        audioType: local
+        audioFile: sonataflairsub.ogg
+        audioLabel: 'Sonata Flair Sub'
 urls:
     -
         urlLink: 'http://www.linuxsynths.com/RaffosynthPatchesDemos/raffosynth.html'

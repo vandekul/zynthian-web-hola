@@ -20,21 +20,13 @@ splash:
 media_thumb: pianoteq6.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: BodySoulByJoostRhodes.mp3
-            audioLabel: 'Body & Soul, by Joost (Pianoteq Fender Rhodes)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: BodySoulByJoostRhodes.mp3
+        audioLabel: 'Body & Soul, by Joost (Pianoteq Fender Rhodes)'
     -
-        type: local
-        local:
-            audioFile: PianoteqMidiDemoSteinweyD.mp3
-            audioLabel: 'Pianoteq MIDI demo (Steinwey Model D)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: PianoteqMidiDemoSteinweyD.mp3
+        audioLabel: 'Pianoteq MIDI demo (Steinwey Model D)'
 urls:
     -
         urlLink: 'https://www.modartt.com/pianoteq'

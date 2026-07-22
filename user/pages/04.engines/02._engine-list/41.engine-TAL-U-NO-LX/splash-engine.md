@@ -17,86 +17,47 @@ splash:
 media_thumb: TAL-U-NO-LX.jpg
 audio:
     -
-        type: soundcloud
-        local:
-            audioFile: 'https://tal-software.com//downloads/mp3/TAL-U-No-LX-demo-fmr.mp3'
-            audioLabel: 'Demo by Fernando Manuel Rodrigues (FMR)'
-        soundcloud:
-            audioLink: 'https://soundcloud.com/the-unfinished/sets/uno-lx-lunox-demo-tracks'
-            soundcloudLabel: 'Uno LX Lunox Demo Tracks'
+        audioType: local
+        audioFile: 'https://tal-software.com//downloads/mp3/TAL-U-No-LX-demo-fmr.mp3'
+        audioLabel: 'Demo by Fernando Manuel Rodrigues (FMR)'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/app-sound/tal-u-no-lx-cosmic-synth'
-            soundcloudLabel: 'TAL-U-No-LX Cosmic Synth'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/the-unfinished/sets/uno-lx-lunox-demo-tracks'
+        audioLabel: 'Uno LX Lunox Demo Tracks'
     -
-        type: soundcloud
-        local:
-            audioFile: '![Opulenta Plus Demo](https://soundcloud.com/saif_sameer/opulenta-plus-demo)'
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/saif_sameer/opulenta-plus-demo'
-            soundcloudLabel: 'Opulenta Plus Demo'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/app-sound/tal-u-no-lx-cosmic-synth'
+        audioLabel: 'TAL-U-No-LX Cosmic Synth'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/pierre-olivier-haas-340667960/coming-back'
-            soundcloudLabel: 'Coming Back - P.O Haas'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/saif_sameer/opulenta-plus-demo'
+        audioLabel: 'Opulenta Plus Demo'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/alexandros-music/alexandros-juno-breath'
-            soundcloudLabel: 'ALEXANDROS-JUNO BREATH'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/pierre-olivier-haas-340667960/coming-back'
+        audioLabel: 'Coming Back - P.O Haas'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/solidtrax/solidtrax-tal-u-no-lx-20'
-            soundcloudLabel: 'Solidtrax - Twenthy (TAL-U-NO-LX Demo)'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/alexandros-music/alexandros-juno-breath'
+        audioLabel: 'ALEXANDROS-JUNO BREATH'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/tal-togu-audio-line/juno-60-vs-tal-u-no-lx'
-            soundcloudLabel: 'Juno 60 vs TAL-U-NO-LX'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/solidtrax/solidtrax-tal-u-no-lx-20'
+        audioLabel: 'Solidtrax - Twenthy (TAL-U-NO-LX Demo)'
+    -
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/tal-togu-audio-line/juno-60-vs-tal-u-no-lx'
+        audioLabel: 'Juno 60 vs TAL-U-NO-LX'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=keXGZdIgCQc'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=keXGZdIgCQc'
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=Q88XxFJKTOk'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=Q88XxFJKTOk'
     -
-        type: vimeo
-        youtube:
-            youtubeLink: ''
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: 'https://vimeo.com/989420290'
-            vimeoLabel: ''
+        videoType: vimeo
+        videoLink: 'https://vimeo.com/989420290'
 urls:
     -
         urlLink: 'https://tal-software.com/products/tal-u-no-lx'

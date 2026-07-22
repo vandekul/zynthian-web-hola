@@ -21,29 +21,17 @@ splash:
 media_thumb: argotlunar.png
 audio:
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/t800infiltrator/argotlunar'
-            soundcloudLabel: 'Argotlunar, by t800infiltrator'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/t800infiltrator/argotlunar'
+        audioLabel: 'Argotlunar, by t800infiltrator'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/ioflow/20110912a'
-            soundcloudLabel: '20110912, by ioflow'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/ioflow/20110912a'
+        audioLabel: '20110912, by ioflow'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/pneuman/rpm-2012-lagrange'
-            soundcloudLabel: 'RPM 2012: lagrange, by pneuman'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/pneuman/rpm-2012-lagrange'
+        audioLabel: 'RPM 2012: lagrange, by pneuman'
 urls:
     -
         urlLink: 'http://mourednik.github.io/argotlunar/)'

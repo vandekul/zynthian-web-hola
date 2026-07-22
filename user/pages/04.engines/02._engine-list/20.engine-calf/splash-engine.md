@@ -24,77 +24,43 @@ splash:
 media_thumb: calf.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: Compressor-DrySignal.ogg
-            audioLabel: 'Compressor Dry Signal'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Compressor-DrySignal.ogg
+        audioLabel: 'Compressor Dry Signal'
     -
-        type: local
-        local:
-            audioFile: Compressor.ogg
-            audioLabel: Compressor
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Compressor.ogg
+        audioLabel: Compressor
     -
-        type: local
-        local:
-            audioFile: Guitar-Dry.ogg
-            audioLabel: 'Guitar Dry'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Guitar-Dry.ogg
+        audioLabel: 'Guitar Dry'
     -
-        type: local
-        local:
-            audioFile: Guitar-Filter.ogg
-            audioLabel: 'Guitar Filter'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Guitar-Filter.ogg
+        audioLabel: 'Guitar Filter'
     -
-        type: local
-        local:
-            audioFile: Guitar-Multichorus.ogg
-            audioLabel: 'Guitar Multichorus'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Guitar-Multichorus.ogg
+        audioLabel: 'Guitar Multichorus'
+
     -
-        type: local
-        local:
-            audioFile: Guitar-Phaser.ogg
-            audioLabel: 'Guitar Phaser'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Guitar-Phaser.ogg
+        audioLabel: 'Guitar Phaser'
     -
-        type: local
-        local:
-            audioFile: Guitar-Saturator.ogg
-            audioLabel: 'Guitar Saturator'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Guitar-Saturator.ogg
+        audioLabel: 'Guitar Saturator'
     -
-        type: local
-        local:
-            audioFile: Guitar-Vintagedelay.ogg
-            audioLabel: 'Guitar Vintage Delay'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Guitar-Vintagedelay.ogg
+        audioLabel: 'Guitar Vintage Delay'
+
     -
-        type: local
-        local:
-            audioFile: Reverb.ogg
-            audioLabel: Reverb
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: Reverb.ogg
+        audioLabel: Reverb
 urls:
     -
         urlLink: 'https://calf-studio-gear.org/'

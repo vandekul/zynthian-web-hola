@@ -18,22 +18,14 @@ splash:
 media_thumb: odin2.jpg
 audio:
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/kvrosc/sets/one-synth-challenge-136-odin-2'
-            soundcloudLabel: 'One Synth Challenge #136: Odin 2 by The Wave Warden'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/kvrosc/sets/one-synth-challenge-136-odin-2'
+        audioLabel: 'One Synth Challenge #136: Odin 2 by The Wave Warden'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=1Zq2FmiZc-E'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=1Zq2FmiZc-E'
+
 urls:
     -
         urlLink: 'https://thewavewarden.com/pages/odin-2'

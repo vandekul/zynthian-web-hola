@@ -17,29 +17,18 @@ splash:
 media_thumb: redwave-card.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: OrionsBelt.ogg
-            audioLabel: 'Orion''s Belt, MIDI Sequenced'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: OrionsBelt.ogg
+        audioLabel: 'Orion''s Belt, MIDI Sequenced'
     -
-        type: local
-        local:
-            audioFile: SalamanderGrandPianoDemoByHumi.mp3
-            audioLabel: 'Demo, by Humi (Salamander Grand Piano SFZ)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: SalamanderGrandPianoDemoByHumi.mp3
+        audioLabel: 'Demo, by Humi (Salamander Grand Piano SFZ)'
     -
-        type: local
-        local:
-            audioFile: RhodesHammondByHumi.mp3
-            audioLabel: 'Too many EPs, by Humi (Straight Rhodes SFZ)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: RhodesHammondByHumi.mp3
+        audioLabel: 'Too many EPs, by Humi (Straight Rhodes SFZ)'
+
 urls:
     -
         urlLink: 'https://sfztools.github.io/'

@@ -18,22 +18,14 @@ splash:
 media_thumb: jc303.png
 audio:
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/ron-rapprich/zynthian-acid'
-            soundcloudLabel: 'Zynthian Adid, by Ron Rapprich'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/ron-rapprich/zynthian-acid'
+        audioLabel: 'Zynthian Adid, by Ron Rapprich'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=NmlQYTLP8ko'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=NmlQYTLP8ko'
+
 urls:
     -
         urlLink: 'https://midilab.co/jc303/'

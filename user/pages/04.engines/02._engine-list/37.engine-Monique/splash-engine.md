@@ -21,21 +21,11 @@ sitemap:
     lastmod: '07-05-2026 16:56'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=naAmy840FAA'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=naAmy840FAA'
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=KmXA1HR-4V4'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=KmXA1HR-4V4'
 urls:
     -
         urlLink: 'https://surge-synth-team.org/monique/'

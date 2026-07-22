@@ -17,70 +17,57 @@ splash:
 media_thumb: synthv1.png
 audio:
     -
-        type: local
-        local:
-            audioFile: woodpecker.ogg
-            audioLabel: Woodpecker
+        audioType: local
+        audioFile: woodpecker.ogg
+        audioLabel: Woodpecker
     -
-        type: local
-        local:
-            audioFile: undeniable.ogg
-            audioLabel: Undeniable
+        audioType: local
+        audioFile: undeniable.ogg
+        audioLabel: Undeniable
     -
-        type: local
-        local:
-            audioFile: noizeexportdemo.ogg
-            audioLabel: 'Noize Export Demo'
+        audioType: local
+        audioFile: noizeexportdemo.ogg
+        audioLabel: 'Noize Export Demo'
     -
-        type: local
-        local:
-            audioFile: saturnone.ogg
-            audioLabel: 'Saturn One'
+        audioType: local
+        audioFile: saturnone.ogg
+        audioLabel: 'Saturn One'
     -
-        type: local
-        local:
-            audioFile: spaceorgan.ogg
-            audioLabel: 'Space Organ'
+        audioType: local
+        audioFile: spaceorgan.ogg
+        audioLabel: 'Space Organ'
     -
-        type: local
-        local:
-            audioFile: clavone.ogg
-            audioLabel: 'Clav One'
+        audioType: local
+        audioFile: clavone.ogg
+        audioLabel: 'Clav One'
     -
-        type: local
-        local:
-            audioFile: bubbler.ogg
-            audioLabel: Bubbler
+        audioType: local
+        audioFile: bubbler.ogg
+        audioLabel: Bubbler
     -
-        type: local
-        local:
-            audioFile: isitterrific.ogg
-            audioLabel: 'Is it terrific?'
+        audioType: local
+        audioFile: isitterrific.ogg
+        audioLabel: 'Is it terrific?'
     -
-        type: local
-        local:
-            audioFile: phasedout.ogg
-            audioLabel: 'Phased Out'
+        audioType: local
+        audioFile: phasedout.ogg
+        audioLabel: 'Phased Out'
     -
-        type: local
-        local:
-            audioFile: solohornone.ogg
-            audioLabel: 'Solo Horn One'
+        audioType: local
+        audioFile: solohornone.ogg
+        audioLabel: 'Solo Horn One'
     -
-        type: local
-        local:
-            audioFile: synthkeysfour.ogg
-            audioLabel: 'Synth Keys Four'
+        audioType: local
+        audioFile: synthkeysfour.ogg
+        audioLabel: 'Synth Keys Four'
     -
-        type: local
-        local:
-            audioFile: eightmm.ogg
-            audioLabel: 'Eight MM'
+        audioType: local
+        audioFile: eightmm.ogg
+        audioLabel: 'Eight MM'
     -
-        type: local
-        local:
-            audioFile: solohornthree.ogg
-            audioLabel: Solohornthree
+        audioType: local
+        audioFile: solohornthree.ogg
+        audioLabel: Solohornthree
 urls:
     -
         urlLink: 'https://synthv1.sourceforge.io'

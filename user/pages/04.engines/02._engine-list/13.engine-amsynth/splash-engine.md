@@ -19,55 +19,45 @@ splash:
 media_thumb: amsynth.png
 audio:
     -
-        type: local
-        local:
-            audioLabel: 'Particularly Two'
-            audioFile: particularlytwo.ogg
+        audioType: local
+        audioLabel: 'Particularly Two'
+        audioFile: particularlytwo.ogg
     -
-        type: local
-        local:
-            audioLabel: 'Corg Two Six'
-            audioFile: corgtwosix.ogg
+        audioType: local
+        audioLabel: 'Corg Two Six'
+        audioFile: corgtwosix.ogg
     -
-        type: local
-        local:
-            audioLabel: 'Glass Bay'
-            audioFile: glassbay.ogg
+        audioType: local
+        audioLabel: 'Glass Bay'
+        audioFile: glassbay.ogg
     -
-        type: local
-        local:
-            audioLabel: Partenza
-            audioFile: partenza.ogg
+        audioType: local
+        audioLabel: Partenza
+        audioFile: partenza.ogg
     -
-        type: local
-        local:
-            audioLabel: 'Simple Life'
-            audioFile: simplelife.ogg
+        audioType: local
+        audioLabel: 'Simple Life'
+        audioFile: simplelife.ogg
     -
-        type: local
-        local:
-            audioLabel: 'End Game'
-            audioFile: endgame.ogg
+        audioType: local
+        audioLabel: 'End Game'
+        audioFile: endgame.ogg
     -
-        type: local
-        local:
-            audioLabel: 'First Pew'
-            audioFile: firstpew.ogg
+        audioType: local
+        audioLabel: 'First Pew'
+        audioFile: firstpew.ogg
     -
-        type: local
-        local:
-            audioLabel: Overpass
-            audioFile: overpass.ogg
+        audioType: local
+        audioLabel: Overpass
+        audioFile: overpass.ogg
     -
-        type: local
-        local:
-            audioLabel: 'Soft Warning'
-            audioFile: softwarning.ogg
+        audioType: local
+        audioLabel: 'Soft Warning'
+        audioFile: softwarning.ogg
     -
-        type: local
-        local:
-            audioLabel: 'Soft Warning'
-            audioFile: softwarning.ogg
+        audioType: local
+        audioLabel: 'Soft Warning'
+        audioFile: softwarning.ogg
 urls:
     -
         urlLink: 'https://amsynth.github.io'

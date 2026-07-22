@@ -18,38 +18,21 @@ splash:
 media_thumb: surge.png
 audio:
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/user-589036812-258992427/surge-2237-ad'
-            soundcloudLabel: '2237 AD'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/user-589036812-258992427/surge-2237-ad'
+        audioLabel: '2237 AD'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/user-589036812-258992427/surge-demo-001-microtonal-soundscape-1-x-surge'
-            soundcloudLabel: 'Microtonal Soundscape'
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/user-589036812-258992427/surge-demo-001-microtonal-soundscape-1-x-surge'
+        audioLabel: 'Microtonal Soundscape'
     -
-        type: soundcloud
-        local:
-            audioFile: ''
-            audioLabel: ''
-        soundcloud:
-            audioLink: 'https://soundcloud.com/theexponent/resurgence'
-            soundcloudLabel: Resurgence
+        audioType: soundcloud
+        audioLink: 'https://soundcloud.com/theexponent/resurgence'
+        audioLabel: Resurgence
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=2GLp6FD6oVE'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=2GLp6FD6oVE'
 urls:
     -
         urlLink: 'https://surge-synthesizer.github.io/'

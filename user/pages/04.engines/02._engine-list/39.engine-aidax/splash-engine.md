@@ -20,29 +20,17 @@ splash:
 media_thumb: aidax.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: always-with-me-always-with-you.wav
-            audioLabel: 'Always with me, always with you (Joe Satriani, played by Stojos)'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: always-with-me-always-with-you.wav
+        audioLabel: 'Always with me, always with you (Joe Satriani, played by Stojos)'
     -
-        type: local
-        local:
-            audioFile: 2024-06-17_13_40_18_last_state.001.wav
-            audioLabel: 'Distortion test, by stojos'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: 2024-06-17_13_40_18_last_state.001.wav
+        audioLabel: 'Distortion test, by stojos'
     -
-        type: local
-        local:
-            audioFile: clean-test.wav
-            audioLabel: 'Clean test, by stojos'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: clean-test.wav
+        audioLabel: 'Clean test, by stojos'
 urls:
     -
         urlLink: 'https://aida-x.cc/'

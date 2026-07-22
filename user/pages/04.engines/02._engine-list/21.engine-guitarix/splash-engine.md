@@ -22,46 +22,26 @@ splash:
 media_thumb: guitarix.jpg
 audio:
     -
-        type: local
-        local:
-            audioFile: guitarixDemoI.ogg
-            audioLabel: 'Guitarix Demo I'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: guitarixDemoI.ogg
+        audioLabel: 'Guitarix Demo I'
     -
-        type: local
-        local:
-            audioFile: guitarixDemoII.ogg
-            audioLabel: 'Guitarix Demo II'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: guitarixDemoII.ogg
+        audioLabel: 'Guitarix Demo II'
     -
-        type: local
-        local:
-            audioFile: guitarixDemoIII.ogg
-            audioLabel: 'Guitarix Demo III'
-        soundcloud:
-            audioLink: ''
-            soundcloudLabel: ''
+        audioType: local
+        audioFile: guitarixDemoIII.ogg
+        audioLabel: 'Guitarix Demo III'
 video:
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=KEVs_P0Rglo'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=KEVs_P0Rglo'
+
     -
-        type: youtube
-        youtube:
-            youtubeLink: 'https://www.youtube.com/watch?v=hlGKDQj2Wmk'
-            youtubeLabel: ''
-        vimeo:
-            vimeoLink: ''
-            vimeoLabel: ''
+        videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=hlGKDQj2Wmk'
+
 urls:
     -
         urlLink: 'https://guitarix.org/'

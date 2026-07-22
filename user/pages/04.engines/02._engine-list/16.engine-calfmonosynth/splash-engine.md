@@ -30,55 +30,45 @@ urls:
         urlLabel: 'Source Code'
 audio:
     -
-        type: local
-        local:
-            audioFile: bribasstwobis.ogg
-            audioLabel: 'Bribass Twobis'
+        audioType: local
+        audioFile: bribasstwobis.ogg
+        audioLabel: 'Bribass Twobis'
     -
-        type: local
-        local:
-            audioFile: pugnacious.ogg
-            audioLabel: Pugnacious
+        audioType: local
+        audioFile: pugnacious.ogg
+        audioLabel: Pugnacious
     -
-        type: local
-        local:
-            audioFile: rushingwind.ogg
-            audioLabel: 'Rushing Wind'
+        audioType: local
+        audioFile: rushingwind.ogg
+        audioLabel: 'Rushing Wind'
     -
-        type: local
-        local:
-            audioFile: woman.ogg
-            audioLabel: Woman
+        audioType: local
+        audioFile: woman.ogg
+        audioLabel: Woman
     -
-        type: local
-        local:
-            audioFile: buzzybass.ogg
-            audioLabel: 'Buzzy Bass'
+        audioType: local
+        audioFile: buzzybass.ogg
+        audioLabel: 'Buzzy Bass'
     -
-        type: local
-        local:
-            audioFile: filthy.ogg
-            audioLabel: Filthy
+        audioType: local
+        audioFile: filthy.ogg
+        audioLabel: Filthy
     -
-        type: local
-        local:
-            audioFile: punchlinetwo.ogg
-            audioLabel: 'Punchline Two'
+        audioType: local
+        audioFile: punchlinetwo.ogg
+        audioLabel: 'Punchline Two'
     -
-        type: local
-        local:
-            audioFile: stinger.ogg
-            audioLabel: Stinger
+        audioType: local
+        audioFile: stinger.ogg
+        audioLabel: Stinger
     -
-        type: local
-        local:
-            audioFile: rebel.ogg
-            audioLabel: Rebel
+        audioType: local
+        audioFile: rebel.ogg
+        audioLabel: Rebel
     -
-        type: local
-        local:
-            audioFile: wizard.ogg
-            audioLabel: Wizard
+        audioType: local
+        audioFile: wizard.ogg
+        audioLabel: Wizard
 ---
 
 Calf Monosynth is a simple monophonic synthesizer with 2 oscillators, multimode filter and an envelope. Designed to maximize flexibility while minimizing the number of controls. Useful for synth basses and leads. 
