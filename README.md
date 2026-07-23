@@ -17,6 +17,16 @@ Local run:
     	bin/grav server
 
 
+## Home page
+
+### Use-Case section
+
+Template: modular/usecase
+
+It's possible to add more use cases from layout.  You must go to Hola Settings and add the information required for use-case.
+
+![](/images/use-case-home-section.jpg)
+
 ## Engine page
 
 Template: splash-engine
