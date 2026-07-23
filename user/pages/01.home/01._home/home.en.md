@@ -13,29 +13,33 @@ button3Text: 'Learn More'
 button3Link: '#concept'
 social:
     -
-        socialIconClass: 'fa fa-comment'
+        socialIconClass: fa-comment
         socialIconText: Discourse
         socialIconLink: 'https://discourse.zynthian.org/?pk_vid=900c6e85f0bf66e41780669099b29b24'
     -
-        socialIconClass: 'fa fa-github'
+        socialIconClass: fa-github
         socialIconText: Github
         socialIconLink: 'https://github.com/zynthian'
     -
-        socialIconClass: 'fa fa-wikipedia-w'
+        socialIconClass: fa-wikipedia-w
         socialIconText: Wiki
         socialIconLink: 'https://wiki.zynthian.org/?pk_vid=900c6e85f0bf66e41780669219b29b24'
     -
-        socialIconClass: 'fa fa-wordpress'
+        socialIconClass: fa-wordpress
         socialIconText: Blog
         socialIconLink: 'https://blog.zynthian.org/?pk_vid=900c6e85f0bf66e41780669541b29b24'
     -
-        socialIconClass: 'fa fa-youtube-play'
+        socialIconClass: fa-youtube-play
         socialIconText: Youtube
         socialIconLink: 'https://www.youtube.com/channel/UCc9Tv__HdwQjPjKUd5mIhaw'
     -
-        socialIconClass: 'fa fa-instagram'
+        socialIconClass: fa-instagram
         socialIconText: Instagram
         socialIconLink: 'https://www.instagram.com/zynthian/'
+    -
+        socialIconText: Contact
+        socialIconLink: 'mailto:info@zynthian.org'
+        socialIconClass: fa-envelope
 ---
 
 Any sound you dreamed of in the palm of your hand.

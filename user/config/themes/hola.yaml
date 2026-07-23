@@ -1,10 +1,3 @@
-enabled: true
-custom_logo:
-  user/themes/hola/images/logo/logo.png:
-    name: logo.png
-    type: image/png
-    size: 5238
-    path: user/themes/hola/images/logo/logo.png
 footer-text: '© Copyright Zynthian 2026'
 footer-design: '<a href="/cookies">Cookie Policy </a>'
 footer-social:
@@ -32,6 +25,10 @@ footer-social:
     socialIconClass: 'fa fa-instagram'
     socialIconText: Instagram
     socialIconLink: 'https://www.instagram.com/zynthian/'
+  -
+    socialIconClass: 'fa fa-envelope'
+    socialIconText: 'Contact us'
+    socialIconLink: 'mailto:info@zynthian.org'
 footer-additional-text: '<a href="/privacy">Privacity Policy </a>'
 header:
   button1Text: 'Get your KIT'

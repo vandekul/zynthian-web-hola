@@ -1,5 +1,10 @@
-last_checked: 1784196996
+last_checked: 1784802322
 data:
+  -
+    title: 'Why I Built Riffle'
+    url: 'https://getgrav.org/blog/why-i-built-riffle'
+    date: '2026-07-21T14:00:00+00:00'
+    summary: ''
   -
     title: 'Grav 2.0 Released!'
     url: 'https://getgrav.org/blog/grav-2-stable-released'
@@ -44,9 +49,4 @@ data:
     title: 'Admin2 Goodies'
     url: 'https://getgrav.org/blog/admin2-goodies'
     date: '2026-06-04T10:00:00+00:00'
-    summary: ''
-  -
-    title: 'Grav 2.0 Developer Guide: Markdown Extensions'
-    url: 'https://getgrav.org/blog/grav-2-dev-markdown-extensions'
-    date: '2026-06-03T12:00:00+00:00'
     summary: ''
