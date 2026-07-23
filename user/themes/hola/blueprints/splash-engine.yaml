@@ -109,7 +109,7 @@ form:
                 .videoLabel:
                     type: text
                     label: Description
-            header.url:
+            header.urls:
               name: url
               type: list
               style: vertical

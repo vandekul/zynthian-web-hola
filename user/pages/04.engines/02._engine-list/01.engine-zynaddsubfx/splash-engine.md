@@ -55,6 +55,8 @@ urls:
         urlLink: 'https://github.com/zynaddsubfx'
         urlLabel: 'Source Code'
 audioFile: CosmicSynthGuitarByJTunes.mp3
+tag: ''
+engines: false
 ---
 
 ZynAddSubFX is a realtime software synthesizer created by Paul Octavian Nasca in 2002. It is a realtime, polyphonic/monophonic, multitimbral, microtonal synthesizer capable of rescaling to up to 128 microtones per octave, as well as key mapping. Although it incorporates the traditional additive and subtractive methods of sound synthesis, as well as a PAD synth capability, it really is in a category of its own, because of how it expands, enriches and compresses harmonic spectrums, thereby obtaining extraordinarily rich sound timbres. It can be run standalone and also as an LV2 plugin.

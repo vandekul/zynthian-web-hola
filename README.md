@@ -21,6 +21,22 @@ Local run:
 
 Template: splash-engine
 
+When you add an engine is important to choose the image that will be shown in the target and the image that will be in engine page:
+
+![](/images/engine-images.jpg)
+
+Also it's important to inform taxonomy:
+- Category: it's used to filter in engines page
+- Homepage: if indicates 'yes' it could be shown in a banner in engine's homepage section. This section only shows five engines randomly but this must have "category homepage = yes"
+- Tag: this is used for engine's use-case section and also for filtering in engines page
+
+![](/images/engine-taxonomy.jpg)
+
+If you want to add media information like audios, videos or links, it's necessari to inform Media Setting section like here:
+
+![](/images/engine-media.jpg)
+![](/images/engine-page.jpg)
+
 ## Use-Case page
 
 Template: splash-engine
