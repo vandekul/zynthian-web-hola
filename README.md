@@ -17,3 +17,17 @@ Local run:
     	bin/grav server
 
 
+## Engine page
+
+Template: splash-engine
+
+## Use-Case page
+
+Template: splash-engine
+
+In order to show engines section, after use-case content and before footer, you must check "Show Engines?" and inform "Tag for Engines".
+The list of engines that will be shown must have the tag indicate in the second field (Tag for Engines).
+
+![](/images/user-case-template.jpg)
+
+
