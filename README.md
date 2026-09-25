@@ -4,8 +4,8 @@ This Website is built using Hola Skeleton as base template.
 
 Installation from scratch (PHP version 7.3.6+ required):
 
-	git clone -b master https://github.com/getgrav/grav.git	
-	cd grav
+	git clone -b master https://github.com/getgrav/grav.git	zynthian-web3
+	cd zynthian-web3
 	mv user user.bak
 	git clone git@github.com:vandekul/zynthian-web-hola.git user
 	./bin/grav install
