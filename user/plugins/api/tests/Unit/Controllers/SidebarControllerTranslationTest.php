@@ -24,7 +24,7 @@ class SidebarControllerTranslationTest extends TestCase
         $user = $this->createMock(UserInterface::class);
         $user->method('get')->willReturnCallback(
             static fn($key, mixed $default = null) => match ($key) {
-                'access.api.super' => true,
+                'access' => ['api' => ['super' => true]],
                 'admin_next' => ['preferences' => ['adminLanguage' => 'en-US']],
                 default => $default,
             },
@@ -35,6 +35,7 @@ class SidebarControllerTranslationTest extends TestCase
             static fn($key) => match ($key) {
                 'language' => $language,
                 'locator' => new SidebarTranslationTestLocator(),
+                'config' => new Config([]),
                 default => null,
             },
         );
@@ -68,6 +69,12 @@ final class SidebarTranslationTestLocator
     public function findResource(string $uri, bool $absolute = true, bool $create = false): ?string
     {
         return null;
+    }
+
+    /** @return array<int, string> */
+    public function findResources(string $uri, bool $absolute = true, bool $all = false): array
+    {
+        return [];
     }
 }
 

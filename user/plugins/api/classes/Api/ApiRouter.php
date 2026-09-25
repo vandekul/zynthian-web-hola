@@ -11,8 +11,10 @@ use Grav\Common\Grav;
 use Grav\Common\Processors\ProcessorBase;
 use Grav\Framework\Psr7\Response;
 use Grav\Plugin\Api\Audit\AuditContext;
+use Grav\Plugin\Api\Popularity\PopularityTracker;
 use Grav\Plugin\Api\Controllers\AuditController;
 use Grav\Plugin\Api\Controllers\AuthController;
+use Grav\Plugin\Api\Controllers\CaptchaController;
 use Grav\Plugin\Api\Controllers\BlueprintController;
 use Grav\Plugin\Api\Controllers\BlueprintFilesController;
 use Grav\Plugin\Api\Controllers\BlueprintUploadController;
@@ -20,6 +22,7 @@ use Grav\Plugin\Api\Controllers\ConfigController;
 use Grav\Plugin\Api\Controllers\DashboardController;
 use Grav\Plugin\Api\Controllers\DashboardWidgetController;
 use Grav\Plugin\Api\Controllers\GpmController;
+use Grav\Plugin\Api\Controllers\McpController;
 use Grav\Plugin\Api\Controllers\MediaController;
 use Grav\Plugin\Api\Controllers\SchedulerController;
 use Grav\Plugin\Api\Controllers\PagesController;
@@ -35,6 +38,7 @@ use Grav\Plugin\Api\Controllers\SsoController;
 use Grav\Plugin\Api\Controllers\FloatingWidgetController;
 use Grav\Plugin\Api\Controllers\ContextPanelController;
 use Grav\Plugin\Api\Controllers\SystemController;
+use Grav\Plugin\Api\Controllers\TranslationsEditorController;
 use Grav\Plugin\Api\Controllers\UsersController;
 use Grav\Plugin\Api\Controllers\GroupsController;
 use Grav\Plugin\Api\Controllers\InvitationsController;
@@ -70,6 +74,12 @@ class ApiRouter extends ProcessorBase
 
     /** @var array<int,string>|null Cached public-route exact paths after plugin contributions. */
     protected ?array $publicExact = null;
+
+    /**
+     * Whether this request is one of the few endpoints that legitimately own PHP
+     * session state (the SSO browser hand-off). Set per request in process().
+     */
+    protected bool $statefulSession = false;
 
 
     public function __construct(Grav $container, Config $config)
@@ -108,9 +118,17 @@ class ApiRouter extends ProcessorBase
      * parallel GETs (all sharing one session cookie) don't serialize on PHP's
      * exclusive per-session file lock. Only GET/HEAD — mutations may still queue
      * flash messages or rotate the session — and skippable via config.
+     *
+     * Stateful endpoints are exempt: closing the session here commits it, and a
+     * closed session silently drops every later write (Session::reopen() only
+     * revives a read-only start), which is what left the SSO CSRF state
+     * unpersisted and failed every admin SSO login (#22).
      */
     protected function closeSessionEarly(string $method): void
     {
+        if ($this->statefulSession) {
+            return;
+        }
         if ($method !== 'GET' && $method !== 'HEAD') {
             return;
         }
@@ -216,6 +234,18 @@ class ApiRouter extends ProcessorBase
                 }
             }
 
+            // Route path (base + version prefix stripped), computed once and
+            // shared by the session-statefulness check, the demo gate and
+            // dispatch so they all classify identically.
+            $apiRoutePath = $this->resolveApiRoutePath($request);
+
+            // A handful of endpoints are stateful by nature: the SSO hand-off
+            // parks its CSRF state and return target in the PHP session between
+            // two browser navigations. They must keep the session open for the
+            // whole request AND keep its cookie, so flag them before anything
+            // downstream closes or strips either (#22).
+            $this->statefulSession = $this->isStatefulSessionRoute($apiRoutePath);
+
             // When the caller presents a bearer token (the admin SPA always
             // does), authentication is stateless and never reads the session —
             // so release Grav's exclusive session lock BEFORE the comparatively
@@ -255,6 +285,17 @@ class ApiRouter extends ProcessorBase
             // context is ready the moment a controller fires an audited event.
             AuditContext::capture($request, $user);
 
+            // Admin2 signs in with a JWT, never the front-end session, so the
+            // admin's own front-end page views reach the popularity tracker as
+            // a guest. Mark the browser instead (getgrav/grav-plugin-api#45).
+            if ($user
+                && $request->getAttribute('api_auth_method') === 'jwt'
+                && empty($_COOKIE[PopularityTracker::EXCLUDE_COOKIE])
+                && $this->config->get('plugins.api.popularity.exclude_admin', true)
+                && PopularityTracker::isAdminUser($user)) {
+                PopularityTracker::sendExcludeCookie(true);
+            }
+
             // Release the PHP session lock for read-only requests. Grav core
             // starts and EXCLUSIVELY locks the session during boot on every
             // request; the admin SPA fires many GETs that all carry the same
@@ -264,10 +305,6 @@ class ApiRouter extends ProcessorBase
             // committing the session now lets those parallel reads run
             // concurrently instead of queuing (admin2#65).
             $this->closeSessionEarly($request->getMethod());
-
-            // Route path (base + version prefix stripped), computed once and
-            // shared by the demo gate and dispatch so they classify identically.
-            $apiRoutePath = $this->resolveApiRoutePath($request);
 
             // Demo mode: block writes from demo accounts (except the writable
             // allowlist and public /auth routes). Runs before rate limiting and
@@ -362,9 +399,17 @@ class ApiRouter extends ProcessorBase
      * visitor, or an admin tab — and Grav is just refreshing it, so leave it
      * untouched (an authenticated request carrying the session cookie does not
      * rotate or clear it).
+     *
+     * Stateful endpoints are exempt: the SSO hand-off deliberately parks state
+     * in the session and needs the browser to come back to the callback holding
+     * the key to it. Stripping the cookie there is what made a first-time SSO
+     * login (no prior front-end session) fail with `sso_state_mismatch` (#22).
      */
     protected function protectSharedSession(): void
     {
+        if ($this->statefulSession) {
+            return;
+        }
         if (!$this->config->get('plugins.api.protect_frontend_session', true)) {
             return;
         }
@@ -463,6 +508,22 @@ class ApiRouter extends ProcessorBase
         return $routePath;
     }
 
+    /**
+     * Whether this route owns PHP session state for the length of a browser
+     * round-trip, rather than being stateless like the rest of the API.
+     *
+     * Only the SSO hand-off qualifies: `start` writes the provider's CSRF state
+     * (and the SPA return target) into the session and 302s to the provider,
+     * and `callback` reads them back when the browser returns. Everything else
+     * under `/auth/sso/` is stateless — `providers` is a plain read and
+     * `exchange` trades a cache-backed one-time code — so they stay on the
+     * default path and keep their session lock released early.
+     */
+    protected function isStatefulSessionRoute(string $routePath): bool
+    {
+        return (bool) preg_match('#^/auth/sso/[^/]+/(start|callback)$#', $routePath);
+    }
+
     protected function dispatch(ServerRequestInterface $request, string $routePath): ResponseInterface
     {
         $this->startPhase('route', 'API: Routing');
@@ -510,7 +571,8 @@ class ApiRouter extends ProcessorBase
 
     protected function createDispatcher(): Dispatcher
     {
-        $cacheFile = $this->container['locator']->findResource('cache://api', true, true) . '/route.cache';
+        $cacheDir = $this->container['locator']->findResource('cache://api', true, true);
+        $cacheFile = $cacheDir . '/route.' . $this->routeCacheFingerprint() . '.cache';
         $cacheDisabled = $this->config->get('system.debugger.enabled', false);
 
         return cachedDispatcher(function (RouteCollector $r) {
@@ -520,6 +582,84 @@ class ApiRouter extends ProcessorBase
             'cacheFile' => $cacheFile,
             'cacheDisabled' => $cacheDisabled,
         ]);
+    }
+
+    /**
+     * Identity of the route table, so installing or enabling a plugin takes
+     * effect without a manual cache clear.
+     *
+     * Plugin routes come from onApiRegisterRoutes, which only fires while the
+     * dispatcher is being BUILT — so once route.cache exists, a newly installed
+     * plugin never gets asked for its routes again. Its sidebar item and page
+     * script still appear (those events fire every request), so the plugin looks
+     * installed and then every call it makes 404s. Nothing in Grav invalidates
+     * this file on plugin install, which made "install a plugin from the admin"
+     * silently half-work until someone ran `bin/grav clear`.
+     *
+     * Keyed on the enabled plugin set and each plugin's blueprint mtime rather
+     * than invalidated by an event: it needs no cooperation from whatever
+     * changed the set, and it is correct for install, enable, disable, removal
+     * and upgrade alike. Stale files stay in cache://api and go with any cache
+     * clear; the set changes rarely enough that they do not accumulate
+     * meaningfully.
+     */
+    protected function routeCacheFingerprint(): string
+    {
+        $locator = $this->container['locator'];
+
+        return self::routeSetFingerprint($this->config, static function (string $slug) use ($locator): int {
+            $file = $locator->findResource("plugins://{$slug}/blueprints.yaml");
+
+            return \is_string($file) ? (int) (@filemtime($file) ?: 0) : 0;
+        });
+    }
+
+    /**
+     * The route table's identity: the enabled plugin set, plus when each
+     * plugin's blueprints.yaml last changed.
+     *
+     * The set alone covers install, enable and disable, but not upgrade: a
+     * plugin whose new version registers a route it did not have before keeps
+     * the old table until someone runs `bin/grav clear`, and every call to the
+     * new route 404s while the admin screen that makes it looks installed. A
+     * version bump always edits blueprints.yaml, so its mtime is the cheapest
+     * honest signal of "this plugin is not the one the table was built from".
+     * A stat per enabled plugin per request is the whole cost.
+     *
+     * @param callable(string): int $blueprintMtime the mtime of a plugin's blueprints.yaml, 0 when it has none
+     */
+    public static function routeSetFingerprint(Config $config, callable $blueprintMtime): string
+    {
+        $parts = [];
+        foreach (self::enabledPluginSlugs($config) as $slug) {
+            $parts[] = $slug . '@' . $blueprintMtime($slug);
+        }
+
+        return substr(hash('sha256', implode(',', $parts)), 0, 16);
+    }
+
+    /**
+     * The slugs of every enabled plugin, sorted.
+     *
+     * Shared with the MCP manifest loader, which keys its own fingerprint on the
+     * same set: both want "what is switched on right now", and one definition of
+     * that keeps the two from drifting apart.
+     *
+     * @return array<int, string>
+     */
+    public static function enabledPluginSlugs(Config $config): array
+    {
+        $enabled = [];
+        foreach ((array) $config->get('plugins', []) as $slug => $settings) {
+            // Grav treats a missing `enabled` as on, so only an explicit false
+            // counts as disabled.
+            if (!is_array($settings) || ($settings['enabled'] ?? true) !== false) {
+                $enabled[] = (string) $slug;
+            }
+        }
+        sort($enabled);
+
+        return $enabled;
     }
 
     protected function registerCoreRoutes(RouteCollector $r): void
@@ -538,6 +678,14 @@ class ApiRouter extends ProcessorBase
         $r->addRoute('GET',  '/auth/setup', [SetupController::class, 'status']);
         $r->addRoute('POST', '/auth/setup', [SetupController::class, 'create']);
         $r->addRoute('GET',  '/auth/password-policy', [PasswordPolicyController::class, 'show']);
+
+        // Login captcha (public — under /auth/). `captcha` is discovery: the
+        // login page asks what challenge to render, the way it asks for SSO
+        // providers. The challenge/redeem pair is the cap.js proof-of-work
+        // round-trip, and only responds while cap is the active provider.
+        $r->addRoute('GET',  '/auth/captcha', [CaptchaController::class, 'show']);
+        $r->addRoute('POST', '/auth/captcha/challenge', [CaptchaController::class, 'challenge']);
+        $r->addRoute('POST', '/auth/captcha/redeem', [CaptchaController::class, 'redeem']);
 
         // SSO / OAuth login bridge for admin-next (public — under /auth/). Static
         // routes before the parameterized ones (FastRoute matching order).
@@ -593,6 +741,11 @@ class ApiRouter extends ProcessorBase
         // Site-level media
         $r->addRoute('GET', '/media', [MediaController::class, 'siteMedia']);
         $r->addRoute('POST', '/media', [MediaController::class, 'uploadSiteMedia']);
+        // Byte-serving fallback for site media the web server will not serve
+        // directly. Grav's shipped .htaccess/nginx configs deny `user/env` and
+        // `user/config` outright, so a multi-site `user://media` resolving to
+        // `user/env/<host>/media` is only reachable through here (#28).
+        $r->addRoute('GET', '/media/raw/{path:.+}', [MediaController::class, 'rawSiteMedia']);
         $r->addRoute('POST', '/media/folders', [MediaController::class, 'createFolder']);
         $r->addRoute('POST', '/media/rename', [MediaController::class, 'renameFile']);
         // Per-file metadata (.meta.yaml sidecar) for site media. The file is
@@ -689,6 +842,9 @@ class ApiRouter extends ProcessorBase
         $r->addRoute('GET', '/gpm/repository/themes', [GpmController::class, 'repositoryThemes']);
         $r->addRoute('GET', '/gpm/repository/{slug}', [GpmController::class, 'repositoryPackage']);
 
+        // MCP tool manifests contributed by plugins, for an MCP server to load.
+        $r->addRoute('GET', '/mcp/tools', [McpController::class, 'tools']);
+
         // Dashboard
         $r->addRoute('GET', '/dashboard/notifications', [DashboardController::class, 'notifications']);
         $r->addRoute('POST', '/dashboard/notifications/{id}/hide', [DashboardController::class, 'hideNotification']);
@@ -722,6 +878,7 @@ class ApiRouter extends ProcessorBase
         $r->addRoute('DELETE', '/reports/twig-content/events', [ReportsController::class, 'clearTwigEvents']);
         $r->addRoute('GET', '/reports/twig-content/page', [ReportsController::class, 'twigContentPageStatus']);
         $r->addRoute('GET', '/reports/twig-content/scan', [ReportsController::class, 'twigContentScan']);
+        $r->addRoute('GET', '/reports/twig-content/sandbox-policy', [ReportsController::class, 'twigContentSandboxPolicy']);
 
         // Audit trail (super-admin only; off by default)
         $r->addRoute('GET', '/audit/status', [AuditController::class, 'status']);
@@ -769,13 +926,34 @@ class ApiRouter extends ProcessorBase
         $r->addRoute('DELETE', '/cache', [SystemController::class, 'clearCache']);
         $r->addRoute('GET', '/system/logs/files', [SystemController::class, 'logFiles']);
         $r->addRoute('GET', '/system/logs', [SystemController::class, 'logs']);
+        $r->addRoute('DELETE', '/system/logs', [SystemController::class, 'clearLog']);
         $r->addRoute('POST', '/system/backup', [SystemController::class, 'backup']);
         $r->addRoute('GET', '/system/backups', [SystemController::class, 'backups']);
         $r->addRoute('DELETE', '/system/backups/{filename}', [SystemController::class, 'deleteBackup']);
         $r->addRoute('GET', '/system/backups/{filename}/download', [SystemController::class, 'downloadBackup']);
 
-        // Translations
+        // Translations — the SPA's own dictionary. NOTE this whole prefix is
+        // public (see $publicPrefixes above): the admin has to render its login
+        // screen before anyone is authenticated. Nothing that reads or writes
+        // site data may be added under it.
         $r->addRoute('GET', '/translations/{lang}', [SystemController::class, 'translations']);
+
+        // Translation editor. Deliberately NOT under /translations — that
+        // prefix skips authentication entirely, which would make the editor's
+        // reads and writes anonymous. Static segments precede parameterized
+        // ones so `/i18n/keys` is not swallowed by `/i18n/keys/{key}`.
+        $r->addRoute('GET', '/i18n/sources', [TranslationsEditorController::class, 'sources']);
+        $r->addRoute('GET', '/i18n/languages', [TranslationsEditorController::class, 'languages']);
+        $r->addRoute('GET', '/i18n/coverage', [TranslationsEditorController::class, 'coverage']);
+        $r->addRoute('GET', '/i18n/keys', [TranslationsEditorController::class, 'keys']);
+        $r->addRoute('GET', '/i18n/translate', [TranslationsEditorController::class, 'translateStatus']);
+        $r->addRoute('POST', '/i18n/translate', [TranslationsEditorController::class, 'translate']);
+        $r->addRoute('GET', '/i18n/import/translation-strings', [TranslationsEditorController::class, 'importStatus']);
+        $r->addRoute('POST', '/i18n/import/translation-strings', [TranslationsEditorController::class, 'import']);
+        $r->addRoute('GET', '/i18n/keys/{key:[A-Za-z0-9_.\-]+}', [TranslationsEditorController::class, 'key']);
+        $r->addRoute('GET', '/i18n/overrides/{lang}', [TranslationsEditorController::class, 'showOverrides']);
+        $r->addRoute('PATCH', '/i18n/overrides/{lang}', [TranslationsEditorController::class, 'patchOverrides']);
+        $r->addRoute('PUT', '/i18n/overrides/{lang}', [TranslationsEditorController::class, 'replaceOverrides']);
 
         // Admin UI languages (locales the admin itself can be rendered in,
         // as opposed to /languages which lists site content languages).

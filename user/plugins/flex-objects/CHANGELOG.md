@@ -1,3 +1,76 @@
+# v1.4.16
+## 09/22/2026
+
+1. [](#new)
+    * The plugin is now available in French. Thanks @Keyskeeper [#244](https://github.com/trilbymedia/grav-plugin-flex-objects/pull/244)
+
+1. [](#bugfix)
+    * Flex directory pages keep their search, sorting and built-in styling on themes that write their scripts and stylesheets into the page head. Both were registered too late to reach those pages, so they now go out with the listing itself. Thanks @onetrev [grav-plugin-form#656](https://github.com/getgrav/grav-plugin-form/issues/656)
+    * The page media field loads jQuery with the rest of the form's scripts on those same themes, and leaves a theme's own copy of jQuery where the theme put it
+
+# v1.4.15
+## 09/13/2026
+
+1. [](#bugfix)
+    * A Flex directory whose blueprint is shipped by a theme no longer goes missing from the frontend and from Admin Next on requests that carry a session cookie. Thanks to @phmg701 [#240](https://github.com/trilbymedia/grav-plugin-flex-objects/issues/240)
+    * Site templates can be kept outside the plugin folder, where a plugin update cannot delete them. The option that does this is now documented and shipped in the plugin's config, and it accepts a list of folders. Thanks to @ttytrekker [#242](https://github.com/trilbymedia/grav-plugin-flex-objects/issues/242)
+
+# v1.4.14
+## 09/10/2026
+
+1. [](#bugfix)
+    * An API key limited to certain Flex directories no longer lists the others or shows records from related directories it wasn't given, even when the account that created it is a super admin
+
+# v1.4.13
+## 09/09/2026
+
+1. [](#new)
+    * Flex directories can now be driven from an MCP client such as grav-mcp or grav-plugin-mcp-server [getgrav/grav-plugin-api#32](https://github.com/getgrav/grav-plugin-api/issues/32)
+    * The plugin ships an `mcp.yaml` manifest, which the API plugin serves at `GET /api/v1/mcp/tools`
+    * Ten `flex_*` tools list directories and their blueprints, list, read, create, update and delete objects, and list and delete object media
+    * Creating or updating an object takes its fields as one `object` argument, because the field names come from each site's blueprints
+    * Requires API plugin 1.0.28 or later
+
+# v1.4.12
+## 09/09/2026
+
+1. [](#improved)
+    * The Security section heading and the "Restrict Page Frontmatter Editing" option now use translation keys instead of hardcoded English, with Spanish included [#239](https://github.com/trilbymedia/grav-plugin-flex-objects/pull/239)
+
+# v1.4.11
+## 09/02/2026
+
+1. [](#bugfix)
+    * A Flex directory whose list columns point at nested values, such as `header.title`, now shows those values instead of an empty cell in every row. Thanks to @Rbau30 [#237](https://github.com/trilbymedia/grav-plugin-flex-objects/issues/237)
+
+# v1.4.10
+## 08/21/2026
+
+1. [](#bugfix)
+    * [security] The Flex export endpoint now requires the directory's `read` permission instead of `list`, and only exports directories whose blueprint enables export, so a list-only credential can no longer dump every field of every record and directories that never offered export (accounts, groups, pages) are no longer exportable.
+    * The After Save control now offers all three choices whatever the configured default is, so a directory blueprint can set "Edit Item" as its default without the "Create New" option disappearing ([#160](https://github.com/getgrav/grav-plugin-admin2/issues/160)).
+    * The After Save control's heading and choices are now translated instead of always showing English.
+
+# v1.4.9
+## 08/11/2026
+
+1. [](#bugfix)
+    * [security] The Flex Object media proxy now denies a request whenever it cannot positively confirm the requester may read the object, rather than only on an explicit denial ([GHSA-ww63-g7x4-jwpg](https://github.com/getgrav/grav/security/advisories/GHSA-ww63-g7x4-jwpg)).
+    * Fixed the `[flex-objects]` shortcode rendering nothing for logged-out visitors, so public collections show up in page content again ([#235](https://github.com/trilbymedia/grav-plugin-flex-objects/issues/235)).
+
+# v1.4.8
+## 08/07/2026
+
+1. [](#bugfix)
+    * [security] The `[flex-objects]` shortcode now checks permission before rendering, so someone who can only edit page content can no longer publish a Flex directory that the admin panel keeps behind a permission ([GHSA-x929-528m-vx2m](https://github.com/getgrav/grav/security/advisories/GHSA-x929-528m-vx2m)).
+    * A Flex directory with a missing or broken blueprint no longer takes down the whole page when the shortcode is used, and logs why nothing was rendered instead.
+
+# v1.4.7
+## 07/25/2026
+
+1. [](#bugfix)
+    * [security] A user with delegated user-management permission can no longer reset another account's password or grant it super-admin access by editing the account through the generic Flex Objects write endpoint, which skipped the checks the dedicated user and group endpoints apply; user and group records must now be changed through those dedicated endpoints ([GHSA-pc8m-jxvh-vmrc](https://github.com/getgrav/grav/security/advisories/GHSA-pc8m-jxvh-vmrc)).
+
 # v1.4.6
 ## 07/09/2026
 

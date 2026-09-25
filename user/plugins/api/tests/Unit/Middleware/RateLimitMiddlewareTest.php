@@ -192,6 +192,54 @@ class RateLimitMiddlewareTest extends TestCase
         self::assertTrue($result['limited']);
     }
 
+    #[Test]
+    public function only_sync_and_thumbnails_skip_the_bucket(): void
+    {
+        $paths = [
+            '/api/v1/sync/channels/pull',
+            '/sub/dir/api/v1/sync/presence',
+            '/api/v1/thumbnails/0f1e2d3c4b5a69788796a5b4c3d2e1f0.jpg',
+            '/sub/dir/api/v1/thumbnails/0f1e2d3c4b5a69788796a5b4c3d2e1f0.webp',
+        ];
+        foreach ($paths as $n => $path) {
+            $middleware = $this->createTestableMiddleware(limit: 1, window: 60);
+            for ($i = 0; $i < 3; $i++) {
+                $request = TestHelper::createMockRequest(path: $path, serverParams: ['REMOTE_ADDR' => "10.9.9.{$n}"]);
+                self::assertFalse($middleware->check($request)['limited'], "{$path} should skip rate limiting");
+            }
+        }
+    }
+
+    #[Test]
+    public function plugin_script_routes_are_rate_limited(): void
+    {
+        $paths = [
+            '/api/v1/custom-fields',
+            '/api/v1/gpm/plugins/editor-pro/fields',
+            '/api/v1/gpm/themes/quark/field/color',
+            '/api/v1/gpm/plugins/ai-pro/widget-script',
+            '/api/v1/gpm/plugins/reports/report-script/weekly',
+        ];
+        foreach ($paths as $n => $path) {
+            $middleware = $this->createTestableMiddleware(limit: 1, window: 60);
+            $request = TestHelper::createMockRequest(path: $path, serverParams: ['REMOTE_ADDR' => "10.6.6.{$n}"]);
+            self::assertFalse($middleware->check($request)['limited']);
+            self::assertTrue($middleware->check($request)['limited'], "{$path} should be rate limited");
+        }
+    }
+
+    #[Test]
+    public function paths_merely_containing_an_excluded_fragment_are_limited(): void
+    {
+        // These used to match str_contains('/sync/').
+        foreach (['/api/v1/pages/sync/notes', '/api/v1/pages/docs/sync/intro', '/api/v1/pages/blog/thumbnails/gallery'] as $n => $path) {
+            $middleware = $this->createTestableMiddleware(limit: 1, window: 60);
+            $request = TestHelper::createMockRequest(path: $path, serverParams: ['REMOTE_ADDR' => "10.8.8.{$n}"]);
+            self::assertFalse($middleware->check($request)['limited']);
+            self::assertTrue($middleware->check($request)['limited'], "{$path} should be rate limited");
+        }
+    }
+
     /**
      * Build a testable RateLimitMiddleware subclass that uses a temp storage directory.
      */

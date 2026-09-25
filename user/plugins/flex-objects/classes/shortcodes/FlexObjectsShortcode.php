@@ -2,9 +2,11 @@
 
 namespace Grav\Plugin\Shortcodes;
 
+use Grav\Framework\Flex\FlexDirectory;
 use Grav\Framework\Flex\Interfaces\FlexCollectionInterface;
 use Grav\Framework\Flex\Interfaces\FlexInterface;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
+use Throwable;
 
 /**
  * [flex-objects] shortcode — render a Flex collection inline in page content.
@@ -57,7 +59,12 @@ class FlexObjectsShortcode extends Shortcode
 
         /** @var FlexInterface|null $flex */
         $flex = $this->grav['flex'] ?? null;
-        $collection = $flex ? $flex->getCollection($type) : null;
+        $directory = $flex ? $flex->getDirectory($type) : null;
+        if (null === $directory || !$this->isRenderable($directory)) {
+            return '';
+        }
+
+        $collection = $directory->getCollection();
         if (!$collection instanceof FlexCollectionInterface) {
             return '';
         }
@@ -93,5 +100,61 @@ class FlexObjectsShortcode extends Shortcode
         $layout = is_string($layout) && $layout !== '' ? $layout : null;
 
         return (string) $collection->render($layout);
+    }
+
+    /**
+     * A shortcode is stored content: anyone who can edit a page can name any registered
+     * Flex type, and the render then happens for whoever views that page. Resolving the
+     * type is therefore not enough on its own, the directory has to say it may be shown.
+     *
+     * The line is drawn where Flex already draws it for the site. A directory marked
+     * `config.site.hidden` holds admin data (accounts, groups, pages) and renders only
+     * for a viewer authorized to list it. An ordinary content directory renders for
+     * everyone, which is the same data a theme template calling the collection directly
+     * has always been free to render.
+     *
+     * `config.site.shortcode` overrides that in either direction: true always publishes,
+     * false keeps the directory out of page content unless the viewer may list it.
+     *
+     * Checking the list permission alone is not enough, and was the bug in 1.4.8:
+     * FlexDirectory::getAuthorizeRule() drops the scope whenever the blueprint declares
+     * `admin.permissions`, so a frontend visitor was asked for an admin permission and
+     * every public collection rendered empty.
+     *
+     * @param FlexDirectory $directory
+     * @return bool
+     */
+    protected function isRenderable(FlexDirectory $directory): bool
+    {
+        try {
+            // An explicit blueprint setting wins, whichever way it points.
+            $shortcode = $directory->getConfig('site.shortcode');
+            if (null !== $shortcode) {
+                return true === $shortcode || true === $directory->isAuthorized('list');
+            }
+
+            // Not hidden from the site means ordinary content, so publish it.
+            if (true !== $directory->getConfig('site.hidden', false)) {
+                return true;
+            }
+
+            // Admin-only data: fall back to the viewer's own list permission, so an
+            // authorized user still sees the collection while everyone else gets nothing.
+            return true === $directory->isAuthorized('list');
+        } catch (Throwable $e) {
+            // A directory whose blueprint is missing or broken cannot be checked, and a
+            // shortcode must never take a page down with it. Treat it as not renderable,
+            // but leave a trace so an empty render can be explained.
+            $log = $this->grav['log'] ?? null;
+            if ($log) {
+                $log->debug(sprintf(
+                    '[flex-objects] shortcode could not authorize "%s": %s',
+                    $directory->getFlexType(),
+                    $e->getMessage()
+                ));
+            }
+
+            return false;
+        }
     }
 }

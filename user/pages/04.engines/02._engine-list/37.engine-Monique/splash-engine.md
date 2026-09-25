@@ -11,6 +11,8 @@ taxonomy:
         - ucase-kb
         - ucase-pr
         - synth-mono
+    homepage:
+        - 'yes'
 date: '17:38 29-01-2025'
 subtitle: 'Monomorphic Synthesizer'
 splash:
@@ -29,7 +31,7 @@ video:
 urls:
     -
         urlLink: 'https://surge-synth-team.org/monique/'
-        urlLabel: 'Monique''s Website'
+        urlLabel: "Monique's Website"
     -
         urlLink: 'https://github.com/surge-synthesizer/monique-monosynth'
         urlLabel: 'Source Code'

@@ -2,8 +2,8 @@
     <div class="usecase-content">
         <div class="row narrow section-intro has-bottom-sep">
             <div class="col-full text-center">
-                <h3>{{ page.header.smallTitle }}</h3>
-                <h1>{{ page.title }}</h1>
+                <h3>{{ page.header.smallTitle|raw }}</h3>
+                <h1>{{ page.title|raw }}</h1>
                 <p class="lead">{{ page.content|striptags }}</p>
             </div>
         </div>
@@ -55,5 +55,18 @@
             </div>
         </div>
 
+        <div class="row narrow section-intro">
+            <div class="col-full text-center">
+                <h3>{{ page.header.postTitle }}</h3>
+            </div>
+        </div>
+
     </div> <!-- end usecase-content -->    
 </section> <!-- end s-usecase -->
+
+<section id="zynthian_projects_cloud"
+         class="s-home page-hero target-section" data-parallax="scroll" data-image-src="{{ page.media[page.header.wordcloud].url() }}"
+         data-natural-width="3000" data-natural-height="2000" data-position-y="center">
+
+</section>
+

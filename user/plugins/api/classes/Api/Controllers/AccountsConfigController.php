@@ -84,8 +84,8 @@ class AccountsConfigController extends AbstractApiController
 
         $filePath = $userConfig . '/' . self::CONFIG_FILE;
         $dir = dirname($filePath);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new \RuntimeException(sprintf('Unable to create directory "%s"', $dir));
         }
 
         // Skip persisting any values injected via GRAV_CONFIG__* env vars (.env);
@@ -99,10 +99,8 @@ class AccountsConfigController extends AbstractApiController
 
     private function requireSuperOrAdmin(ServerRequestInterface $request): void
     {
-        $user = $this->getUser($request);
-        if ($this->isSuperAdmin($user)) {
-            return;
-        }
-        $this->requirePermission($request, 'admin.super');
+        // Scope cap must run before the super short-circuit, or a scoped key on a
+        // super account rewrites accounts config uncapped (GHSA-jqgq-v53x-x99g).
+        $this->requireSuper($request);
     }
 }

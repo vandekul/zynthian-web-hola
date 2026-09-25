@@ -11,6 +11,8 @@ taxonomy:
         - ucase-kb
         - synth-emu
         - synth-phy
+    homepage:
+        - 'yes'
 date: '17:38 10-03-2020'
 subtitle: 'Tonewheel Organ Emulator'
 splash:
@@ -22,7 +24,7 @@ sitemap:
 urls:
     -
         urlLink: 'http://setbfree.org'
-        urlLabel: 'Project''s Website'
+        urlLabel: "Project's Website"
     -
         urlLink: 'http://www.linuxsynths.com/SetBfreePatchesDemos/setbfree.html'
         urlLabel: 'LinuxSynths Page'
@@ -33,7 +35,7 @@ video:
     -
         videoType: vimeo
         videoLink: 'https://vimeo.com/130633814'
-        videoLabel: 'A rendition of Jimmy Smith''s The Cat'
+        videoLabel: "A rendition of Jimmy Smith's The Cat"
 audio:
     -
         audioType: local

@@ -4,10 +4,10 @@
     <section class="small-page-header page-hero" style="background-image:url({{ page.media[page.header.background].url() }})">
         <div class="row page-header__content narrow text-center">
             <h3 class="page-header__title">
-                {{ page.header.subtitle }}
+                {{ page.header.subtitle|raw }}
             </h3>
             <h1 class="page-header__title">
-                {{ page.title }}
+                {{ page.title|raw }}
             </h1>
         </div>
     </section>

@@ -12,6 +12,7 @@ use Grav\Plugin\Api\Tests\Unit\TestHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 use RocketTheme\Toolbox\Event\Event;
 
@@ -46,7 +47,6 @@ class UsersControllerFilterTest extends TestCase
     private function matchesFilters(UsersController $c, UserInterface $user, array $filters): bool
     {
         $m = new ReflectionMethod($c, 'userMatchesFilters');
-        $m->setAccessible(true);
         return $m->invoke($c, $user, $filters);
     }
 
@@ -62,12 +62,26 @@ class UsersControllerFilterTest extends TestCase
     private function assembleTabs(UsersController $c, array $contributed, UserInterface $user): array
     {
         $m = new ReflectionMethod($c, 'assembleFilterTabs');
-        $m->setAccessible(true);
         // assembleFilterTabs takes the fired Event and returns the resolved
         // { tabs, defaultFilter, showAll } structure; these cases assert on the
         // tab row itself.
-        $result = $m->invoke($c, new Event(['filters' => $contributed]), $user);
+        $result = $m->invoke($c, new Event(['filters' => $contributed]), $user, $this->unscopedRequest($user));
         return $result['tabs'];
+    }
+
+    /**
+     * A credential with no API-key scopes attached, i.e. a session or JWT login.
+     * The `authorize` filter runs the scope cap now (GHSA-p57v-xhv3-mf2w), and an
+     * absent scope list means unscoped, so these cases exercise the ACL alone.
+     */
+    private function unscopedRequest(UserInterface $user): ServerRequestInterface
+    {
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getAttribute')->willReturnCallback(
+            static fn($name, $default = null) => $name === 'api_user' ? $user : $default,
+        );
+
+        return $request;
     }
 
     #[Test]
@@ -186,7 +200,6 @@ class UsersControllerFilterTest extends TestCase
     {
         $c = $this->controller();
         $m = new ReflectionMethod($c, 'getListFilters');
-        $m->setAccessible(true);
 
         $withAccess = TestHelper::createMockRequest(
             method: 'GET',
@@ -290,7 +303,6 @@ class UsersControllerFilterTest extends TestCase
     {
         $c = $this->controller();
         $m = new ReflectionMethod($c, 'getListFilters');
-        $m->setAccessible(true);
 
         $request = TestHelper::createMockRequest(
             method: 'GET',

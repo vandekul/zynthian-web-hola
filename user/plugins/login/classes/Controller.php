@@ -201,6 +201,24 @@ class Controller
 
         $code = $this->post['2fa_code'] ?? null;
         $secret = $user->twofa_secret ?? null;
+        $username = (string)$user->get('username');
+
+        // Cap wrong codes. This uses its own counter, not login_attempts: that
+        // one is cleared as soon as the password verifies, and re-doing the
+        // password to obtain a fresh challenge is exactly what an attacker
+        // guessing the code does on every cycle (GHSA-9j6w-2q6c-q3q8).
+        $rateLimiter = $this->login->getRateLimiter('twofa_attempts');
+        if ($rateLimiter->isRateLimited($username)) {
+            $messages->add($t->translate(['PLUGIN_LOGIN.TOO_MANY_2FA_ATTEMPTS', $rateLimiter->getInterval()]), 'error');
+
+            $user->authenticated = false;
+            $user->authorized = false;
+            $this->grav['session']->invalidate()->start();
+
+            $this->setRedirect($this->login->getRoute('login') ?? '/', 303);
+
+            return true;
+        }
 
         $eventOptions = [
             'credentials' => ['username' => $user->get('username')],
@@ -212,6 +230,8 @@ class Controller
         $event->setUser($user);
 
         if (!$code || !$secret || !$twoFa->verifyCode($secret, $code)) {
+            $rateLimiter->registerRateLimitedAction($username);
+
             $event->setStatus(UserLoginEvent::AUTHENTICATION_FAILURE | UserLoginEvent::AUTHORIZATION_CHALLENGE);
             $event->setMessage($t->translate('PLUGIN_LOGIN.2FA_FAILED'),  'error');
 
@@ -232,6 +252,7 @@ class Controller
                 );
             }
         } else {
+            $rateLimiter->resetRateLimit($username);
 
             $event->setStatus(UserLoginEvent::AUTHENTICATION_SUCCESS | UserLoginEvent::AUTHORIZATION_CHALLENGE);
             $event->setMessage($t->translate('PLUGIN_LOGIN.LOGIN_SUCCESSFUL'),  'info');
@@ -711,10 +732,26 @@ class Controller
             $password = $data['password'] ?? null;
             $token = $data['token'] ?? null;
 
+            // The `pw_resets` limiter above only covers asking for a reset
+            // email. Token submission is the endpoint an attacker would
+            // actually hammer, so it gets its own counter, incremented on
+            // failed attempts only (GHSA-x239-6jqx-5hjh).
+            $rateLimiter = $this->login->getRateLimiter('token_attempts');
+            $userKey = (string)($username ?? '');
+
+            if ($rateLimiter->isRateLimited($userKey)) {
+                $messages->add($language->translate('PLUGIN_LOGIN.RESET_INVALID_LINK'), 'error');
+                $this->grav->redirectLangSafe($this->login->getRoute('forgot') ?? '/');
+
+                return true;
+            }
+
             if ($user && !empty($user->reset) && $user->exists()) {
                 [$good_token, $expire] = explode('::', $user->reset);
 
-                if ($good_token === $token) {
+                // Constant-time: a plain === leaks how many leading characters
+                // of the token were right through its early exit.
+                if (hash_equals($good_token, (string)$token)) {
                     if (time() > $expire) {
                         $messages->add($language->translate('PLUGIN_LOGIN.RESET_LINK_EXPIRED'), 'error');
                         $this->grav->redirectLangSafe($this->login->getRoute('forgot') ?? '/');
@@ -732,6 +769,8 @@ class Controller
                     return true;
                 }
             }
+
+            $rateLimiter->registerRateLimitedAction($userKey);
 
             $messages->add($language->translate('PLUGIN_LOGIN.RESET_INVALID_LINK'), 'error');
             $this->grav->redirectLangSafe($this->login->getRoute('forgot') ?? '/');

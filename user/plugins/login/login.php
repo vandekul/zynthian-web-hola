@@ -31,6 +31,7 @@ use Grav\Framework\Flex\Interfaces\FlexObjectInterface;
 use Grav\Framework\Form\Interfaces\FormInterface;
 use Grav\Framework\Psr7\Response;
 use Grav\Framework\Session\SessionInterface;
+use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Form\Form;
 use Grav\Plugin\Login\Events\PageAuthorizeEvent;
 use Grav\Plugin\Login\Events\UserLoginEvent;
@@ -100,12 +101,17 @@ class LoginPlugin extends Plugin
             'onTwigSiteVariables'       => ['onTwigSiteVariables', -100000],
             'onAdminTwigTemplatePaths'  => ['onAdminUntrustedHostNotice', 0],
             'onApiDashboardNotifications' => ['onApiDashboardNotifications', 0],
+            'onApiUserListColumns'      => ['onApiUserListColumns', 0],
+            'onApiUserListColumnData'   => ['onApiUserListColumnData', 0],
+            'onApiUserListRowActions'   => ['onApiUserListRowActions', 0],
+            'onApiUserListRowAction'    => ['onApiUserListRowAction', 0],
             'onFormProcessed'           => ['onFormProcessed', 0],
             'onUserLoginAuthenticate'   => [['userLoginAuthenticateByMagic', 10004], ['userLoginAuthenticateRateLimit', 10003], ['userLoginAuthenticateByRegistration', 10002], ['userLoginAuthenticateByRememberMe', 10001], ['userLoginAuthenticateByEmail', 10000], ['userLoginAuthenticate', 0]],
             'onUserLoginAuthorize'      => ['userLoginAuthorize', 0],
             'onUserLoginFailure'        => ['userLoginGuest', 0],
             'onUserLoginGuest'          => ['userLoginGuest', 0],
             'onUserLogin'               => [['userLoginResetRateLimit', 1000], ['userLogin', 10]],
+            'onUserLoginAuthorized'     => ['userLoginAuthorized', 0],
             'onUserLogout'              => ['userLogout', 0],
         ];
     }
@@ -224,7 +230,12 @@ class LoginPlugin extends Plugin
                 // Try remember me login.
                 $session->user = $c['login']->login(
                     ['username' => ''],
-                    ['remember_me' => true, 'remember_me_login' => true, 'failureEvent' => 'onUserLoginGuest']
+                    [
+                        'remember_me' => true,
+                        'remember_me_login' => true,
+                        'twofa' => $c['config']->get('plugins.login.twofa_enabled', false),
+                        'failureEvent' => 'onUserLoginGuest'
+                    ]
                 );
             }
 
@@ -483,13 +494,29 @@ class LoginPlugin extends Plugin
         $redirect_route = $this->config->get('plugins.login.user_registration.redirect_after_activation');
         $redirect_code = null;
 
+        // Activation is the second unauthenticated endpoint that compares a
+        // secret token, so it gets the same treatment as password reset:
+        // a counter on failed attempts (GHSA-x239-6jqx-5hjh).
+        $rateLimiter = $this->login->getRateLimiter('token_attempts');
+        $userKey = (string)$username;
+
+        if ($rateLimiter->isRateLimited($userKey)) {
+            $message = $this->grav['language']->translate('PLUGIN_LOGIN.INVALID_REQUEST');
+            $messages->add($message, 'error');
+            $this->grav->redirectLangSafe($redirect_route ?: '/', $redirect_code);
+
+            return;
+        }
+
         if (empty($user->activation_token)) {
             $message = $this->grav['language']->translate('PLUGIN_LOGIN.INVALID_REQUEST');
             $messages->add($message, 'error');
         } else {
             [$good_token, $expire] = explode('::', $user->activation_token, 2);
 
-            if ($good_token === $token) {
+            // Constant-time: a plain === leaks how many leading characters
+            // of the token were right through its early exit.
+            if (hash_equals($good_token, (string)$token)) {
                 if (time() > $expire) {
                     $message = $this->grav['language']->translate('PLUGIN_LOGIN.ACTIVATION_LINK_EXPIRED');
                     $messages->add($message, 'error');
@@ -529,6 +556,8 @@ class LoginPlugin extends Plugin
                     $this->grav->fireEvent('onUserActivated', new Event(['user' => $user]));
                 }
             } else {
+                $rateLimiter->registerRateLimitedAction($userKey);
+
                 $message = $this->grav['language']->translate('PLUGIN_LOGIN.INVALID_REQUEST');
                 $messages->add($message, 'error');
             }
@@ -701,6 +730,19 @@ class LoginPlugin extends Plugin
                     return;
                 }
                 break;
+
+            case 'logout':
+                // CSRF hardening (GHSA-cmm3-j4qp-472x): `logout` had neither a nonce
+                // nor a method check, so a cross-site top-level GET carried the
+                // session cookie (SameSite=Lax sends it on navigations) and forced
+                // the victim out. Worse, when that browser held no valid remember-me
+                // cookie, userLogout() falls through to cleanAllTriplets() and wipes
+                // the account's persistent login on *every* device.
+                if (!$this->isSelfInitiatedLogout($uri, $post)) {
+                    $this->grav['messages']->add($this->grav['language']->translate('PLUGIN_LOGIN.ACCESS_DENIED'), 'info');
+                    return;
+                }
+                break;
         }
 
         $controller = new Controller($this->grav, $task, $post);
@@ -709,17 +751,105 @@ class LoginPlugin extends Plugin
     }
 
     /**
+     * Decide whether a `login.logout` request was started by the user rather than
+     * forged by a third-party page.
+     *
+     * Logout is deliberately more permissive than the other tasks. The plugin has
+     * always accepted a plain link, and third-party themes rely on that -- several
+     * ship a bare `<a href="...?task=login.logout">` with no nonce at all, and this
+     * plugin's own 2FA cancel button posts the task carrying `login-form-nonce`
+     * rather than `logout-nonce`. Forcing every theme onto a nonced POST would break
+     * working sites for an issue whose whole impact is an unwanted sign-out, so this
+     * accepts any credible proof the request is the user's own.
+     *
+     * @param Uri   $uri
+     * @param array $post
+     * @return bool
+     */
+    protected function isSelfInitiatedLogout(Uri $uri, array $post): bool
+    {
+        // 1. The canonical logout link this plugin renders. login-status.html.twig
+        //    and login-form.html.twig have always called
+        //    uri.addNonce(..., 'logout-form', 'logout-nonce'); nothing ever verified it.
+        $nonce = $post['logout-nonce'] ?? $uri->param('logout-nonce');
+        if (is_string($nonce) && $nonce !== '' && Utils::verifyNonce($nonce, 'logout-form')) {
+            return true;
+        }
+
+        // 2. The 2FA screen's cancel button posts task=login.logout from the login
+        //    form, so it carries the `login-form` nonce instead.
+        if (isset($post['login-form-nonce']) && Utils::verifyNonce($post['login-form-nonce'], 'login-form')) {
+            return true;
+        }
+
+        // 3. No nonce. Ask the browser where the request came from. Every engine that
+        //    supports fetch metadata sends Sec-Fetch-Site on navigations: `cross-site`
+        //    is the forged case, and `none` means the user typed the URL or followed a
+        //    bookmark. This is what keeps a theme's bare <a> working on a same-origin
+        //    click while rejecting the attacker's cross-site navigation.
+        $fetchSite = $_SERVER['HTTP_SEC_FETCH_SITE'] ?? null;
+        if (is_string($fetchSite) && $fetchSite !== '') {
+            return in_array(strtolower($fetchSite), ['same-origin', 'same-site', 'none'], true);
+        }
+
+        // 4. A browser too old to send fetch metadata. Compare the referring origin:
+        //    the strict-origin-when-cross-origin policy browsers now default to still
+        //    sends the origin across sites.
+        $referrer = $_SERVER['HTTP_REFERER'] ?? null;
+        if (is_string($referrer) && $referrer !== '') {
+            $parts = parse_url($referrer);
+            if (!isset($parts['scheme'], $parts['host'])) {
+                return false;
+            }
+
+            $origin = $parts['scheme'] . '://' . $parts['host'];
+            if (isset($parts['port'])) {
+                $origin .= ':' . $parts['port'];
+            }
+
+            // Uri::base() is the scheme://host[:port] origin; Uri::rootUrl(true)
+            // would also carry any subdirectory, which is not part of an origin.
+            return rtrim($origin, '/') === rtrim($uri->base(), '/');
+        }
+
+        // 5. No nonce, no fetch metadata, no referrer: a bare navigation from a
+        //    pre-2020 browser. Allow it rather than stranding those visitors with no
+        //    way to sign out. The nonced link above closes the vector for every
+        //    current browser, and the impact here is a sign-out, not a compromise.
+        return true;
+    }
+
+    /**
      * Authorize the Page fallback url (page media accessed through the page route)
      */
     public function authorizeFallBackUrl(): void
     {
-        if ($this->config->get('plugins.login.protect_protected_page_media', false)) {
-            $page_url = \dirname($this->grav['uri']->path());
-            $page = $this->grav['pages']->find($page_url);
-            unset($this->grav['page']);
-            $this->grav['page'] = $page;
-            $this->authorizePage();
+        if (!$this->config->get('plugins.login.protect_protected_page_media', false)) {
+            return;
         }
+
+        $page_url = \dirname($this->grav['uri']->path());
+
+        // Resolve the page the same way `Grav::fallbackUrl()` does, so the rules
+        // being checked belong to the page core is about to serve the file from.
+        // Without `$all`, a `site.routes` entry can hand back a different page.
+        $page = $this->grav['pages']->find($page_url, true);
+
+        // Media stored inside a module folder (`_module`) belongs to the page that
+        // includes the module, so climb to the nearest non-module ancestor and apply
+        // that page's `access` rules. `authorizePage()` skips modules outright, which
+        // left module media served to anyone. getgrav/grav-plugin-login#294
+        while ($page instanceof PageInterface && $page->isModule()) {
+            $page = $page->parent();
+        }
+
+        if (!$page instanceof PageInterface) {
+            return;
+        }
+
+        unset($this->grav['page']);
+        $this->grav['page'] = $page;
+        $this->authorizePage();
     }
 
     /**
@@ -1044,6 +1174,25 @@ class LoginPlugin extends Plugin
         /** @var UserCollectionInterface $users */
         $users = $this->grav['accounts'];
 
+        // Registration is an unauthenticated endpoint that answers "is this
+        // address already taken?", so it gets a per-IP counter to stop it
+        // being walked through a list of addresses (GHSA-crh8-xm27-j9g9).
+        $registrationLimiter = $this->login->getRateLimiter('registrations');
+        $ipKey = $this->login->getIpKey();
+        $registrationLimiter->registerRateLimitedAction($ipKey, 'ip');
+
+        if ($registrationLimiter->isRateLimited($ipKey, 'ip')) {
+            $this->grav->fireEvent('onFormValidationError', new Event([
+                'form'    => $form,
+                'message' => $language->translate([
+                    'PLUGIN_LOGIN.TOO_MANY_REGISTRATION_ATTEMPTS',
+                    $registrationLimiter->getInterval()
+                ])
+            ]));
+            $event->stopPropagation();
+            return;
+        }
+
         // Check for existing username
         $username = $form_data->get('username');
         $existing_username = $users->find($username, ['username']);
@@ -1063,6 +1212,28 @@ class LoginPlugin extends Plugin
         $email    = $form_data->get('email');
         $existing_email = $users->find($email, ['email']);
         if ($existing_email->exists()) {
+            // When registration finishes over email anyway, answer exactly as
+            // a fresh address would be answered and tell the real owner
+            // instead, so the form stops confirming which addresses have an
+            // account (GHSA-crh8-xm27-j9g9). Without activation email the
+            // account is usable immediately, so a silent non-answer would
+            // leave a legitimate visitor stuck — keep the explicit message
+            // there.
+            if ($this->config->get('plugins.login.user_registration.options.send_activation_email', false)) {
+                $this->login->sendAlreadyRegisteredEmail($existing_email);
+
+                $fullname = $form_data->get('fullname') ?: $form_data->get('username');
+                $messages->add(
+                    $language->translate(['PLUGIN_LOGIN.ACTIVATION_NOTICE_MSG', $fullname]),
+                    'info'
+                );
+
+                $event->stopPropagation();
+                $redirect = $this->config->get('plugins.login.user_registration.redirect_after_registration');
+                $this->grav->redirectLangSafe($redirect ?: $this->grav['uri']->rootUrl(), 302);
+                return;
+            }
+
             $this->grav->fireEvent('onFormValidationError', new Event([
                 'form'    => $form,
                 'message' => $language->translate([
@@ -1220,16 +1391,41 @@ class LoginPlugin extends Plugin
         $user     = $this->grav['user'];
         $language = $this->grav['language'];
 
-        $form->validate();
-
         /** @var Data $form_data */
         $form_data = $form->getData();
+        // The form has already filtered empty strings to null. Keep those clear
+        // operations when validation filters the data a second time.
+        $form_data->setMissingValuesAsNull(true);
+        if (!$form->validate()) {
+            // Match the returns below: without firing the event and stopping
+            // propagation, Form::process() carries on to the `message` action and
+            // reports the profile as updated when nothing was saved.
+            $this->grav->fireEvent('onFormValidationError', new Event([
+                'form'     => $form,
+                'message'  => $form->getError() ?: $language->translate('PLUGIN_LOGIN.PROFILE_NOT_UPDATED'),
+                'messages' => $form->getErrors()
+            ]));
+            $event->stopPropagation();
+            return false;
+        }
 
         // Don't save if user doesn't exist
         if (!$user->exists()) {
             $this->grav->fireEvent('onFormValidationError', new Event([
                 'form'    => $form,
                 'message' => $language->translate('PLUGIN_LOGIN.USER_IS_REMOTE_ONLY')
+            ]));
+            $event->stopPropagation();
+            return false;
+        }
+
+        // A user who has supplied the correct password but has not completed
+        // the second-factor challenge exists in the session, but is not yet
+        // authorized to change account data.
+        if ($user->authorized !== true) {
+            $this->grav->fireEvent('onFormValidationError', new Event([
+                'form'    => $form,
+                'message' => $language->translate('PLUGIN_LOGIN.PROFILE_NOT_UPDATED')
             ]));
             $event->stopPropagation();
             return false;
@@ -1276,6 +1472,8 @@ class LoginPlugin extends Plugin
         // persist straight to the account and grant super-admin (GHSA-h33v-82r9-v8pm).
         $privilegeFields = ['groups', 'access'];
 
+        $formValues = $form_data->toArray();
+        $missing = new \stdClass();
         $data = [];
         foreach ($fields as $field) {
             if (in_array($field, $privilegeFields, true)) {
@@ -1289,9 +1487,20 @@ class LoginPlugin extends Plugin
                 continue;
             }
 
-            $data_field = $form_data->get($field);
-            if (!isset($data[$field]) && isset($data_field)) {
-                $data[$field] = $form_data->get($field);
+            // Preserve dot-path lookup while distinguishing a cleared value from an absent field.
+            $data_field = $formValues;
+            foreach (explode('.', $field) as $segment) {
+                if (is_object($data_field) && isset($data_field->{$segment})) {
+                    $data_field = $data_field->{$segment};
+                } elseif (is_array($data_field) && array_key_exists($segment, $data_field)) {
+                    $data_field = $data_field[$segment];
+                } else {
+                    $data_field = $missing;
+                    break;
+                }
+            }
+            if (!array_key_exists($field, $data) && $data_field !== $missing) {
+                $data[$field] = $data_field;
             }
         }
 
@@ -1510,7 +1719,9 @@ class LoginPlugin extends Plugin
         $user = $event->getUser();
         foreach ($event->getAuthorize() as $authorize) {
             if (!$user->authorize($authorize)) {
-                if ($user->state !== 'enabled') {
+                // Match the default core `authorize()` applies (UserTrait,
+                // UserObject): an account with no explicit state is enabled.
+                if ($user->get('state', 'enabled') !== 'enabled') {
                     $event->setMessage($this->grav['language']->translate('PLUGIN_LOGIN.USER_ACCOUNT_DISABLED'), 'error');
                 }
                 $event->setStatus($event::AUTHORIZATION_DENIED);
@@ -1532,6 +1743,7 @@ class LoginPlugin extends Plugin
         $user = $users->load('');
 
         $event->setUser($user);
+        unset($this->grav['session']->remember_me_pending);
         $this->grav['session']->user = $user;
     }
 
@@ -1565,8 +1777,29 @@ class LoginPlugin extends Plugin
             // If the user wants to be remembered, create Rememberme cookie.
             $username = $user->get('username');
             if ($event->getCredential('rememberme')) {
-                $login->rememberMe()->createCookie($username);
+                if ($event->isDelayed()) {
+                    // Defer issuance until the second factor succeeds.
+                    $session->remember_me_pending = $username;
+                } else {
+                    $login->rememberMe()->createCookie($username);
+                }
             }
+        }
+    }
+
+    /**
+     * Complete a deferred remember-me request after the second factor succeeds.
+     */
+    public function userLoginAuthorized(UserLoginEvent $event): void
+    {
+        /** @var SessionInterface $session */
+        $session = $this->grav['session'];
+        $pending = $session->remember_me_pending ?? null;
+        unset($session->remember_me_pending);
+
+        $username = (string)$event->getUser()->get('username');
+        if (is_string($pending) && $pending !== '' && hash_equals($pending, $username)) {
+            $this->grav['login']->rememberMe()->createCookie($username);
         }
     }
 
@@ -1674,5 +1907,192 @@ class LoginPlugin extends Plugin
             'reappear_after' => '+7 days',
         ];
         $event['notifications'] = $notifications;
+    }
+
+    /**
+     * [onApiUserListColumns] Declare the "Login" column on the Admin Next Users list.
+     *
+     * Shows a badge on accounts currently locked out by the failed-login rate
+     * limiter, which is otherwise invisible to an administrator — the lockout
+     * lives in the cache, not on the account.
+     *
+     * @param Event $event
+     * @return void
+     */
+    public function onApiUserListColumns(Event $event): void
+    {
+        $columns = $event['columns'] ?? [];
+        $columns[] = [
+            'id' => 'login-lockout',
+            'plugin' => 'login',
+            'label' => $this->grav['language']->translate('PLUGIN_LOGIN.LOCKOUT_COLUMN_LABEL'),
+            'field' => 'login.lockout',
+            'formatter' => 'badge',
+            'sortable' => false,
+            'priority' => 10,
+            'authorize' => 'api.users.read',
+        ];
+        $event['columns'] = $columns;
+    }
+
+    /**
+     * [onApiUserListColumnData] Fill in the lockout badge for the served page of users.
+     *
+     * Resolves the whole locked set in one sweep and then looks each username up,
+     * so the cost is independent of how many users the page lists.
+     *
+     * @param Event $event
+     * @return void
+     */
+    public function onApiUserListColumnData(Event $event): void
+    {
+        $usernames = $event['usernames'] ?? [];
+        if (!is_array($usernames) || !$usernames) {
+            return;
+        }
+
+        $locked = $this->getLoginInstance()->getLockedAccounts();
+        if (!$locked) {
+            return;
+        }
+
+        $language = $this->grav['language'];
+        $data = $event['data'] ?? [];
+        foreach ($usernames as $username) {
+            if (!isset($locked[$username])) {
+                continue;
+            }
+
+            $data[$username]['login.lockout'] = $language->translate([
+                'PLUGIN_LOGIN.LOCKOUT_COLUMN_VALUE',
+                $locked[$username]['attempts'],
+            ]);
+        }
+        $event['data'] = $data;
+    }
+
+    /**
+     * [onApiUserListRowActions] Declare the per-user Unlock button.
+     *
+     * @param Event $event
+     * @return void
+     */
+    public function onApiUserListRowActions(Event $event): void
+    {
+        $actions = $event['actions'] ?? [];
+        $actions[] = [
+            'id' => 'login-unlock',
+            'plugin' => 'login',
+            'label' => $this->grav['language']->translate('PLUGIN_LOGIN.LOCKOUT_UNLOCK_LABEL'),
+            'icon' => 'fa-unlock',
+            'action' => 'unlock',
+            'priority' => 10,
+            'authorize' => 'api.users.write',
+        ];
+        $event['actions'] = $actions;
+    }
+
+    /**
+     * [onApiUserListRowAction] Clear an account's failed-login lockout.
+     *
+     * The API plugin re-checks this action's declared `authorize` against the
+     * caller before dispatching, and resolves the username against a real
+     * account, so by the time we get here the request is already vetted.
+     *
+     * @param Event $event
+     * @return void
+     */
+    public function onApiUserListRowAction(Event $event): void
+    {
+        if (($event['id'] ?? '') !== 'login-unlock') {
+            return;
+        }
+
+        $username = $event['username'] ?? '';
+        if (!is_string($username) || $username === '') {
+            return;
+        }
+
+        // This handler's own half of the row-action contract. Unlocking clears
+        // every rate limit standing against an account, so a caller who is not a
+        // super admin must not do it to one. The API plugin enforces the same
+        // floor before dispatching; this is the belt to its braces, and only ever
+        // runs underneath it, so ForbiddenException is always loaded by the time
+        // we could throw. (GHSA-985r-mpj8-5rqw)
+        $caller = $event['user'] ?? null;
+        $target = $this->grav['accounts']->load($username);
+        $callerIsSuper = $caller instanceof UserInterface
+            && ($caller->authorize('admin.super') === true || $caller->authorize('api.super') === true);
+        if ($target && $target->exists() && !$callerIsSuper && $this->accessGrantsSuper($target)) {
+            throw new ForbiddenException("Only super admins can clear a super admin account's lockout.");
+        }
+
+        $language = $this->grav['language'];
+        $cleared = $this->getLoginInstance()->unlockUser($username);
+
+        $event['result'] = [
+            'status' => 'success',
+            'message' => $cleared
+                ? $language->translate(['PLUGIN_LOGIN.LOCKOUT_UNLOCKED', $username])
+                : $language->translate(['PLUGIN_LOGIN.LOCKOUT_NOT_LOCKED', $username]),
+        ];
+    }
+
+    /**
+     * Does this account's own `access` map confer super-admin authority, under
+     * either flag? A classic `admin.super` account may not carry `api.super`, and
+     * vice versa, so both count.
+     *
+     * Reads the raw access map rather than calling authorize() on purpose: an
+     * account loaded from disk is neither authenticated nor authorized, so
+     * UserObject::authorize() returns false for it whatever its ACL actually
+     * says. This mirrors the API plugin's own accessGrantsSuper().
+     *
+     * @param UserInterface $user
+     * @return bool
+     */
+    protected function accessGrantsSuper(UserInterface $user): bool
+    {
+        // Own access map plus every group's. Core authorizes group access before
+        // the account's own, and a group carrying admin.super authorizes every
+        // action for its members, so an account that is super only by membership
+        // was invisible here while being fully super at authorization time
+        // (GHSA-vv8m-jqpm-38x4).
+        $maps = [$user->get('access')];
+        foreach ((array) $user->get('groups', []) as $group) {
+            if (is_string($group)) {
+                $maps[] = $this->grav['config']->get("groups.{$group}.access");
+            }
+        }
+
+        foreach ($maps as $access) {
+            if (!is_array($access)) {
+                continue;
+            }
+            foreach (['admin', 'api'] as $scope) {
+                if (!empty($access[$scope]['super']) || !empty($access["{$scope}.super"])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The Login service, instantiated on demand.
+     *
+     * The Users list is served by the API plugin, which doesn't necessarily run
+     * the front-end bootstrap that registers `login` in the container.
+     *
+     * @return Login
+     */
+    protected function getLoginInstance(): Login
+    {
+        if (!isset($this->grav['login'])) {
+            $this->grav['login'] = new Login($this->grav);
+        }
+
+        return $this->grav['login'];
     }
 }

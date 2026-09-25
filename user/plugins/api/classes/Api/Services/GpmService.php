@@ -87,6 +87,19 @@ class GpmService
             return false;
         }
 
+        // Refuse a package built for another Grav generation. Nothing else on
+        // this path checks: the caller resolves dependencies and hands us
+        // slugs, so before this a plugin still requiring the Grav 1.7 `admin`
+        // plugin could install it next to Admin 2 whenever the repository
+        // happened to serve it — which the testing release channel did, because
+        // that beta declared no compatibility for the feed to filter on
+        // (getgrav/grav-premium-issues#618).
+        foreach ($packages as $package) {
+            if (!GravGPM::declaresGravCompatibility($package->compatibility ?? null)) {
+                return false;
+            }
+        }
+
         $messages = '';
 
         foreach ($packages as $package) {
@@ -106,7 +119,7 @@ class GpmService
                 return false;
             }
 
-            $license = Licenses::get($package->slug);
+            $license = Licenses::forPackage($package);
             $local = static::download($package, $license);
 
             Installer::install(
@@ -399,6 +412,17 @@ class GpmService
         try {
             $contents = Response::get($package->zipball_url . $query, []);
         } catch (\Exception $e) {
+            // A refused premium download is worth explaining in the store's
+            // words when it gave any (updates lapsed, key does not cover this
+            // add-on); otherwise say what happened without echoing the
+            // request URL, which carries the licence key.
+            $reason = Licenses::refusalReason($e);
+            if ($reason !== null) {
+                throw new \RuntimeException($reason);
+            }
+            if ($package->premium && $e->getCode() === 401) {
+                throw new \RuntimeException("The licence key for '{$package->slug}' was not accepted by the download server. Check the key in user/data/licenses.yaml.");
+            }
             throw new \RuntimeException($e->getMessage());
         }
 
@@ -464,8 +488,10 @@ class GpmService
                             if (method_exists($install, 'allowIncompatibleOverride')) {
                                 $install::allowIncompatibleOverride(true);
                             }
-                            if (method_exists($install, 'allowPendingOverride')) {
-                                $install::allowPendingOverride(true);
+                            // Core names it allowPendingPackageOverride(); the older name never
+                            // existed, so pending plugin updates could not be overridden here.
+                            if (method_exists($install, 'allowPendingPackageOverride')) {
+                                $install::allowPendingPackageOverride(true);
                             }
                             // Recompute so install() reuses an unblocked, cached report.
                             $report = $install->generatePreflightReport();

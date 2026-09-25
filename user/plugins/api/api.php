@@ -18,6 +18,8 @@ use Grav\Plugin\Api\Audit\AuditSubscriber;
 use Grav\Plugin\Api\Demo\DemoManager;
 use Grav\Plugin\Api\Auth\ApiKeyManager;
 use Grav\Plugin\Api\Popularity\PopularityTracker;
+use Grav\Plugin\Api\Services\TranslationOverrideStore;
+use Grav\Plugin\Api\Services\TranslationSourceIndex;
 use Grav\Plugin\Api\Webhooks\WebhookDispatcher;
 use RocketTheme\Toolbox\Event\Event;
 
@@ -42,6 +44,10 @@ class ApiPlugin extends Plugin
                 ['onRequestHandlerInit', 99000],
             ],
             'onBeforeCacheClear' => ['onBeforeCacheClear', 0],
+            // Re-merge this site's translation overrides. Fires unconditionally
+            // (not gated on isAdmin()) because overrides apply to the front end
+            // as much as the admin. See onThemeInitialized() for the timing.
+            'onThemeInitialized' => ['onThemeInitialized', 0],
             PermissionsRegisterEvent::class => ['onRegisterPermissions', 1000],
             // Fires from Plugins::init(), which runs BEFORE InitializeProcessor
             // starts the session — the only window in which we can still stop the
@@ -115,11 +121,33 @@ class ApiPlugin extends Plugin
             return;
         }
 
-        // Unlock this one page for this request only (nothing is written to disk).
-        // Setting both flags also covers a page that is explicitly `routable:
-        // false`, which the author still wants to see rendered in a preview.
-        $page->published(true);
-        $page->routable(true);
+        // Unlock for this request only (nothing is written to disk). Setting
+        // both flags also covers a page that is explicitly `routable: false`,
+        // which the author still wants rendered in a preview, and every module
+        // is non-routable by definition.
+        //
+        // A module cannot be shown on its own: it exists only as a section
+        // inside its parent, so the admin points the preview at the nearest
+        // ordinary ancestor instead (admin2#170). Keep walking up while the
+        // page is a module, so a nested module and the ordinary page hosting it
+        // are unlocked too. An ordinary page leaves the loop after one pass,
+        // exactly as before, and the chain is read from the site's own page
+        // tree, so the token still reaches nothing but the pages the module
+        // physically lives in. `$seen` guards a malformed tree.
+        //
+        // The unlock has to land on the hydrated objects that find() and
+        // parent() return: a collection filter trusts the frozen index flag
+        // while a page is still lazy, and only reads the live one once the page
+        // is instantiated (Collection::filterByPageFlag, grav#4201). Touching
+        // the chain here is what lets the parent's `@self.modular` collection
+        // see an unpublished module, so do not "optimise" the walk away.
+        $seen = [];
+        while ($page !== null && !$page->root() && !isset($seen[(string) $page->path()])) {
+            $seen[(string) $page->path()] = true;
+            $page->published(true);
+            $page->routable(true);
+            $page = $page->isModule() ? $page->parent() : null;
+        }
     }
 
     public function autoload(): ClassLoader
@@ -154,6 +182,37 @@ class ApiPlugin extends Plugin
 
         if (str_starts_with($currentPath, $this->base)) {
             $this->active = true;
+        }
+    }
+
+    /**
+     * Raise this site's translation overrides above the active theme's strings.
+     *
+     * `user/languages/<lang>.yaml` is already merged at config-compile time, and
+     * that is enough to beat Grav core and every plugin. It is not enough to
+     * beat a theme: theme language files are absent from the compile-time scan
+     * in `ConfigServiceProvider::languages()` and are merged into the finished
+     * object later, by `Themes::loadLanguages()`. So an override of a theme
+     * string — the most common thing a site owner wants to change — would
+     * silently lose.
+     *
+     * `onThemeInitialized` is the first event after that merge, so re-applying
+     * the same file here is what actually makes an override an override. The
+     * store reads only the languages this request can render, so the cost is one
+     * small YAML file, and none at all on a site with no overrides.
+     */
+    public function onThemeInitialized(): void
+    {
+        if (!$this->config->get('plugins.api.translation_overrides', true)) {
+            return;
+        }
+
+        try {
+            $sources = new TranslationSourceIndex($this->grav);
+            (new TranslationOverrideStore($this->grav, $sources))->applyRuntime();
+        } catch (\Throwable $e) {
+            // A malformed override file must never take the site down.
+            $this->grav['log']->warning('[api] translation overrides skipped: ' . $e->getMessage());
         }
     }
 
@@ -320,10 +379,44 @@ class ApiPlugin extends Plugin
         }
 
         // Only a super-admin may act on a super-admin account.
+        // NOT $target->authorize(): a target loaded from storage is not
+        // `authenticated`, so authorize() returns false for every action and this
+        // guard never fired for ANY super target. Read the effective access map —
+        // own plus group-inherited — instead (GHSA-vv8m-jqpm-38x4).
         $target = $this->grav['accounts']->load($username);
-        if ($target->exists() && $target->authorize('admin.super') && !$current->authorize('admin.super')) {
+        if ($target->exists() && $this->accountIsSuper($target) && !$current->authorize('admin.super')) {
             $this->outputJson(['status' => 'error', 'message' => 'Only super-admins can manage super-admin accounts.']);
         }
+    }
+
+    /**
+     * Whether an account loaded from storage is effectively super, through its own
+     * access map or any group it belongs to. Login-state independent by design, so
+     * it works on the non-authenticated user objects `accounts->load()` returns.
+     *
+     * @param object $target
+     */
+    protected function accountIsSuper($target): bool
+    {
+        $maps = [$target->get('access')];
+        foreach ((array) $target->get('groups', []) as $group) {
+            if (is_string($group)) {
+                $maps[] = $this->grav['config']->get("groups.{$group}.access");
+            }
+        }
+
+        foreach ($maps as $access) {
+            if (!is_array($access)) {
+                continue;
+            }
+            foreach (['admin', 'api'] as $scope) {
+                if (!empty($access[$scope]['super']) || !empty($access["{$scope}.super"])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     protected function handleApiKeyGenerate(): void

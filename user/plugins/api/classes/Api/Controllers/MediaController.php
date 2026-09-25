@@ -68,7 +68,7 @@ class MediaController extends AbstractApiController
     {
         $this->requirePermission($request, 'api.media.read');
 
-        $page = $this->findPageOrFail($request);
+        $page = $this->findPageOrFail($request, 'read');
         $pagePath = $page->path();
 
         // Create fresh Media object to avoid stale page cache
@@ -89,7 +89,7 @@ class MediaController extends AbstractApiController
     {
         $this->requirePermission($request, 'api.media.write');
 
-        $page = $this->findPageOrFail($request);
+        $page = $this->findPageOrFail($request, 'update');
         $pagePath = $page->path();
 
         if (!$pagePath || !is_dir($pagePath)) {
@@ -150,7 +150,7 @@ class MediaController extends AbstractApiController
     {
         $this->requirePermission($request, 'api.media.write');
 
-        $page = $this->findPageOrFail($request);
+        $page = $this->findPageOrFail($request, 'update');
         $filename = $this->getSafeFilename($request);
         $pagePath = $page->path();
 
@@ -204,7 +204,7 @@ class MediaController extends AbstractApiController
     {
         $this->requirePermission($request, 'api.media.read');
 
-        $page = $this->findPageOrFail($request);
+        $page = $this->findPageOrFail($request, 'read');
         $filename = $this->getSafeFilename($request);
         $filePath = $this->requirePageMediaFile($page->path(), $filename);
 
@@ -212,7 +212,7 @@ class MediaController extends AbstractApiController
     }
 
     /**
-     * PUT /pages/{route}/media/{filename}/meta - Save a page media file's
+     * PATCH /pages/{route}/media/{filename}/meta - Save a page media file's
      * editable metadata. Only configured fields present in the body are written;
      * every other key in the sidecar (EXIF, dimensions, upload info) is kept.
      */
@@ -220,7 +220,7 @@ class MediaController extends AbstractApiController
     {
         $this->requirePermission($request, 'api.media.write');
 
-        $page = $this->findPageOrFail($request);
+        $page = $this->findPageOrFail($request, 'update');
         $filename = $this->getSafeFilename($request);
         $filePath = $this->requirePageMediaFile($page->path(), $filename);
 
@@ -248,7 +248,7 @@ class MediaController extends AbstractApiController
     {
         $this->requirePermission($request, 'api.media.write');
 
-        $page = $this->findPageOrFail($request);
+        $page = $this->findPageOrFail($request, 'update');
         $filename = $this->getSafeFilename($request);
         $filePath = $this->requirePageMediaFile($page->path(), $filename);
 
@@ -320,6 +320,17 @@ class MediaController extends AbstractApiController
 
         $currentPath = $relativePath !== '' ? $mediaPath . '/' . $relativePath : $mediaPath;
 
+        // Is a metadata filter/sort query requested? (mirrors page media, #4210)
+        $hasMetaQuery = isset($queryParams['filter'])
+            || (isset($queryParams['sort']) && $queryParams['sort'] !== '');
+
+        // Search is a recursive filename scan; metadata filter/sort is a
+        // per-folder collection query. Combining them has no coherent meaning,
+        // so reject it rather than silently ignoring one (#4210).
+        if (!empty($queryParams['search']) && $hasMetaQuery) {
+            throw new ValidationException('search cannot be combined with filter or sort.');
+        }
+
         // Handle search mode
         if (!empty($queryParams['search'])) {
             return $this->handleMediaSearch($request, $mediaPath, $queryParams);
@@ -327,12 +338,16 @@ class MediaController extends AbstractApiController
 
         // Verify directory exists
         if (!is_dir($currentPath)) {
-            // Return empty result for non-existent paths
+            // Return empty result for non-existent paths, echoing the requested
+            // page/per_page like any other empty listing would.
+            $pagination = $this->getPagination($request);
             $baseUrl = $this->getApiBaseUrl() . '/media';
-            return ApiResponse::paginated([], 0, 1, 20, $baseUrl, 200, [], [
+            return ApiResponse::paginated([], 0, $pagination['page'], $pagination['per_page'], $baseUrl, 200, [], [
                 'path' => $relativePath,
                 'folders' => [],
-            ]);
+            ],
+            query: $request->getQueryParams()
+        );
         }
 
         $result = $this->scanMediaDirectoryWithFolders($currentPath, $relativePath);
@@ -340,9 +355,44 @@ class MediaController extends AbstractApiController
         $result['files'] = $this->applySiteMediaOrder($result['files'], $currentPath);
         $pagination = $this->getPagination($request);
 
+        $files = $result['files'];
+
+        // Optional metadata filter/sort, bound to the configured schema and
+        // shared with page media (#4210). Only build a real Media collection
+        // when a query is actually requested: constructing Media can trigger an
+        // EXIF `.meta.yaml` auto-write on GET when `system.media.auto_metadata_exif`
+        // is on, so the plain scan path above must stay side-effect-free.
+        if ($hasMetaQuery) {
+            $media = new \Grav\Common\Page\Media($currentPath);
+            // Throws ValidationException on too many clauses / unknown sort
+            // field — let it propagate, matching page media.
+            $collection = $this->applyMediaQuery($media, $request);
+
+            // The collection is keyed by filename ("<basename>.<ext>"), the same
+            // names scanMediaDirectoryWithFolders() produces, so its keys map
+            // straight back onto the scanned list.
+            $queried = [];
+            foreach ($collection as $name => $medium) {
+                $queried[] = is_string($name) && $name !== ''
+                    ? $name
+                    : ($medium->get('filename') ?: basename((string) $medium->path()));
+            }
+
+            if (isset($queryParams['sort']) && $queryParams['sort'] !== '') {
+                // A sort overrides the manual-order sidecar: the collection's
+                // order wins.
+                $files = $queried;
+            } else {
+                // Filter-only: keep the folder's manual order but drop anything
+                // the collection filtered out. Files that don't resolve as media
+                // simply won't appear — acceptable per #4210.
+                $keep = array_flip($queried);
+                $files = array_values(array_filter($files, static fn(string $f) => isset($keep[$f])));
+            }
+        }
+
         // Apply type filter
         $typeFilter = $queryParams['type'] ?? null;
-        $files = $result['files'];
         if ($typeFilter) {
             $files = array_values(array_filter($files, function (string $file) use ($currentPath, $typeFilter) {
                 $mime = mime_content_type($currentPath . '/' . $file) ?: '';
@@ -379,6 +429,7 @@ class MediaController extends AbstractApiController
                 'folders' => $result['folders'],
                 'ordered' => is_file($currentPath . '/' . self::MEDIA_ORDER_FILE),
             ],
+            query: $request->getQueryParams(),
         );
     }
 
@@ -400,7 +451,7 @@ class MediaController extends AbstractApiController
 
         $targetDir = $relativePath !== '' ? $mediaPath . '/' . $relativePath : $mediaPath;
 
-        if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true)) {
+        if (!is_dir($targetDir) && !@mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
             throw new ValidationException('Unable to create upload directory.');
         }
 
@@ -413,10 +464,45 @@ class MediaController extends AbstractApiController
         $settings = $this->parseUploadFieldSettings($request);
 
         $created = [];
+        $uploadedNames = [];
         foreach ($uploadedFiles as $file) {
+            // Fire before event — plugins can throw to reject specific files.
+            // The page-media upload has fired this since day one; site media
+            // never did, so a listener vetting uploads was silently bypassed
+            // by anything added on Admin Next's Media page (#41). `page` is
+            // null and `path` carries the media-root-relative folder, matching
+            // the after-events below.
+            $this->fireEvent('onApiBeforeMediaUpload', [
+                'page' => null,
+                'path' => $relativePath,
+                'filename' => $file->getClientFilename(),
+                'type' => $file->getClientMediaType(),
+                'size' => $file->getSize(),
+            ]);
+
             $filename = $this->processUploadedFile($file, $targetDir, $settings);
+            $uploadedNames[] = $filename;
             $created[] = $this->serializeSiteFile($targetDir, $filename, $relativePath);
         }
+
+        // Site media belongs to no page, so `object` and `page` are null here,
+        // unlike every other emitter of this event, which always has one. A
+        // listener that dereferences them without a check needs updating.
+        // Firing it at all is the point: plugins that watch the admin media
+        // events never heard about an upload to `user://media`, so Git Sync's
+        // "Sync on Media Changes" silently did nothing for a file added on
+        // Admin Next's Media page, and it only reached the remote on the next
+        // page save or scheduled sync (trilbymedia/grav-plugin-git-sync#261).
+        $this->fireAdminEvent('onAdminAfterAddMedia', [
+            'object' => null,
+            'page' => null,
+            'path' => $relativePath,
+        ]);
+        $this->fireEvent('onApiMediaUploaded', [
+            'page' => null,
+            'path' => $relativePath,
+            'filenames' => $uploadedNames,
+        ]);
 
         $location = $this->getApiBaseUrl() . '/media';
 
@@ -442,6 +528,14 @@ class MediaController extends AbstractApiController
             throw new NotFoundException("Media file not found.");
         }
 
+        // Fire before event — plugins can throw to veto the delete. Same
+        // parity gap as the upload side: only page media used to fire it (#41).
+        $this->fireEvent('onApiBeforeMediaDelete', [
+            'page' => null,
+            'filename' => basename($relativePath),
+            'path' => $relativePath,
+        ]);
+
         unlink($filePath);
 
         // Also remove any metadata file
@@ -452,6 +546,19 @@ class MediaController extends AbstractApiController
 
         // Keep the folder's order sidecar coherent.
         $this->removeFromSiteMediaOrder(dirname($filePath), basename($filePath));
+
+        // Same null `object` / `page` caveat as the upload side above.
+        $this->fireAdminEvent('onAdminAfterDelMedia', [
+            'object' => null,
+            'page' => null,
+            'filename' => basename($relativePath),
+            'path' => $relativePath,
+        ]);
+        $this->fireEvent('onApiMediaDeleted', [
+            'page' => null,
+            'filename' => basename($relativePath),
+            'path' => $relativePath,
+        ]);
 
         $parentDir = ltrim(dirname($relativePath), '.');
         return ApiResponse::noContent(
@@ -479,7 +586,7 @@ class MediaController extends AbstractApiController
     }
 
     /**
-     * PUT /media/meta?path=... - Save a site media file's editable metadata.
+     * PATCH /media/meta?path=... - Save a site media file's editable metadata.
      */
     public function saveSiteMediaMeta(ServerRequestInterface $request): ResponseInterface
     {
@@ -623,7 +730,9 @@ class MediaController extends AbstractApiController
             throw new ValidationException('Folder already exists.');
         }
 
-        if (!mkdir($absolutePath, 0775, true)) {
+        // Suppressed so the ValidationException below is what the caller sees,
+        // rather than a raw PHP warning fataling the request first (#30).
+        if (!@mkdir($absolutePath, 0775, true) && !is_dir($absolutePath)) {
             throw new ValidationException('Unable to create folder.');
         }
 
@@ -733,7 +842,7 @@ class MediaController extends AbstractApiController
 
         // Ensure target directory exists
         $targetDir = dirname($toAbsolute);
-        if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true)) {
+        if (!is_dir($targetDir) && !@mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
             throw new ValidationException('Unable to create destination directory.');
         }
 
@@ -803,12 +912,14 @@ class MediaController extends AbstractApiController
             throw new ValidationException('Unable to rename folder.');
         }
 
-        $name = basename($to);
+        // Same counts the folder listing reports, so a client can patch the
+        // renamed entry in place without a refetch.
+        [$childrenCount, $fileCount] = $this->countFolderEntries($toAbsolute);
         $data = [
-            'name' => $name,
+            'name' => basename($to),
             'path' => $to,
-            'children_count' => 0,
-            'file_count' => 0,
+            'children_count' => $childrenCount,
+            'file_count' => $fileCount,
         ];
 
         return ApiResponse::ok(
@@ -1008,9 +1119,67 @@ class MediaController extends AbstractApiController
     }
 
     /**
+     * GET /media/raw/{path} - Byte-serve a site-media file.
+     *
+     * Only used for files the web server refuses to serve directly (see
+     * {@see isWebServable()}); everything else keeps its cheap static URL. It is
+     * permission-gated like the rest of the site-media routes, and works as an
+     * `<img src>` because the API accepts the site's own session cookie.
+     */
+    public function rawSiteMedia(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requirePermission($request, 'api.media.read');
+
+        $mediaPath = $this->getSiteMediaPath();
+        $relative = $this->validateRelativePath((string) $this->getRouteParam($request, 'path'), $mediaPath);
+
+        $filePath = $relative !== '' ? $mediaPath . '/' . $relative : '';
+        if ($filePath === '' || !is_file($filePath)) {
+            throw new NotFoundException('Media file not found.');
+        }
+
+        $mime = mime_content_type($filePath) ?: 'application/octet-stream';
+
+        // Allow-list rather than deny-list: this route steps around the web
+        // server's own rules, so anything not recognisably media stays
+        // unreachable instead of being handed back as readable source.
+        $servable = str_starts_with($mime, 'image/')
+            || str_starts_with($mime, 'video/')
+            || str_starts_with($mime, 'audio/')
+            || str_starts_with($mime, 'font/')
+            || $mime === 'application/pdf';
+
+        if (!$servable) {
+            throw new NotFoundException('Media file not found.');
+        }
+
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new NotFoundException('Media file not found.');
+        }
+
+        return new Response(
+            200,
+            [
+                'Content-Type' => $mime,
+                'Content-Length' => (string) strlen($content),
+                'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+                // The media folder is user-writable, so an uploaded SVG is a
+                // stored-XSS vector the moment it is navigated to directly. The
+                // sandbox and null default-src neuter it while leaving it
+                // renderable in an <img>; nosniff stops type confusion.
+                'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+                'X-Content-Type-Options' => 'nosniff',
+                'Cache-Control' => 'private, max-age=600',
+            ],
+            $content
+        );
+    }
+
+    /**
      * Resolve a page from the route parameter or throw a 404.
      */
-    private function findPageOrFail(ServerRequestInterface $request): PageInterface
+    private function findPageOrFail(ServerRequestInterface $request, ?string $pageAction = null): PageInterface
     {
         $route = $this->getRouteParam($request, 'route');
 
@@ -1022,6 +1191,15 @@ class MediaController extends AbstractApiController
 
         if (!$page) {
             throw new NotFoundException("Page '/{$route}' not found.");
+        }
+
+        // A page's media lives inside the page, so rules in its frontmatter
+        // apply here too: a page nobody may edit is a page whose attachments
+        // nobody may replace (getgrav/grav-plugin-admin2#150). This only takes
+        // authority away — permission to touch media still comes from
+        // `api.media.*`, never from a page-level grant.
+        if ($pageAction !== null) {
+            $this->assertPageNotDenied($request, $page, $pageAction);
         }
 
         return $page;
@@ -1226,15 +1404,18 @@ class MediaController extends AbstractApiController
     }
 
     /**
-     * Apply the optional metadata filter/sort query params to a page's media
+     * Apply the optional metadata filter/sort query params to a media
      * collection, returning the (possibly filtered/sorted) collection to
      * serialize. With no query params this is a no-op returning `$media->all()`.
+     * Shared by page media (`GET /pages/{route}/media`) and site media
+     * (`GET /media`); the parameter is typed to the `AbstractMedia` base both
+     * `Page\Media` and `GlobalMedia` extend.
      *
      * The filterable/sortable surface is bound to the configured
      * `media_metadata.fields` schema (via {@see getMetadataFieldDefs()}): only
      * admin-defined keys are accepted and each field's `type` drives which
      * operators are legal. Unknown fields are ignored leniently; malformed
-     * clauses and unsupported operators are rejected with a 400. Filtering rides
+     * clauses and unsupported operators are rejected with a 422 (ValidationException). Filtering rides
      * the existing `api.media.read` permission and adds no path or file input.
      *
      * Supported params:
@@ -1242,9 +1423,10 @@ class MediaController extends AbstractApiController
      *    `filter[]=…`). Operators: {@see AbstractMedia::META_OPERATORS}.
      *  - `sort=field` with `order=asc|desc` (`dir=` accepted as an alias).
      *
+     * @param \Grav\Common\Page\Medium\AbstractMedia $media
      * @return iterable<\Grav\Common\Media\Interfaces\MediaObjectInterface>
      */
-    private function applyMediaQuery(\Grav\Common\Page\Media $media, ServerRequestInterface $request): iterable
+    private function applyMediaQuery(\Grav\Common\Page\Medium\AbstractMedia $media, ServerRequestInterface $request): iterable
     {
         // Guard against a core older than the one that shipped the query
         // methods; degrade to the full unfiltered listing rather than error.
@@ -1694,8 +1876,9 @@ class MediaController extends AbstractApiController
 
                 $name = $item->getFilename();
 
-                // Skip hidden and metadata files
-                if (str_starts_with($name, '.') || str_ends_with($name, '.meta.yaml')) {
+                // Skip hidden and metadata files, and the manual-order sidecar
+                // (the folder listing hides it too; it isn't a media file).
+                if (str_starts_with($name, '.') || str_ends_with($name, '.meta.yaml') || $name === self::MEDIA_ORDER_FILE) {
                     continue;
                 }
 
@@ -1752,6 +1935,7 @@ class MediaController extends AbstractApiController
                 'folders' => [],
                 'search' => $queryParams['search'],
             ],
+            query: $request->getQueryParams(),
         );
     }
 
@@ -1818,21 +2002,7 @@ class MediaController extends AbstractApiController
                 $folderPath = $relativePath !== '' ? $relativePath . '/' . $name : $name;
                 $childPath = $absolutePath . '/' . $name;
 
-                // Count immediate children
-                $childrenCount = 0;
-                $fileCount = 0;
-                if (is_dir($childPath)) {
-                    foreach (new \DirectoryIterator($childPath) as $child) {
-                        if ($child->isDot() || str_starts_with($child->getFilename(), '.')) {
-                            continue;
-                        }
-                        if ($child->isDir()) {
-                            $childrenCount++;
-                        } elseif (!str_ends_with($child->getFilename(), '.meta.yaml') && $child->getFilename() !== self::MEDIA_ORDER_FILE) {
-                            $fileCount++;
-                        }
-                    }
-                }
+                [$childrenCount, $fileCount] = $this->countFolderEntries($childPath);
 
                 $folders[] = [
                     'name' => $name,
@@ -1856,6 +2026,130 @@ class MediaController extends AbstractApiController
     }
 
     /**
+     * Count a folder's immediate subfolders and media files, skipping hidden
+     * entries, `.meta.yaml` sidecars and the manual-order sidecar.
+     *
+     * @return array{0: int, 1: int} [children_count, file_count]
+     */
+    private function countFolderEntries(string $absolutePath): array
+    {
+        $childrenCount = 0;
+        $fileCount = 0;
+        if (!is_dir($absolutePath)) {
+            return [0, 0];
+        }
+
+        foreach (new \DirectoryIterator($absolutePath) as $child) {
+            $name = $child->getFilename();
+            if ($child->isDot() || str_starts_with($name, '.')) {
+                continue;
+            }
+            if ($child->isDir()) {
+                $childrenCount++;
+            } elseif (!str_ends_with($name, '.meta.yaml') && $name !== self::MEDIA_ORDER_FILE) {
+                $fileCount++;
+            }
+        }
+
+        return [$childrenCount, $fileCount];
+    }
+
+    /**
+     * Build the browser-facing URL for a site-media file already resolved to an
+     * absolute filesystem path.
+     *
+     * `user://media` is a stream, so it does not always land in `user/media`: a
+     * multi-site install resolves it per-environment (`user/env/<host>/media`),
+     * and a `user/` folder symlinked outside the install is a supported layout.
+     * A hardcoded `/user/media/` prefix therefore points at a path with nothing
+     * on disk, and every preview 404s (#28).
+     *
+     * The direct URL is derived the way core's `MediaFileTrait::url()` does it —
+     * strip the install root, prefix `base_url` — but only when the result is
+     * something the web server will actually hand over. Grav's shipped
+     * `.htaccess` and `webserver-configs/nginx.conf` both deny `user/env` and
+     * `user/config` whatever the file type, so those fall back to this plugin's
+     * own permission-gated byte-serving route instead of a guaranteed 403.
+     */
+    private function resolvePublicUrl(string $absolutePath, string $mediaRelativePath): string
+    {
+        $relative = $this->relativeToWebroot($absolutePath);
+
+        if ($relative !== null && $this->isWebServable($relative)) {
+            // `base_url` (not `base_url_relative`) is the key core's own media
+            // URLs use, so this honours the install's `system.absolute_urls`
+            // setting and its subfolder base in exactly the same way.
+            $base = rtrim((string) ($this->grav['base_url'] ?? ''), '/');
+
+            return $base . '/' . $relative;
+        }
+
+        $encoded = implode('/', array_map('rawurlencode', explode('/', $mediaRelativePath)));
+
+        return $this->getApiBaseUrl() . '/media/raw/' . $encoded;
+    }
+
+    /**
+     * Express an absolute path as a webroot-relative URL path, or null when it
+     * does not sit under a root the site is served from.
+     *
+     * Both sides are `realpath()`d and compared with a trailing separator: the
+     * locator is built on `GRAV_WEBROOT` and can hand back a symlink-resolved
+     * path, and a bare prefix compare would let `/var/www/html` swallow
+     * `/var/www/html-backup`. Returning null rather than the input path is
+     * deliberate — a miss must never put a server filesystem path into an
+     * `<img src>`.
+     */
+    private function relativeToWebroot(string $absolutePath): ?string
+    {
+        $real = realpath($absolutePath);
+        if ($real === false) {
+            return null;
+        }
+
+        // USER_DIR is listed separately from the install roots because a `user/`
+        // folder symlinked outside the install is a supported layout; its files
+        // are still served from `/<user-path>/…`, so the prefix is put back.
+        $roots = [
+            [GRAV_WEBROOT, ''],
+            [GRAV_ROOT, ''],
+            [USER_DIR, trim(GRAV_USER_PATH, '/') . '/'],
+        ];
+
+        foreach ($roots as [$root, $urlPrefix]) {
+            $realRoot = realpath($root);
+            if ($realRoot === false) {
+                continue;
+            }
+
+            $realRoot = rtrim($realRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            if (strncmp($real, $realRoot, strlen($realRoot)) !== 0) {
+                continue;
+            }
+
+            return $urlPrefix . str_replace(DIRECTORY_SEPARATOR, '/', substr($real, strlen($realRoot)));
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether the web server will serve a webroot-relative path directly.
+     *
+     * Mirrors the deny rules Grav ships in `.htaccess` and
+     * `webserver-configs/nginx.conf`, which block `user/config`, `user/env` and
+     * `user/accounts` for every file type. A multi-site `user://media` living
+     * inside `user/env/<host>/` is on disk but 403s over HTTP, so its direct URL
+     * would be exactly as broken as the hardcoded one it replaces.
+     */
+    private function isWebServable(string $relative): bool
+    {
+        $userPath = preg_quote(trim(GRAV_USER_PATH, '/'), '#');
+
+        return !preg_match('#^' . $userPath . '/(config|env|accounts)(/|$)#i', $relative);
+    }
+
+    /**
      * Build a serialized array for a raw file in the site media directory.
      * Used when we don't have Grav Medium objects available.
      */
@@ -1869,7 +2163,7 @@ class MediaController extends AbstractApiController
         $data = [
             'filename' => $filename,
             'path' => $relativePath,
-            'url' => '/user/media/' . $fullRelativePath,
+            'url' => $this->resolvePublicUrl($filePath, $fullRelativePath),
             'type' => $mime,
             'size' => (int) filesize($filePath),
         ];
@@ -1892,12 +2186,13 @@ class MediaController extends AbstractApiController
                 ];
             }
 
-            // Generate thumbnail
+            // Generate thumbnail. The mime is already known, so pass it through
+            // to skip the service's own magic-byte sniff.
             try {
                 $thumbnailService = $this->getThumbnailService();
-                $hash = $thumbnailService->getOrCreate($filePath);
-                if ($hash) {
-                    $data['thumbnail_url'] = $this->getApiBaseUrl() . '/thumbnails/' . $hash;
+                $thumbFilename = $thumbnailService->ensureThumbnail($filePath, $mime);
+                if ($thumbFilename) {
+                    $data['thumbnail_url'] = $this->getApiBaseUrl() . '/thumbnails/' . $thumbFilename;
                 }
             } catch (\Throwable) {
                 // Thumbnail generation failed — skip it

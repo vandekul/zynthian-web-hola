@@ -10,9 +10,13 @@ role: default
 body_classes: 'use-case custom-list'
 limit_reveal: '0'
 media_order: 'always-with-me-always-with-you.wav,CleanGuitarByRodrigoAmaral.mp3,CrunchGuitarByRodrigoAmaral.mp3,ElectroKalimbaMisteryForestDreamByJofemodo.mp3,LeadGuitarByRodrigoAmaral.mp3,ui_screenshots_sl.png,use-cases-2-new.jpg,_DSC4534_01_web_use_case_fx_unit.jpg'
-subtitle: 'Would you like a custom FX-chain for every song?'
+subtitle: 'The best free FXs library'
 background: _DSC4534_01_web_use_case_fx_unit.jpg
 audio:
+    -
+        audioType: local
+        audioFile: portland_nights.mp3
+        audioLabel: 'Portland Nights, by TKC (SooperLooper)'
     -
         audioType: local
         audioFile: always-with-me-always-with-you.wav
@@ -29,10 +33,6 @@ audio:
         audioType: local
         audioFile: LeadGuitarByRodrigoAmaral.mp3
         audioLabel: 'Lead Guitar, by Rodrigo Amaral'
-    -
-        audioType: local
-        audioFile: ElectroKalimbaMisteryForestDreamByJofemodo.mp3
-        audioLabel: 'Kalimba Mistery Forest Dream, by Jofemodo'
 video:
     -
         videoType: youtube
@@ -51,15 +51,16 @@ The official Zynthian V5 Kit have 2 balanced audio-inputs with independent gain-
 
 Zynthian supports the LV2-plugin standard and includes hundreds of audio-processing plugins. You can combine them as you like for sculpting the sound, recreating vintage landscapes or exploring new textures. You can have any number of FX-chains with flexible routing allowing as simple or complex configuration as desired.
 
-If you are a guitar guy, you will enjoy the 3 neural modelers included with zynthian:
+If you are a guitar guy, you will enjoy the neural modelers included with zynthian:
 
-+ [Aida-X](/engines/_engine-list/engine-aidax)
 + [NAM](/engines/_engine-list/engine-nam)
 + [Ratatouille](/engines/_engine-list/engine-ratatouille)
++ [Aida-X](/engines/_engine-list/engine-aidax)
++ [Neural Rack](/engines/_engine-list/engine-neuralrack)
 
-They bring state-of-the-art, accurate emulation of analog gear like amplifiers, distortion, fuzz, overdrive stomp-boxes, etc. Literally thousands of models are freely available in places like [ToneHunt](https://tonehunt.org). Simply download your favorite gear model and get the tone you love.
+They bring state-of-the-art, accurate emulation of analog gear like amplifiers, distortion, fuzz, overdrive stomp-boxes, etc. Literally thousands of models are freely available from [Tone3000](https://tone3000.com), that is fully integrated with zynthian. Choose a model for your favorite gear and get the tone you love with a few clicks.
 
-If you like looping, Sooper Looper is fully integrated, allowing to control up to 6 independent loops with instant record, overdub, reverse, multiply, replace, time-stretch, pitch-shift, and much more.
+If you like looping, SooperLooper is fully integrated, allowing to control up to 6 independent loops with instant record, overdub, reverse, multiply, replace, time-stretch, pitch-shift, and much more.
 
 [figure class=""]![Zynthian UI](ui_screenshots_sl.png)[/figure]
 

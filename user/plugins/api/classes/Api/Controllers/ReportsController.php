@@ -7,7 +7,6 @@ namespace Grav\Plugin\Api\Controllers;
 use Grav\Common\Helpers\YamlLinter;
 use Grav\Common\Page\Pages;
 use Grav\Common\Security;
-use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Response\ApiResponse;
 use Psr\Http\Message\ResponseInterface;
@@ -229,19 +228,21 @@ class ReportsController extends AbstractApiController
      * POST /reports/twig-content/allowlist
      *
      * Append a single blocked token to the matching security.twig_sandbox
-     * allowlist. Writes the FULL effective list back to user/config/security.yaml
-     * because Grav replaces (never deep-merges) YAML lists on config merge — a
-     * partial override would wipe the shipped defaults. Restricted to API super
-     * users, mirroring the security-scope write rule in ConfigController.
+     * allowlist. Since the 2026-08-12 audit the shipped defaults live in code
+     * (SandboxDefaults) and `allowed_*` is ADDITIVE, so this writes just the
+     * user's growing delta to user/config/security.yaml — the defaults are always
+     * merged in underneath. Restricted to API super users, mirroring the
+     * security-scope write rule in ConfigController.
      *
      * Body: { rule: tag|filter|function|method|property, token: string, class?: string }
      */
     public function allowlistAdd(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, 'api.config.write');
-        if (!$this->isSuperAdmin($this->getUser($request))) {
-            throw new ForbiddenException('The Twig sandbox allowlist can only be modified by an API super user.');
-        }
+        // requireSuper() runs the API-key scope cap before the super check, so a
+        // key scoped to api.config.write on a super account can no longer widen the
+        // Twig sandbox allowlist (an SSTI precursor). A bare isSuperAdmin() after
+        // the api.config.write check skipped the cap (GHSA-v5ph-7v92-wqm6).
+        $this->requireSuper($request);
 
         $body  = $this->getRequestBody($request);
         $rule  = is_string($body['rule'] ?? null) ? trim($body['rule']) : '';
@@ -284,10 +285,16 @@ class ReportsController extends AbstractApiController
     /**
      * DELETE /reports/twig-content/events — clear the diagnostics ring buffer
      * once the operator has dealt with the flagged blocks.
+     *
+     * Clearing is a write to a site-wide record every admin reads, so it takes
+     * the system write permission, the same gate as dismissing a dashboard
+     * notification. Under the report's read permission an account or key that
+     * may only view reports could empty it, and the demo write-lock, which
+     * skips anything ending in `.read`, never applied. (grav-plugin-api#35)
      */
     public function clearTwigEvents(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, 'api.reports.read');
+        $this->requirePermission($request, 'api.system.write');
         $cleared = Security::clearTwigContentEvents();
 
         return ApiResponse::ok(['cleared' => $cleared]);
@@ -364,6 +371,24 @@ class ReportsController extends AbstractApiController
         $pages->enablePages();
 
         return ApiResponse::ok(Security::scanContentTwigUsage($pages));
+    }
+
+    /**
+     * GET /reports/twig-content/sandbox-policy
+     *
+     * The effective Twig-sandbox policy, broken down per list into the built-in
+     * code defaults, the site's additive `allowed_*` entries, its `denied_*`
+     * tightenings, and the resulting effective set. Read-only: it explains what
+     * page-content Twig may do and why, now that the ~300-line default baseline
+     * lives in code (Grav\Common\Twig\Sandbox\SandboxDefaults) rather than in the
+     * editable security.yaml. Operators still widen via POST .../allowlist and by
+     * hand-editing `allowed_*`/`denied_*`.
+     */
+    public function twigContentSandboxPolicy(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requirePermission($request, 'api.reports.read');
+
+        return ApiResponse::ok(Security::describeEffectiveSandbox($this->grav['config']));
     }
 
     /**

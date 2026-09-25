@@ -11,6 +11,8 @@ taxonomy:
         - ucase-kb
         - synth-emu
         - synth-phy
+    homepage:
+        - 'yes'
 date: '17:38 10-03-2020'
 subtitle: 'Pipe Organ Emulator'
 splash:
@@ -37,7 +39,7 @@ audio:
 urls:
     -
         urlLink: ' https://kokkinizita.linuxaudio.org/linuxaudio/aeolus/index.html'
-        urlLabel: 'Project''s Website'
+        urlLabel: "Project's Website"
     -
         urlLink: 'https://github.com/fugalh/aeolus'
         urlLabel: 'Source Code'

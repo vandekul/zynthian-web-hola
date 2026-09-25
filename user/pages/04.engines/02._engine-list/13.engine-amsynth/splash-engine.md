@@ -9,8 +9,6 @@ taxonomy:
         - free-software
         - synth-sub
         - ucase-pr
-    homepage:
-        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Virtual Analog Synthesizer'
 splash:
@@ -61,7 +59,7 @@ audio:
 urls:
     -
         urlLink: 'https://amsynth.github.io'
-        urlLabel: 'Project''s Website'
+        urlLabel: "Project's Website"
     -
         urlLink: 'http://www.linuxsynths.com/amSynthdemos/amsynth.html'
         urlLabel: 'LinuxSynths Page'

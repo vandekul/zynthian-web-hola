@@ -10,6 +10,8 @@ taxonomy:
         - synth-sub
         - ucase-kb
         - ucase-pr
+    homepage:
+        - 'yes'
 date: '17:38 29-01-2025'
 subtitle: 'Hybrid Synthesizer'
 splash:
@@ -25,14 +27,13 @@ video:
     -
         videoType: youtube
         videoLink: 'https://www.youtube.com/watch?v=1Zq2FmiZc-E'
-
 urls:
     -
         urlLink: 'https://thewavewarden.com/pages/odin-2'
-        urlLabel: 'Odin2''s Website'
+        urlLabel: "Odin2's Website"
     -
         urlLink: 'https://dl.dropboxusercontent.com/s/hvfewfykddmunrd/Odin2_manual_v2.3.0.pdf'
-        urlLabel: 'Odin2''s Manual'
+        urlLabel: "Odin2's Manual"
     -
         urlLink: 'https://github.com/TheWaveWarden/odin2'
         urlLabel: 'Source Code'

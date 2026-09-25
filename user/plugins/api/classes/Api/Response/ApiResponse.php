@@ -4,11 +4,62 @@ declare(strict_types=1);
 
 namespace Grav\Plugin\Api\Response;
 
+use Grav\Common\Grav;
 use Grav\Framework\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
 class ApiResponse
 {
+    /** Encoding flags shared by every response body this class produces. */
+    private const JSON_FLAGS = JSON_UNESCAPED_SLASHES
+        | JSON_UNESCAPED_UNICODE
+        | JSON_INVALID_UTF8_SUBSTITUTE;
+
+    /**
+     * Build a PSR-7 JSON response, without ever handing a `false` to the body.
+     *
+     * json_encode() returns false on malformed UTF-8, and Nyholm's
+     * Stream::create() type-hints string|resource|StreamInterface, so that
+     * false came back out as an unhandled TypeError instead of a response.
+     * The trigger in practice was the system log viewer: grav.log accumulates
+     * whatever gets logged, invalid byte sequences included, so the endpoint
+     * that reads the log could not encode its own output.
+     *
+     * JSON_INVALID_UTF8_SUBSTITUTE replaces bad bytes with U+FFFD rather than
+     * failing. The guard below covers the remaining ways encoding can fail
+     * (recursion depth, INF/NAN), where the honest answer is a 500 with a real
+     * message instead of a half-serialized body under the original status.
+     */
+    private static function json(int $status, array $headers, array $body): ResponseInterface
+    {
+        $headers = array_merge($headers, [
+            'Content-Type' => 'application/json',
+            'Cache-Control' => 'no-store, max-age=0',
+        ]);
+
+        $json = json_encode($body, self::JSON_FLAGS);
+
+        if ($json === false) {
+            $reason = json_last_error_msg();
+
+            try {
+                Grav::instance()['log']->error('API: response body could not be JSON-encoded: ' . $reason);
+            } catch (\Throwable) {
+                // Logging must never be the reason a response fails to render.
+            }
+
+            $status = 500;
+            $json = json_encode([
+                'error' => [
+                    'code' => 'response_encoding_failed',
+                    'message' => 'The response could not be encoded as JSON: ' . $reason,
+                ],
+            ], self::JSON_FLAGS) ?: '{"error":{"code":"response_encoding_failed"}}';
+        }
+
+        return new Response($status, $headers, $json);
+    }
+
     /**
      * Create a standard JSON response with the data envelope.
      */
@@ -21,16 +72,18 @@ class ApiResponse
             $body['meta'] = $meta;
         }
 
-        $headers = array_merge($headers, [
-            'Content-Type' => 'application/json',
-            'Cache-Control' => 'no-store, max-age=0',
-        ]);
-
-        return new Response($status, $headers, json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        return self::json($status, $headers, $body);
     }
 
     /**
      * Create a paginated response with meta and links.
+     *
+     * Pass the request's query parameters as `$query` so every link keeps the
+     * active filters, search and sort; only `page` and `per_page` change from
+     * link to link. Without it, "next" on a filtered list paged through the
+     * whole unfiltered set.
+     *
+     * @param array<string, mixed> $query
      */
     public static function paginated(
         array $data,
@@ -42,6 +95,7 @@ class ApiResponse
         array $headers = [],
         array $extraMeta = [],
         ?int $locatedAtIndex = null,
+        array $query = [],
     ): ResponseInterface {
         $totalPages = $perPage > 0 ? (int) ceil($total / $perPage) : 1;
 
@@ -63,30 +117,28 @@ class ApiResponse
             $meta = array_merge($meta, $extraMeta);
         }
 
+        unset($query['page'], $query['per_page']);
+        $link = static fn (int $to): string => $baseUrl . '?' . http_build_query(['page' => $to, 'per_page' => $perPage] + $query);
+
         $body = [
             'data' => $data,
             'meta' => $meta,
             'links' => [
-                'self' => $baseUrl . '?' . http_build_query(['page' => $page, 'per_page' => $perPage]),
+                'self' => $link($page),
             ],
         ];
 
         if ($page > 1) {
-            $body['links']['first'] = $baseUrl . '?' . http_build_query(['page' => 1, 'per_page' => $perPage]);
-            $body['links']['prev'] = $baseUrl . '?' . http_build_query(['page' => $page - 1, 'per_page' => $perPage]);
+            $body['links']['first'] = $link(1);
+            $body['links']['prev'] = $link($page - 1);
         }
 
         if ($page < $totalPages) {
-            $body['links']['next'] = $baseUrl . '?' . http_build_query(['page' => $page + 1, 'per_page' => $perPage]);
-            $body['links']['last'] = $baseUrl . '?' . http_build_query(['page' => $totalPages, 'per_page' => $perPage]);
+            $body['links']['next'] = $link($page + 1);
+            $body['links']['last'] = $link($totalPages);
         }
 
-        $headers = array_merge($headers, [
-            'Content-Type' => 'application/json',
-            'Cache-Control' => 'no-store, max-age=0',
-        ]);
-
-        return new Response($status, $headers, json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        return self::json($status, $headers, $body);
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Grav\Plugin\Api\Controllers;
 
 use Grav\Common\Filesystem\Folder;
 use Grav\Common\Grav;
+use Grav\Common\Inflector;
 use Grav\Common\Config\Config;
 use Grav\Common\Language\Language;
 use Grav\Common\Language\LanguageCodes;
@@ -14,7 +15,6 @@ use Grav\Common\Page\Page;
 use Grav\Common\Page\PageOrdering;
 use Grav\Common\Security;
 use Grav\Framework\Flex\FlexDirectory;
-use Grav\Common\User\Interfaces\UserInterface;
 use Grav\Plugin\Api\Exceptions\ApiException;
 use Grav\Plugin\Api\Exceptions\NotFoundException;
 use Grav\Plugin\Api\Exceptions\TwigContentForbiddenException;
@@ -28,6 +28,7 @@ use Grav\Plugin\Api\Serializers\PageSerializer;
 use Grav\Plugin\Api\Services\ThumbnailService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RocketTheme\Toolbox\File\MarkdownFile;
 
 class PagesController extends AbstractApiController
 {
@@ -133,10 +134,13 @@ class PagesController extends AbstractApiController
         $collection = $collection->sort([$flexSortField => $sortOrder]);
 
         // Skip the virtual pages-root container (no file on disk). The home
-        // page IS a real file-backed page even though its route is '/'.
+        // page IS a real file-backed page even though its route is '/', and a
+        // page carrying `routes.default: ''` is a real page whose route is the
+        // empty string, so ask root() rather than testing the route for
+        // truthiness (getgrav/grav-plugin-api#34).
         $items = [];
         foreach ($collection as $page) {
-            if ($page instanceof PageInterface && $page->route() && $page->exists()) {
+            if ($page instanceof PageInterface && !$page->root() && $page->exists()) {
                 $items[] = $page;
             }
         }
@@ -158,7 +162,7 @@ class PagesController extends AbstractApiController
             'include_translations' => $includeTranslations,
         ];
 
-        $data = $this->serializer->serializeCollection($slice, $listOptions);
+        $data = $this->attachPageCapabilities($request, $slice, $this->serializer->serializeCollection($slice, $listOptions));
 
         return ApiResponse::paginated(
             data: $data,
@@ -167,6 +171,7 @@ class PagesController extends AbstractApiController
             perPage: $pagination['per_page'],
             baseUrl: $this->getApiBaseUrl() . '/pages',
             locatedAtIndex: $locatedAt,
+            query: $request->getQueryParams(),
         );
     }
 
@@ -213,7 +218,7 @@ class PagesController extends AbstractApiController
             'include_translations' => $includeTranslations,
         ];
 
-        $data = $this->serializer->serializeCollection($slice, $listOptions);
+        $data = $this->attachPageCapabilities($request, $slice, $this->serializer->serializeCollection($slice, $listOptions));
 
         return ApiResponse::paginated(
             data: $data,
@@ -222,6 +227,7 @@ class PagesController extends AbstractApiController
             perPage: $pagination['per_page'],
             baseUrl: $this->getApiBaseUrl() . '/pages',
             locatedAtIndex: $locatedAt,
+            query: $request->getQueryParams(),
         );
     }
 
@@ -230,20 +236,20 @@ class PagesController extends AbstractApiController
      */
     public function show(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_READ);
         $previousLang = $this->applyLanguage($request);
 
         try {
             $this->enablePages();
 
             $route = $this->getRouteParam($request, 'route');
-            $page = $this->findPageOrFail('/' . $route);
+            $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_READ);
+            $this->authorizePageAction($request, $page, 'read', self::PERMISSION_READ);
 
             // If the page already has process.twig:true, the same gate that
             // governs writes also governs reading the full record. Returning
             // the editor view to a user who can't save it is misleading; let
             // Admin Next show the toast on the show() failure instead.
-            $this->guardTwigContent($page, [], $this->getUser($request));
+            $this->guardTwigContent($request, $page, []);
 
             $query = $request->getQueryParams();
             $summary = filter_var($query['summary'] ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -260,7 +266,13 @@ class PagesController extends AbstractApiController
 
             $data = $this->serializer->serialize($page, $options);
 
-            return $this->respondWithEtag($data);
+            // The ETag is the page's own state — take it BEFORE attaching the
+            // caller's capabilities, which vary per user and would otherwise
+            // make every If-Match on a later PATCH mismatch.
+            $etag = $this->generateEtag($data);
+            $data['permissions'] = $this->pageCapabilities($request, $page);
+
+            return $this->respondWithEtag($data, etag: $etag);
         } finally {
             $this->restoreLanguage($previousLang);
         }
@@ -282,8 +294,6 @@ class PagesController extends AbstractApiController
      */
     public function previewToken(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_READ);
-
         if (!$this->config->get('plugins.api.allow_draft_preview', true)) {
             throw new ForbiddenException('Draft preview is disabled for this site.');
         }
@@ -294,11 +304,24 @@ class PagesController extends AbstractApiController
             $this->enablePages();
 
             $route = $this->getRouteParam($request, 'route');
-            $page = $this->findPageOrFail('/' . $route);
+            $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_READ);
+            $this->authorizePageAction($request, $page, 'read', self::PERMISSION_READ);
 
-            // Pin the token to the page's canonical public route — the same value
-            // the admin builds the preview URL from — so it can only ever unlock
-            // this page. Only super admins and users with page-read can reach here.
+            // The page the browser must actually load. The same page as the one
+            // asked for, except for a module, which only renders inside its
+            // parent (admin2#170).
+            $target = self::previewRenderTarget($page);
+
+            // Previewing a module unlocks its host page too, so the caller has
+            // to be allowed to read that page in its own right: a per-page ACL
+            // can grant a module without granting its parent.
+            if ($target !== $page) {
+                $this->authorizePageAction($request, $target, 'read', self::PERMISSION_READ);
+            }
+
+            // Pin the token to the page's canonical public route, the same value
+            // the admin builds the preview URL from, so it can only ever unlock
+            // this page. Only super admins and users with page-read reach here.
             $jwt = new JwtAuthenticator($this->grav, $this->config);
             $ttl = max(30, (int) $this->config->get('plugins.api.preview_token_ttl', 300));
             $token = $jwt->generatePreviewToken($this->getUser($request), $page->route(), $ttl);
@@ -306,10 +329,66 @@ class PagesController extends AbstractApiController
             return ApiResponse::create([
                 'token' => $token,
                 'expires_in' => $ttl,
+                'route' => (string) $target->route(),
+                // A theme that gives its modules an anchor can scroll straight
+                // to the one being previewed. Advisory only: a theme that emits
+                // no such id simply lands at the top of the parent.
+                'anchor' => $target !== $page ? self::previewAnchor($page) : null,
             ]);
         } finally {
             $this->restoreLanguage($previousLang);
         }
+    }
+
+    /**
+     * The page a preview of `$page` should actually load.
+     *
+     * Normally the page itself. A module is the exception: it is never a page
+     * in its own right, only a section the theme draws inside its parent.
+     * Requesting one directly renders the module template standalone, with no
+     * `<html>` and no theme assets, and emits the section twice, because a
+     * module's content is already that template's output (Twig::processPage())
+     * and the dispatched page render then wraps it in the very same template
+     * again (admin2#170).
+     *
+     * Resolved by walking the real hierarchy, never by trimming the route:
+     * with `system.home.hide_in_urls` a route can be missing its home segment,
+     * and string-splitting it lands on the wrong page (admin2#132).
+     */
+    private static function previewRenderTarget(PageInterface $page): PageInterface
+    {
+        $seen = [];
+
+        while ($page->isModule()) {
+            $seen[(string) $page->path()] = true;
+            $parent = $page->parent();
+            if ($parent === null || $parent->root() || isset($seen[(string) $parent->path()])) {
+                break;
+            }
+            $page = $parent;
+        }
+
+        return $page;
+    }
+
+    /**
+     * The fragment that scrolls a preview to the module being previewed.
+     *
+     * There is no core convention for this, so it is advisory: our themes give
+     * each module an element whose id is the module's menu label hyphenized
+     * (see Quark 2's `modular.html.twig`), and a theme that emits nothing of
+     * the sort simply lands at the top of the parent page.
+     */
+    private static function previewAnchor(PageInterface $page): ?string
+    {
+        $label = trim((string) $page->menu());
+        if ($label === '') {
+            return null;
+        }
+
+        $anchor = Inflector::hyphenize($label);
+
+        return $anchor === '' ? null : $anchor;
     }
 
     /**
@@ -343,12 +422,47 @@ class PagesController extends AbstractApiController
     }
 
     /**
+     * Structural route of a page's parent, resolved from the real hierarchy.
+     *
+     * Never derive a parent by string-splitting the public route(): when
+     * `system.home.hide_in_urls` is on, a child of the home page has its
+     * home segment stripped from route() (e.g. '/child' instead of
+     * '/home/child'), so routeParent(route()) collapses to '/', which the
+     * move/copy/reorganize code then treats as the pages filesystem root —
+     * physically relocating the page out of home (getgrav/grav-plugin-admin2#132).
+     * The parent's rawRoute() carries the real structural segment ('/home'),
+     * and a genuine top-level page reports '/' because its parent is the
+     * pages-root. Mirrors the hierarchy-based logic in {@see isDirectChildOf()}.
+     *
+     * Falls back to string-splitting the public route only for objects with no
+     * materialized parent pointer (e.g. test doubles); real pages always carry
+     * one, so the hidden-home fix always takes the hierarchy path in practice.
+     */
+    private static function structuralParentRoute(object $page): string
+    {
+        if (method_exists($page, 'parent')) {
+            $parent = $page->parent();
+            if ($parent !== null) {
+                if (method_exists($parent, 'root') && $parent->root()) {
+                    return '/';
+                }
+                if (method_exists($parent, 'rawRoute') && $parent->rawRoute()) {
+                    return $parent->rawRoute();
+                }
+            }
+        }
+
+        return self::routeParent($page->route());
+    }
+
+    /**
      * POST /pages - Create a new page.
      */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
-
+        // Authorized further down, against the PARENT page: a `create` rule in
+        // frontmatter governs what may be added beneath that page. Until the
+        // parent is known, only the shape of the request is validated.
         $body = $this->getRequestBody($request);
         $this->requireFields($body, ['route', 'title']);
 
@@ -391,12 +505,21 @@ class PagesController extends AbstractApiController
             if ($parentRoute !== '/') {
                 $parent = $this->grav['pages']->find($parentRoute);
                 if (!$parent) {
+                    // Don't confirm which parents exist to a caller who can't
+                    // create pages anywhere.
+                    $this->requirePermission($request, self::PERMISSION_WRITE);
                     throw new ValidationException("Parent page not found at route: {$parentRoute}");
                 }
                 $parentPath = $parent->path();
             } else {
+                // Top level: the pages root can still carry rules of its own.
+                $parent = method_exists($this->grav['pages'], 'root')
+                    ? $this->grav['pages']->root()
+                    : null;
                 $parentPath = $this->grav['locator']->findResource('page://', true);
             }
+
+            $this->authorizePageAction($request, $parent, 'create', self::PERMISSION_WRITE);
 
             // Resolve `order: "auto"` against existing siblings: if any sibling
             // carries a numeric prefix, assign the next number; otherwise leave
@@ -430,7 +553,7 @@ class PagesController extends AbstractApiController
             // Enforce security.twig_content.* gate before any plugin event can
             // mutate the header — reject the create up-front if the request
             // wants process.twig:true and the user isn't allowed.
-            $this->guardTwigContent(null, $header, $this->getUser($request));
+            $this->guardTwigContent($request, null, $header);
 
             // Fire before event — plugins can modify $header/$content or throw to cancel
             $this->fireEvent('onApiBeforePageCreate', [
@@ -492,6 +615,9 @@ class PagesController extends AbstractApiController
             $data = $resolved !== null
                 ? $this->serializer->serialize($resolved)
                 : ['route' => $route, 'kind' => $kind];
+            if ($resolved !== null) {
+                $data['permissions'] = $this->pageCapabilities($request, $resolved);
+            }
             $location = $this->getApiBaseUrl() . '/pages' . $route;
 
             return ApiResponse::created(
@@ -606,14 +732,14 @@ class PagesController extends AbstractApiController
      */
     public function update(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
         $previousLang = $this->applyLanguage($request);
 
         try {
             $this->enablePages();
 
             $route = $this->getRouteParam($request, 'route');
-            $page = $this->findPageOrFail('/' . $route);
+            $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_WRITE);
+            $this->authorizePageAction($request, $page, 'update', self::PERMISSION_WRITE);
 
             // Guard against writing to a non-existent translation file. When
             // ?lang=X is specified but no X translation exists, Grav's fallback
@@ -646,7 +772,7 @@ class PagesController extends AbstractApiController
             // and the existing page state, before any plugin event can mutate
             // either. Covers two cases: user tries to flip process.twig:true,
             // or user tries to edit a page that already has it on.
-            $this->guardTwigContent($page, (array) ($body['header'] ?? []), $this->getUser($request));
+            $this->guardTwigContent($request, $page, (array) ($body['header'] ?? []));
 
             // Fire before event — plugins can modify $body or throw to cancel
             $this->fireEvent('onApiBeforePageUpdate', ['page' => $page, 'data' => &$body]);
@@ -692,7 +818,9 @@ class PagesController extends AbstractApiController
             // Template change requires renaming the page file (e.g. default.md → post.md)
             $templateChanged = false;
             $oldFilePath = null;
+            $previousTemplate = null;
             if (array_key_exists('template', $body) && $body['template'] !== $page->template()) {
+                $previousTemplate = $page->template();
                 // The page FILENAME is the template basename only. For modular
                 // modules Grav's template() returns a `modular/<name>` form, so
                 // feeding that straight into name()/the old path would write
@@ -742,11 +870,24 @@ class PagesController extends AbstractApiController
             $this->clearPagesCache();
 
             $this->fireAdminEvent('onAdminAfterSave', ['object' => $page, 'page' => $page]);
-            $this->fireEvent('onApiPageUpdated', ['page' => $page]);
+            // `previous_template` is only present when the template actually
+            // changed. Anything keyed on a page's template - the sync plugin's
+            // collaboration rooms, for one - cannot work out what the page used to
+            // be from the saved page alone, and would otherwise leave whatever it
+            // had built against the old one stranded.
+            $updatedEvent = ['page' => $page];
+            if ($templateChanged) {
+                $updatedEvent['previous_template'] = $previousTemplate;
+            }
+            $this->fireEvent('onApiPageUpdated', $updatedEvent);
 
             $data = $this->serializer->serialize($page);
+            // ETag from the page state alone — see show() for why the caller's
+            // capabilities must stay out of it.
+            $etag = $this->generateEtag($data);
+            $data['permissions'] = $this->pageCapabilities($request, $page);
 
-            return $this->respondWithEtag($data, 200, ['pages:update:/' . $route, 'pages:list']);
+            return $this->respondWithEtag($data, 200, ['pages:update:/' . $route, 'pages:list'], $etag);
         } finally {
             $this->restoreLanguage($previousLang);
         }
@@ -757,14 +898,14 @@ class PagesController extends AbstractApiController
      */
     public function delete(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
         $previousLang = $this->applyLanguage($request);
 
         try {
             $this->enablePages();
 
             $route = $this->getRouteParam($request, 'route');
-            $page = $this->findPageOrFail('/' . $route);
+            $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_WRITE);
+            $this->authorizePageAction($request, $page, 'delete', self::PERMISSION_WRITE);
 
             $query = $request->getQueryParams();
             $lang = $query['lang'] ?? null;
@@ -774,7 +915,7 @@ class PagesController extends AbstractApiController
             if ($lang && $this->isMultiLangEnabled()) {
                 $this->fireEvent('onApiBeforePageDelete', ['page' => $page, 'lang' => $lang]);
 
-                $this->deleteLanguageFile($page, $lang);
+                $this->deleteLanguageFile($page, $lang, $includeChildren);
                 $this->clearPagesCache();
 
                 $this->fireAdminEvent('onAdminAfterDelete', ['object' => $page, 'page' => $page]);
@@ -814,11 +955,14 @@ class PagesController extends AbstractApiController
      */
     public function move(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
         $this->enablePages();
 
         $route = $this->getRouteParam($request, 'route');
-        $page = $this->findPageOrFail('/' . $route);
+        $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_WRITE);
+        // Moving a page rewrites it in place, so it takes `update` on the page —
+        // the same action core's Flex listing gates move/copy on — plus
+        // `create` on wherever it lands (checked once the destination is known).
+        $this->authorizePageAction($request, $page, 'update', self::PERMISSION_WRITE);
 
         $body = $this->getRequestBody($request);
         $this->requireFields($body, ['parent']);
@@ -831,12 +975,7 @@ class PagesController extends AbstractApiController
         // unvalidated slug like '01.home/../../../tmp/evil' would relocate the
         // page directory outside user/pages (GHSA-qjq4-jp55-4mx2).
         $rawSlug = $body['slug'] ?? $page->slug();
-        if (!is_string($rawSlug)
-            || preg_match('#[/\\\\]#', $rawSlug)
-            || strpos($rawSlug, '..') !== false
-            || strpbrk($rawSlug, "\0") !== false) {
-            throw new ValidationException('Invalid slug: must be a single path segment.');
-        }
+        $this->assertSinglePathSegment($rawSlug, 'slug');
         $newSlug = ltrim($rawSlug, '.');
         if ($newSlug === '') {
             throw new ValidationException('Invalid slug: must not be empty.');
@@ -858,6 +997,9 @@ class PagesController extends AbstractApiController
 
         // Resolve new parent path
         if ($newParentRoute === '/') {
+            $newParent = method_exists($this->grav['pages'], 'root')
+                ? $this->grav['pages']->root()
+                : null;
             $newParentPath = $this->grav['locator']->findResource('page://', true);
         } else {
             $newParent = $this->grav['pages']->find($newParentRoute);
@@ -867,9 +1009,13 @@ class PagesController extends AbstractApiController
             $newParentPath = $newParent->path();
         }
 
-        // Build new directory name
+        $this->authorizePageAction($request, $newParent, 'create', self::PERMISSION_WRITE);
+
+        // Build new directory name, keeping the width the folder already uses so a
+        // site on a non-default `system.pages.order_digits` is not silently renumbered.
+        $digits = PageOrdering::digitsFromFolder(basename($page->path() ?? '')) ?? PageOrdering::defaultDigits();
         $dirName = $newOrder !== null
-            ? str_pad((string) $newOrder, 2, '0', STR_PAD_LEFT) . '.' . $newSlug
+            ? str_pad((string) $newOrder, $digits, '0', STR_PAD_LEFT) . '.' . $newSlug
             : $newSlug;
 
         $oldPath = $page->path();
@@ -911,8 +1057,10 @@ class PagesController extends AbstractApiController
         }
 
         $data = $this->serializer->serialize($movedPage);
+        $etag = $this->generateEtag($data);
+        $data['permissions'] = $this->pageCapabilities($request, $movedPage);
 
-        return $this->respondWithEtag($data, 200, $moveTags);
+        return $this->respondWithEtag($data, 200, $moveTags, $etag);
     }
 
     /**
@@ -920,11 +1068,12 @@ class PagesController extends AbstractApiController
      */
     public function copy(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
         $this->enablePages();
 
         $route = $this->getRouteParam($request, 'route');
-        $page = $this->findPageOrFail('/' . $route);
+        $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_WRITE);
+        // Copying reads the source and creates at the destination.
+        $this->authorizePageAction($request, $page, 'read', self::PERMISSION_WRITE);
 
         $body = $this->getRequestBody($request);
         $this->requireFields($body, ['route']);
@@ -935,6 +1084,9 @@ class PagesController extends AbstractApiController
 
         // Resolve destination parent path
         if ($destParentRoute === '/') {
+            $destParent = method_exists($this->grav['pages'], 'root')
+                ? $this->grav['pages']->root()
+                : null;
             $destParentPath = $this->grav['locator']->findResource('page://', true);
         } else {
             $destParent = $this->grav['pages']->find($destParentRoute);
@@ -944,6 +1096,8 @@ class PagesController extends AbstractApiController
             $destParentPath = $destParent->path();
         }
 
+        $this->authorizePageAction($request, $destParent, 'create', self::PERMISSION_WRITE);
+
         $destPath = $destParentPath . '/' . $destSlug;
 
         if (is_dir($destPath)) {
@@ -952,11 +1106,24 @@ class PagesController extends AbstractApiController
 
         $sourcePath = $page->path();
         Folder::copy($sourcePath, $destPath);
+        $this->rewriteCopiedSlug($destPath, $destSlug, $page->extension());
         $this->clearPagesCache();
 
         // Re-init and find the copied page
         $this->enablePages(true);
         $copiedPage = $this->grav['pages']->find($destRoute);
+
+        // A copy produces a new page, so it announces itself exactly like
+        // create() does. This endpoint fired nothing at all before (#23).
+        if ($copiedPage) {
+            $this->fireAdminEvent('onAdminAfterSave', ['object' => $copiedPage, 'page' => $copiedPage]);
+        }
+        $this->fireEvent('onApiPageCreated', [
+            'page' => $copiedPage,
+            'route' => $destRoute,
+            'source_route' => '/' . $route,
+            'method' => 'copy',
+        ]);
 
         $copyTags = ['pages:create:' . $destRoute, 'pages:list'];
 
@@ -969,6 +1136,7 @@ class PagesController extends AbstractApiController
         }
 
         $data = $this->serializer->serialize($copiedPage);
+        $data['permissions'] = $this->pageCapabilities($request, $copiedPage);
         $location = $this->getApiBaseUrl() . '/pages' . $destRoute;
 
         return ApiResponse::created($data, $location, $this->invalidationHeaders($copyTags));
@@ -979,11 +1147,11 @@ class PagesController extends AbstractApiController
      */
     public function languages(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_READ);
         $this->enablePages();
 
         $route = $this->getRouteParam($request, 'route');
-        $page = $this->findPageOrFail('/' . $route);
+        $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_READ);
+        $this->authorizePageAction($request, $page, 'read', self::PERMISSION_READ);
 
         $translated = $page->translatedLanguages();
         $untranslated = $page->untranslatedLanguages();
@@ -1006,11 +1174,11 @@ class PagesController extends AbstractApiController
      */
     public function translate(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
         $this->enablePages();
 
         $route = $this->getRouteParam($request, 'route');
-        $page = $this->findPageOrFail('/' . $route);
+        $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_WRITE);
+        $this->authorizePageAction($request, $page, 'update', self::PERMISSION_WRITE);
 
         $body = $this->getRequestBody($request);
         $this->requireFields($body, ['lang']);
@@ -1038,6 +1206,14 @@ class PagesController extends AbstractApiController
             is_array($header) ? $header : [],
         );
 
+        // Same Twig-content scope/permission cap create()/update() enforce: an
+        // api.pages.write key scoped below admin.pages_twig must not enable
+        // process.twig on the page it authors here. translate() previously wrote
+        // a caller-supplied header/content without this gate, letting a scoped key
+        // turn on Twig-in-content (SSTI) that create()/update() would reject.
+        // (GHSA-w94c-jmg4-w4c9, follow-up to GHSA-96xv-p87j-58mx)
+        $this->guardTwigContent($request, null, is_array($body['header'] ?? null) ? $body['header'] : []);
+
         $this->fireEvent('onApiBeforePageTranslate', [
             'page' => $page,
             'lang' => $lang,
@@ -1055,6 +1231,9 @@ class PagesController extends AbstractApiController
         $translatedPage->header((object) $header);
         $translatedPage->rawMarkdown($content);
 
+        // Editor XSS backstop, as run by create()/update(). (GHSA-w94c-jmg4-w4c9)
+        $this->validatePageChanges($translatedPage, ['header' => $header, 'content' => $content]);
+
         // Allow plugins to modify the page before save
         $this->fireAdminEvent('onAdminSave', ['object' => &$translatedPage, 'page' => &$translatedPage]);
 
@@ -1066,10 +1245,12 @@ class PagesController extends AbstractApiController
         /** @var Language $language */
         $language = $this->grav['language'];
         $previousLang = $language->getActive() ?? false;
-        $language->setActive($lang);
 
         try {
-            $this->enablePages(true);
+            // The file was written explicitly above, so this switch only affects
+            // what gets echoed back — but without it the response (and the
+            // events below) carried the source-language page (#24).
+            $this->switchLanguage($lang);
             $newPage = $this->grav['pages']->find('/' . $route);
 
             $this->fireAdminEvent('onAdminAfterSave', ['object' => $newPage ?? $translatedPage, 'page' => $newPage ?? $translatedPage]);
@@ -1080,6 +1261,7 @@ class PagesController extends AbstractApiController
             ]);
 
             $data = $this->serializer->serialize($newPage ?? $translatedPage);
+            $data['permissions'] = $this->pageCapabilities($request, $newPage ?? $translatedPage);
             $location = $this->getApiBaseUrl() . '/pages/' . $route;
 
             return ApiResponse::created(
@@ -1107,16 +1289,16 @@ class PagesController extends AbstractApiController
      */
     public function adoptLanguage(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
         $this->enablePages();
 
         $route = $this->getRouteParam($request, 'route');
-        $page = $this->findPageOrFail('/' . $route);
+        $page = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_WRITE);
+        $this->authorizePageAction($request, $page, 'update', self::PERMISSION_WRITE);
 
         $body = $this->getRequestBody($request);
         $this->requireFields($body, ['lang']);
 
-        $lang = (string) $body['lang'];
+        $lang = $body['lang'];
         $this->validateLanguageCode($lang);
 
         if (!$this->isMultiLangEnabled()) {
@@ -1174,10 +1356,9 @@ class PagesController extends AbstractApiController
         /** @var Language $language */
         $language = $this->grav['language'];
         $previousLang = $language->getActive() ?? false;
-        $language->setActive($lang);
 
         try {
-            $this->enablePages(true);
+            $this->switchLanguage($lang);
             $newPage = $this->grav['pages']->find('/' . $route);
 
             $this->fireEvent('onApiPageLanguageAdopted', [
@@ -1187,6 +1368,7 @@ class PagesController extends AbstractApiController
             ]);
 
             $data = $this->serializer->serialize($newPage ?? $page);
+            $data['permissions'] = $this->pageCapabilities($request, $newPage ?? $page);
 
             return ApiResponse::create(
                 $data,
@@ -1247,8 +1429,7 @@ class PagesController extends AbstractApiController
      */
     public function sync(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
-
+        // Authorized against the page itself, once the source language is loaded.
         $body = $this->getRequestBody($request);
         $this->requireFields($body, ['source_lang', 'target_lang']);
 
@@ -1269,20 +1450,22 @@ class PagesController extends AbstractApiController
 
         try {
             // Load the source page
-            $language->setActive($sourceLang);
-            $this->enablePages(true);
+            $this->switchLanguage($sourceLang);
             $sourcePage = $this->grav['pages']->find('/' . $route);
 
             if (!$sourcePage) {
+                $this->requirePermission($request, self::PERMISSION_WRITE);
                 throw new NotFoundException("Page not found at route '/{$route}' for source language '{$sourceLang}'.");
             }
+
+            $this->authorizePageAction($request, $sourcePage, 'update', self::PERMISSION_WRITE);
 
             $sourceContent = $sourcePage->rawMarkdown();
             $sourceHeader = $this->headerToArray($sourcePage->header());
 
-            // Load the target page
-            $language->setActive($targetLang);
-            $this->enablePages(true);
+            // Load the target page. The rebuild here is what makes the write
+            // land on the target translation rather than the source file (#24).
+            $this->switchLanguage($targetLang);
             $targetPage = $this->grav['pages']->find('/' . $route);
 
             if (!$targetPage) {
@@ -1305,9 +1488,18 @@ class PagesController extends AbstractApiController
                 'content' => &$sourceContent,
             ]);
 
+            // Parity with translate()/create()/update(): enforce the Twig-content
+            // cap and the editor XSS backstop on this write too. sync() copies from
+            // an already-vetted on-disk source rather than the request body, so it
+            // is not a standalone injection path, but every page-write entry point
+            // should apply the same guards. (GHSA-w94c-jmg4-w4c9)
+            $this->guardTwigContent($request, $targetPage, $sourceHeader);
+
             // Overwrite the target with source data
             $targetPage->header((object) $sourceHeader);
             $targetPage->rawMarkdown($sourceContent);
+
+            $this->validatePageChanges($targetPage, ['header' => $sourceHeader, 'content' => $sourceContent]);
 
             $this->fireAdminEvent('onAdminSave', ['object' => &$targetPage, 'page' => &$targetPage]);
             $targetPage->save();
@@ -1326,6 +1518,7 @@ class PagesController extends AbstractApiController
             ]);
 
             $data = $this->serializer->serialize($updatedPage ?? $targetPage);
+            $data['permissions'] = $this->pageCapabilities($request, $updatedPage ?? $targetPage);
             return ApiResponse::create(
                 $data,
                 200,
@@ -1341,6 +1534,11 @@ class PagesController extends AbstractApiController
      */
     public function compare(ServerRequestInterface $request): ResponseInterface
     {
+        // Account-wide gate up front (this endpoint reads a page that may not
+        // resolve at all); a page-level deny is applied below to each side as
+        // it loads. Each translation carries its own frontmatter, and when the
+        // source doesn't resolve the target is the only page checked at all,
+        // so both sides need their own check.
         $this->requirePermission($request, self::PERMISSION_READ);
 
         $params = $request->getQueryParams();
@@ -1362,12 +1560,12 @@ class PagesController extends AbstractApiController
 
         try {
             // Load source page
-            $language->setActive($sourceLang);
-            $this->enablePages(true);
+            $this->switchLanguage($sourceLang);
             $sourcePage = $this->grav['pages']->find('/' . $route);
 
             $sourceData = null;
             if ($sourcePage) {
+                $this->assertPageNotDenied($request, $sourcePage, 'read');
                 $translated = $sourcePage->translatedLanguages();
                 $sourceData = [
                     'lang' => $sourceLang,
@@ -1379,13 +1577,15 @@ class PagesController extends AbstractApiController
                 ];
             }
 
-            // Load target page
-            $language->setActive($targetLang);
-            $this->enablePages(true);
+            // Load target page. Without the extension-memo reset inside
+            // switchLanguage() this resolved back to the source file, so the
+            // two sides of the comparison were always identical (#24).
+            $this->switchLanguage($targetLang);
             $targetPage = $this->grav['pages']->find('/' . $route);
 
             $targetData = null;
             if ($targetPage) {
+                $this->assertPageNotDenied($request, $targetPage, 'read');
                 $translated = $targetPage->translatedLanguages();
                 $targetData = [
                     'lang' => $targetLang,
@@ -1414,11 +1614,13 @@ class PagesController extends AbstractApiController
      */
     public function reorder(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, self::PERMISSION_WRITE);
         $this->enablePages();
 
         $route = $this->getRouteParam($request, 'route');
-        $parent = $this->findPageOrFail('/' . $route);
+        $parent = $this->findPageOrFail('/' . $route, $request, self::PERMISSION_WRITE);
+        // Reordering rewrites the children's folder prefixes, which is an
+        // update of the container they live in.
+        $this->authorizePageAction($request, $parent, 'update', self::PERMISSION_WRITE);
 
         $body = $this->getRequestBody($request);
         $this->requireFields($body, ['order']);
@@ -1557,15 +1759,27 @@ class PagesController extends AbstractApiController
             $pages[$normalizedRoute] = $page;
         }
 
+        // Which page-level action each operation exercises, so a page that
+        // denies it is skipped rather than silently swept up in a bulk call.
+        // Only denials are honored here: the caller already cleared the
+        // account-wide write gate above, so there is no grant to fall back on.
+        $pageActions = match ($operation) {
+            'publish', 'unpublish' => ['publish', 'update'],
+            'delete' => ['delete'],
+            'copy' => ['read'],
+        };
+
         $results = [];
+        $copied = [];
 
         foreach ($pages as $route => $page) {
             try {
+                $this->assertPageNotDenied($request, $page, ...$pageActions);
                 match ($operation) {
-                    'publish' => $this->batchPublish($page, true),
-                    'unpublish' => $this->batchPublish($page, false),
-                    'delete' => $this->batchDelete($page),
-                    'copy' => $this->batchCopy($page, $options),
+                    'publish' => $this->batchPublish($page, $route, true),
+                    'unpublish' => $this->batchPublish($page, $route, false),
+                    'delete' => $this->batchDelete($page, $route),
+                    'copy' => $copied[$route] = $this->batchCopy($page, $options),
                 };
                 $results[] = ['route' => $route, 'status' => 'success'];
             } catch (\Throwable $e) {
@@ -1575,13 +1789,36 @@ class PagesController extends AbstractApiController
 
         $this->clearPagesCache();
 
+        // Copies announce themselves once the index knows about them, so
+        // listeners get a real page object rather than a bare route. One
+        // rebuild covers the whole batch (#23).
+        if ($copied !== []) {
+            $this->enablePages(true);
+
+            foreach ($copied as $sourceRoute => $destRoute) {
+                $newPage = $this->grav['pages']->find($destRoute);
+                if ($newPage) {
+                    $this->fireAdminEvent('onAdminAfterSave', ['object' => $newPage, 'page' => $newPage]);
+                }
+                $this->fireEvent('onApiPageCreated', [
+                    'page' => $newPage,
+                    'route' => $destRoute,
+                    'source_route' => $sourceRoute,
+                    'method' => 'batch',
+                ]);
+            }
+        }
+
         // Build per-route invalidations so listeners on specific pages react too.
+        // A copy creates a page at the DESTINATION, so that is the route whose
+        // cache entry is new — tagging the untouched source instead told
+        // clients to refetch the wrong page.
         $tags = ['pages:list'];
         foreach ($results as $r) {
             if ($r['status'] !== 'success') continue;
             $tags[] = match ($operation) {
                 'delete' => 'pages:delete:' . $r['route'],
-                'copy' => 'pages:create:' . $r['route'],
+                'copy' => 'pages:create:' . ($copied[$r['route']] ?? $r['route']),
                 default => 'pages:update:' . $r['route'],
             };
         }
@@ -1647,7 +1884,11 @@ class PagesController extends AbstractApiController
                 throw new ValidationException("Page not found at route: {$route}");
             }
 
-            $currentParentRoute = self::routeParent($page->route());
+            // Reorganize is all-or-nothing, so a page that denies being moved
+            // fails the whole request rather than being quietly skipped.
+            $this->assertPageNotDenied($request, $page, 'update');
+
+            $currentParentRoute = self::structuralParentRoute($page);
             $affectedParentRoutes[$currentParentRoute] = true;
 
             // Resolve destination parent
@@ -1662,6 +1903,7 @@ class PagesController extends AbstractApiController
                     if (!$newParent) {
                         throw new ValidationException("Destination parent not found at route: {$newParentRoute} (operation index {$index}).");
                     }
+                    $this->assertPageNotDenied($request, $newParent, 'create');
                     $newParentPath = $newParent->path();
                 }
                 $affectedParentRoutes[$newParentRoute] = true;
@@ -1788,8 +2030,11 @@ class PagesController extends AbstractApiController
                 $position = $op['position'];
                 $destParentPath = $op['newParentPath'];
 
+                // Keep the width the folder already used — the temp name carries no
+                // prefix, so the original path is what to read it from.
+                $digits = PageOrdering::digitsFromFolder(basename($op['oldPath'])) ?? PageOrdering::defaultDigits();
                 $dirName = $position !== null
-                    ? str_pad((string) $position, 2, '0', STR_PAD_LEFT) . '.' . $slug
+                    ? str_pad((string) $position, $digits, '0', STR_PAD_LEFT) . '.' . $slug
                     : $slug;
 
                 $finalPath = $destParentPath . '/' . $dirName;
@@ -1819,11 +2064,35 @@ class PagesController extends AbstractApiController
 
         $this->fireEvent('onApiPagesReorganized', ['operations' => $resolved]);
 
+        // Plus one per-page move, so a listener written against the single-page
+        // /move endpoint picks up reorganize moves too instead of quietly
+        // missing them (#23). Ops that didn't actually rename anything on disk
+        // (siblings renumbered to the position they already held) are skipped.
+        foreach ($resolved as $op) {
+            if (empty($op['actuallyMoves'])) {
+                continue;
+            }
+
+            $parentRoute = (string) $op['newParentRoute'];
+            $newRoute = ($parentRoute === '/' ? '' : rtrim($parentRoute, '/')) . '/' . $op['slug'];
+
+            $this->fireEvent('onApiPageMoved', [
+                'page' => $this->grav['pages']->find($newRoute),
+                'old_route' => $op['route'],
+                'new_route' => $newRoute,
+                'method' => 'reorganize',
+            ]);
+        }
+
         // --- Phase 4: Build response with all affected pages ---
         $affectedData = [];
         foreach (array_keys($affectedParentRoutes) as $parentRoute) {
+            // '/' means the pages-root (genuine top-level pages), NOT the home
+            // page — find('/') resolves to home when it's the default route, so
+            // reporting its children would list home's children instead of the
+            // real top-level set (getgrav/grav-plugin-admin2#132).
             $parent = $parentRoute === '/'
-                ? $this->grav['pages']->find('/')
+                ? $this->grav['pages']->root()
                 : $this->grav['pages']->find($parentRoute);
 
             if (!$parent) {
@@ -1901,13 +2170,53 @@ class PagesController extends AbstractApiController
     }
 
     /**
-     * Find a page by route or throw NotFoundException.
+     * Stamp each serialized listing row with what this caller may do to that
+     * page, so a client can hide the edit/delete affordances a page's own
+     * frontmatter denies (getgrav/grav-plugin-admin2#150).
+     *
+     * Only the paginated slice is annotated, and rows are never dropped — a
+     * page whose rules deny reading still appears in the listing without
+     * actions, exactly as core's Flex page index behaves.
+     *
+     * @param list<PageInterface> $pages Pages in the same order they were serialized.
+     * @param list<array<string, mixed>> $data
+     * @return list<array<string, mixed>>
      */
-    private function findPageOrFail(string $route): PageInterface
+    private function attachPageCapabilities(ServerRequestInterface $request, array $pages, array $data): array
     {
+        $pages = array_values($pages);
+
+        foreach ($data as $index => $item) {
+            $page = $pages[$index] ?? null;
+            if ($page instanceof PageInterface) {
+                $item['permissions'] = $this->pageCapabilities($request, $page);
+                $data[$index] = $item;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Find a page by route or throw NotFoundException.
+     *
+     * Page-level permissions can only be evaluated once the page is in hand, so
+     * the endpoints that honor them authorize AFTER this lookup. Pass the
+     * request and the endpoint's account-wide permission and a miss is gated
+     * too — otherwise a caller with no page permission at all could probe which
+     * routes exist by reading 404 vs 403.
+     */
+    private function findPageOrFail(
+        string $route,
+        ?ServerRequestInterface $request = null,
+        ?string $permission = null,
+    ): PageInterface {
         $page = $this->resolvePageByRoute($route);
 
         if (!$page) {
+            if ($request !== null && $permission !== null) {
+                $this->requirePermission($request, $permission);
+            }
             throw new NotFoundException("Page not found at route: {$route}");
         }
 
@@ -1925,9 +2234,12 @@ class PagesController extends AbstractApiController
         $pages = [];
 
         foreach ($instances as $page) {
-            // Skip the virtual pages-root container (no file on disk).
-            // The home page is a real file-backed page with route '/'.
-            if (!$page->route() || !$page->exists()) {
+            // Skip the virtual pages-root container (no file on disk). The home
+            // page is a real file-backed page with route '/', and a page
+            // carrying `routes.default: ''` is a real page whose route is the
+            // empty string, so ask root() rather than testing the route for
+            // truthiness (getgrav/grav-plugin-api#34).
+            if ($page->root() || !$page->exists()) {
                 continue;
             }
 
@@ -1952,12 +2264,14 @@ class PagesController extends AbstractApiController
                 'template' => $page->template() === $value,
                 'routable' => $page->routable() === filter_var($value, FILTER_VALIDATE_BOOLEAN),
                 'visible' => $page->visible() === filter_var($value, FILTER_VALIDATE_BOOLEAN),
-                'parent' => str_starts_with($page->route(), '/' . trim($value, '/')),
+                'parent' => self::routeStartsWith($page, '/' . trim($value, '/')),
                 'children_of' => $this->isDirectChildOf($page, $value),
                 // Root-level = direct child of the pages-root, resolved from the
                 // real hierarchy (see isDirectChildOf) so home-page children
-                // aren't mistaken for top-level pages.
-                'root' => filter_var($value, FILTER_VALIDATE_BOOLEAN) && $this->isDirectChildOf($page, '/'),
+                // aren't mistaken for top-level pages. Compared like the other
+                // boolean filters, so root=false means "non-root pages only"
+                // rather than `false && …`, which excluded every page.
+                'root' => $this->isDirectChildOf($page, '/') === filter_var($value, FILTER_VALIDATE_BOOLEAN),
                 default => true,
             };
 
@@ -1981,6 +2295,28 @@ class PagesController extends AbstractApiController
      * (getgrav/grav-plugin-admin2#32). Comparing against the actual parent
      * page, like admin-classic's tree does, keeps the hierarchy correct.
      */
+    /**
+     * Does either of the page's routes start with the given prefix?
+     *
+     * The `parent` filter matches on the public route, which a route alias can
+     * rewrite. A page carrying `routes.default: ''` has an empty public route
+     * and so could never prefix-match anything, which left it unreachable
+     * through this filter (getgrav/grav-plugin-api#34). The structural route is
+     * always present, so testing both keeps existing public-route matches
+     * working while letting an aliased page still be found by where it actually
+     * lives in the tree.
+     */
+    private static function routeStartsWith(PageInterface $page, string $prefix): bool
+    {
+        foreach ([$page->route(), $page->rawRoute()] as $route) {
+            if (is_string($route) && $route !== '' && str_starts_with($route, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function isDirectChildOf(PageInterface $page, string $parentValue): bool
     {
         $parent = $page->parent();
@@ -2114,13 +2450,13 @@ class PagesController extends AbstractApiController
             FILTER_VALIDATE_BOOLEAN
         );
 
-        $data = $this->serializer->serializeCollection($slice, [
+        $data = $this->attachPageCapabilities($request, $slice, $this->serializer->serializeCollection($slice, [
             'include_content' => false,
             'render_content' => false,
             'include_children' => false,
             'include_media' => false,
             'include_translations' => $includeTranslations,
-        ]);
+        ]));
 
         return ApiResponse::paginated(
             data: $data,
@@ -2129,6 +2465,7 @@ class PagesController extends AbstractApiController
             perPage: $pagination['per_page'],
             baseUrl: $this->getApiBaseUrl() . '/pages',
             locatedAtIndex: $locatedAt,
+            query: $request->getQueryParams(),
         );
     }
 
@@ -2189,30 +2526,89 @@ class PagesController extends AbstractApiController
 
     /**
      * Batch helper: set published state on a page.
+     *
+     * Fires the same before/after pair as PATCH /pages/{route}. Bulk actions
+     * used to run silently, so anything tracking per-page state — a search
+     * index, a redirect map, and the plugin's own audit trail and webhook
+     * dispatcher, which both subscribe to these events — simply missed them
+     * (#23). The `method` hint lets a listener tell a bulk edit from a
+     * single-page one without changing the payload shape.
      */
-    private function batchPublish(PageInterface $page, bool $published): void
+    private function batchPublish(PageInterface $page, string $route, bool $published): void
     {
         $header = $this->headerToArray($page->header());
         $header['published'] = $published;
-        $page->header((object) $header);
+
+        $data = ['header' => $header];
+        $this->fireEvent('onApiBeforePageUpdate', ['page' => $page, 'data' => &$data, 'method' => 'batch']);
+
+        $page->header((object) ($data['header'] ?? $header));
+
+        $this->fireAdminEvent('onAdminSave', ['object' => &$page, 'page' => &$page]);
         $page->save();
+
+        $this->fireAdminEvent('onAdminAfterSave', ['object' => $page, 'page' => $page]);
+        $this->fireEvent('onApiPageUpdated', ['page' => $page, 'route' => $route, 'method' => 'batch']);
     }
 
     /**
      * Batch helper: delete a page.
+     *
+     * Event parity with DELETE /pages/{route} (#23). This is the one that hurt
+     * most: the page was gone and no delete hook had ever run, so listeners
+     * never got to clean up after it and nothing was written to the audit log.
      */
-    private function batchDelete(PageInterface $page): void
+    private function batchDelete(PageInterface $page, string $route): void
     {
+        $this->fireEvent('onApiBeforePageDelete', ['page' => $page, 'method' => 'batch']);
+
         Folder::delete($page->path());
+
+        $this->fireAdminEvent('onAdminAfterDelete', ['object' => $page, 'page' => $page]);
+        $this->fireEvent('onApiPageDeleted', ['route' => $route, 'method' => 'batch']);
     }
 
     /**
      * Batch helper: copy a page.
      */
-    private function batchCopy(PageInterface $page, array $options): void
+    /**
+     * Reject any value that is not a single path segment. A slug/suffix becomes a
+     * page-folder name, never a path: a separator, parent-traversal or null byte
+     * lets it escape user/pages once concatenated into a filesystem path (e.g.
+     * Folder::copy()'s recursive mkdir resolves `..`). Shared by move() and
+     * batchCopy(). (GHSA-qjq4-jp55-4mx2, GHSA-g6j3-8jv9-ch5f)
+     *
+     * @param mixed $value
+     * @param string $field
+     * @return string
+     */
+    private function assertSinglePathSegment(mixed $value, string $field): string
     {
-        $destParent = $options['destination'] ?? self::routeParent($page->route());
+        if (!is_string($value)
+            || $value === ''
+            || preg_match('#[/\\\\]#', $value)
+            || str_contains($value, '..')
+            || str_contains($value, "\0")) {
+            throw new ValidationException("Invalid {$field}: must be a single path segment.");
+        }
+
+        return $value;
+    }
+
+    /**
+     * Batch helper: copy a page. Returns the destination route so batch() can
+     * fire one created-event per copy after a single index rebuild — resolving
+     * each new page inside this loop would mean a full filesystem walk per
+     * item (#23).
+     */
+    private function batchCopy(PageInterface $page, array $options): string
+    {
+        $destParent = $options['destination'] ?? self::structuralParentRoute($page);
         $suffix = $options['suffix'] ?? '-copy';
+        // The suffix becomes part of the destination folder name; reject any
+        // separator or traversal before it reaches Folder::copy() (whose
+        // recursive mkdir resolves `..`). (GHSA-g6j3-8jv9-ch5f)
+        $this->assertSinglePathSegment($suffix, 'suffix');
         $destSlug = $page->slug() . $suffix;
 
         if ($destParent === '/') {
@@ -2231,6 +2627,69 @@ class PagesController extends AbstractApiController
         }
 
         Folder::copy($page->path(), $destPath);
+        $this->rewriteCopiedSlug($destPath, $destSlug, $page->extension());
+
+        return ($destParent === '/' ? '' : rtrim($destParent, '/')) . '/' . $destSlug;
+    }
+
+    /**
+     * Point a freshly copied page's `slug:` at its own folder.
+     *
+     * Folder::copy() reproduces the source byte for byte, so an explicit `slug:`
+     * in the frontmatter travels with it and the copy claims the source's route:
+     * slug() prefers the header value over the folder name, and route() is just
+     * the parent route plus slug(). Grav does not reject that — Pages::buildRoutes()
+     * logs "Route already exists" and lets whichever page is indexed last win, so
+     * the listing shows two pages on one route, admin-next's keyed page tree
+     * aborts on the duplicate, and the title bump the admin sends straight after a
+     * copy can resolve to the ORIGINAL page and overwrite it. Admin-classic has
+     * always rewritten the header slug when duplicating a page
+     * (AdminController::taskCopy()); this gives the API the same behaviour.
+     * (#25, getgrav/grav-plugin-admin2#154)
+     *
+     * Rewritten in place, before the index is rebuilt, so the copy already sits on
+     * its own route by the time we resolve and serialize it. Doing it afterwards
+     * would not be enough: Page::route() is memoized during buildRoutes(), so the
+     * response would still echo the source's route.
+     *
+     * Only a page that already declared a slug gets one written back, so we never
+     * add frontmatter the source did not have. Every language variant in the folder
+     * is rewritten, because each carries its own frontmatter. Child folders are
+     * left alone: their slugs are relative to this page, so they become unique
+     * again as soon as the parent's does.
+     *
+     * @param string $destPath  Filesystem path of the copied page folder.
+     * @param string $destSlug  Slug the copy should answer to.
+     * @param string $extension Page file extension, including the leading dot.
+     */
+    private function rewriteCopiedSlug(string $destPath, string $destSlug, string $extension): void
+    {
+        $extension = '.' . ltrim($extension, '.');
+
+        // scandir rather than glob: a page folder name may legitimately contain
+        // `[` or `*`, which glob would read as a pattern.
+        foreach (scandir($destPath) ?: [] as $filename) {
+            if (!str_ends_with($filename, $extension)) {
+                continue;
+            }
+
+            $file = MarkdownFile::instance($destPath . '/' . $filename);
+
+            try {
+                $header = $file->header();
+                if (!is_array($header) || !array_key_exists('slug', $header)) {
+                    continue;
+                }
+
+                $header['slug'] = $destSlug;
+                $file->header($header);
+                $file->save();
+            } finally {
+                // AbstractFile::instance() keeps a static instance cache, and the
+                // index rebuild that follows must not read a stale one.
+                $file->free();
+            }
+        }
     }
 
     /**
@@ -2314,6 +2773,41 @@ class PagesController extends AbstractApiController
     }
 
     /**
+     * Make a language active for page lookups, and optionally rebuild the pages
+     * index against it.
+     *
+     * Every language switch must go through here. `setActive()` on its own is
+     * not enough: Grav memoizes the language→file-extension priority list the
+     * first time `Pages::recurse()` asks for it, under a key that does not
+     * include the language ("<ext>-default-0" in
+     * `Language::getFallbackPageExtensions()`). So a request that activates a
+     * second language gets a fresh filesystem walk resolved with the FIRST
+     * language's priorities, and every page binds to the wrong translation
+     * file — the target of a sync resolves to the source's file, so the write
+     * lands there and the translation is never touched (#24), and a compare
+     * returns the source content on both sides. Core spells out the required
+     * sequence in `Language::resetFallbackPageExtensions()`'s own docblock:
+     * setActive → reset → rebuild.
+     *
+     * This also matters beyond the request: the index built with the stale
+     * priorities is cached under the legitimate per-language cache id, so a
+     * poisoned build can leak into ordinary front-end requests for that
+     * language until the pages hash changes.
+     */
+    private function switchLanguage(string $lang, bool $rebuild = true): void
+    {
+        /** @var Language $language */
+        $language = $this->grav['language'];
+
+        $language->setActive($lang);
+        $language->resetFallbackPageExtensions();
+
+        if ($rebuild) {
+            $this->enablePages(true);
+        }
+    }
+
+    /**
      * Apply language from ?lang= query parameter or an explicit language code.
      * Returns the previous active language so it can be restored.
      */
@@ -2329,7 +2823,6 @@ class PagesController extends AbstractApiController
             $this->validateLanguageCode($lang);
 
             $changed = $language->getActive() !== $lang;
-            $language->setActive($lang);
 
             // Grav builds (and caches) the pages index for whichever language
             // is active at init time; enablePages()/init() are then no-ops. If
@@ -2339,11 +2832,7 @@ class PagesController extends AbstractApiController
             // language and a GET returns the wrong content. Force a rebuild
             // against the now-active language so route lookups target the
             // requested translation. See getgrav/grav-plugin-api#6.
-            if ($changed) {
-                $pages = $this->grav['pages'];
-                $pages->enablePages();
-                $pages->reset();
-            }
+            $this->switchLanguage($lang, $changed);
         }
 
         return $previousLang;
@@ -2351,6 +2840,11 @@ class PagesController extends AbstractApiController
 
     /**
      * Restore the previously active language.
+     *
+     * The pages index is deliberately left as the endpoint built it (rebuilding
+     * it again would cost a full filesystem walk for nothing), but the
+     * extension-priority memo is dropped so anything later in the request
+     * resolves page files against the language that is actually active again.
      */
     private function restoreLanguage(string|false $previousLang): void
     {
@@ -2359,16 +2853,21 @@ class PagesController extends AbstractApiController
             return;
         }
 
-        /** @var Language $language */
-        $language = $this->grav['language'];
-        $language->setActive($previousLang);
+        $this->switchLanguage($previousLang, false);
     }
 
     /**
      * Validate that a language code is configured in the site.
      */
-    private function validateLanguageCode(string $lang): void
+    private function validateLanguageCode(mixed $lang): void
     {
+        // Codes arrive straight from the body or query string, so a JSON number
+        // or a `lang[]=` array can land here. Reject those as a 422 instead of
+        // letting a string type hint turn them into a TypeError (500).
+        if (!is_string($lang) || $lang === '') {
+            throw new ValidationException('Language code must be a non-empty string.');
+        }
+
         /** @var Language $language */
         $language = $this->grav['language'];
 
@@ -2428,7 +2927,7 @@ class PagesController extends AbstractApiController
     /**
      * Delete only a specific language file for a page, preserving other translations.
      */
-    private function deleteLanguageFile(PageInterface $page, string $lang): void
+    private function deleteLanguageFile(PageInterface $page, string $lang, bool $includeChildren = true): void
     {
         $this->validateLanguageCode($lang);
 
@@ -2437,8 +2936,15 @@ class PagesController extends AbstractApiController
             throw new NotFoundException("No translation found for language '{$lang}' at route: {$page->route()}");
         }
 
-        // If this is the only translation, delete the entire page directory
+        // If this is the only translation, delete the entire page directory.
+        // That removes the children too, so honour ?children=false exactly
+        // like a plain delete does instead of wiping the subtree regardless.
         if (count($translated) <= 1) {
+            if (!$includeChildren && $page->children()->count() > 0) {
+                throw new ValidationException(
+                    'This page has children. Use ?children=true to confirm deletion of the page and all its children.'
+                );
+            }
             Folder::delete($page->path());
             return;
         }
@@ -2579,8 +3085,9 @@ class PagesController extends AbstractApiController
      * `admin.pages` hierarchy so granting `admin.pages` does NOT implicitly
      * grant twig-toggle (the Flex ACL walks parent prefixes).
      */
-    private function guardTwigContent(?PageInterface $existingPage, array $incomingHeader, UserInterface $user): void
+    private function guardTwigContent(ServerRequestInterface $request, ?PageInterface $existingPage, array $incomingHeader): void
     {
+        $user = $this->getUser($request);
         $existingTwig = false;
         if ($existingPage !== null) {
             $existingHeader = $this->headerToArray($existingPage->header());
@@ -2609,7 +3116,14 @@ class PagesController extends AbstractApiController
             return;
         }
 
-        if ($this->isSuperAdmin($user) || $this->hasPermission($user, 'admin.pages_twig')) {
+        // The scope cap runs here too: a key scoped to api.pages.write on a super
+        // account must also carry admin.pages_twig in its scopes, otherwise the
+        // bare isSuperAdmin() branch would re-grant a capability the key was scoped
+        // out of and let it enable Twig-in-content (GHSA-96xv-p87j-58mx).
+        // @scope-cap-exempt: the cap is the scopeAllows() conjunct on this same
+        // condition, so the super branch cannot be reached uncapped.
+        if ($this->scopeAllows($request, 'admin.pages_twig')
+            && ($this->isSuperAdmin($user) || $this->hasPermission($user, 'admin.pages_twig'))) {
             return;
         }
 

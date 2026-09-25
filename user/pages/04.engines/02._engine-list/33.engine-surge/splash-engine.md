@@ -10,6 +10,8 @@ taxonomy:
         - synth-sub
         - ucase-kb
         - ucase-pr
+    homepage:
+        - 'yes'
 date: '17:38 20-10-2020'
 subtitle: 'Hybrid Synthesizer'
 splash:
@@ -36,10 +38,10 @@ video:
 urls:
     -
         urlLink: 'https://surge-synthesizer.github.io/'
-        urlLabel: 'Surge''s Website'
+        urlLabel: "Surge's Website"
     -
         urlLink: 'https://surge-synthesizer.github.io/manual/'
-        urlLabel: 'Surge''s Manual'
+        urlLabel: "Surge's Manual"
     -
         urlLink: 'https://github.com/surge-synthesizer/surge'
         urlLabel: 'Source Code'

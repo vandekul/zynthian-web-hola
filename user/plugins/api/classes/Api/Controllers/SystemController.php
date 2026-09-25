@@ -17,6 +17,13 @@ use Psr\Http\Message\ServerRequestInterface;
 class SystemController extends AbstractApiController
 {
     /**
+     * Locale every other locale falls back to, and the one admin2 authors its
+     * strings in. Must be the canonical form `normalizeLangCode()` produces, so a
+     * request for `en` or `en-US` skips the backfill instead of merging with itself.
+     */
+    private const FALLBACK_LANG = 'en-US';
+
+    /**
      * GET /system/environments — list writable environment targets.
      *
      * Response shape:
@@ -29,8 +36,9 @@ class SystemController extends AbstractApiController
      *   }
      *
      * `name: ""` represents the base user/config target. Any other entry is an
-     * existing user/env/<name>/ folder that can be selected as a write target.
-     * Legacy user/<host>/config/ layouts (Grav 1.6 fallback) are included too.
+     * existing environment resolved by Grav's environment:// stream or its
+     * configured common environment path. Legacy user/<host>/config/ layouts
+     * (Grav 1.6 fallback) are included too.
      */
     public function environments(ServerRequestInterface $request): ResponseInterface
     {
@@ -63,7 +71,8 @@ class SystemController extends AbstractApiController
      * POST /system/environments — create a new env folder.
      *
      * Body: { "name": "staging.foo.com" }
-     * Creates user/env/<name>/config/ (and user/env/ if missing).
+     * Creates the configured environment's config/ directory (or the standard
+     * user/env/<name>/config/ path when no common path is configured).
      */
     public function createEnvironment(ServerRequestInterface $request): ResponseInterface
     {
@@ -88,21 +97,27 @@ class SystemController extends AbstractApiController
     }
 
     /**
-     * DELETE /system/environments/{name} — remove a user/env/<name>/ folder.
+     * DELETE /system/environments/{name} — remove an environment folder.
      *
      * Refuses to delete the env that Grav resolved for the current request, and
      * refuses to act on legacy user/<name>/ layouts. See EnvironmentService for
      * the full safety rules.
+     *
+     * Super only, unlike create: the folder can hold `system` and `security`
+     * overrides that only a super user may write (ConfigController's
+     * SUPER_WRITE_SCOPES), and deleting it reverts them just as surely.
      */
     public function deleteEnvironment(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, 'api.config.write');
+        $this->requireSuper($request);
 
         $name = (string) $this->getRouteParam($request, 'name');
 
         $envService = new EnvironmentService($this->grav);
         try {
             $envService->deleteEnvironment($name);
+        } catch (\OutOfBoundsException $e) {
+            throw new NotFoundException($e->getMessage());
         } catch (\InvalidArgumentException $e) {
             throw new ValidationException($e->getMessage());
         }
@@ -127,7 +142,7 @@ class SystemController extends AbstractApiController
             'php_version' => PHP_VERSION,
             'php_extensions' => get_loaded_extensions(),
             'server_software' => $redact ? self::DEMO_REDACTED : ($_SERVER['SERVER_SOFTWARE'] ?? 'unknown'),
-            'environment' => $this->config->get('system.environment') ?? $this->grav['uri']->environment(),
+            'environment' => (string) ($this->config->get('system.environment') ?? $this->grav['uri']->environment()),
             'plugins' => $plugins,
             'themes' => $themes,
             'php_config' => $this->getPhpConfig($redact),
@@ -215,14 +230,25 @@ class SystemController extends AbstractApiController
         $query = $request->getQueryParams();
         $scope = $query['scope'] ?? 'standard';
 
-        $allowedScopes = ['all', 'standard', 'images', 'assets', 'tmp'];
-        if (!in_array($scope, $allowedScopes, true)) {
+        // API scope => core Cache::clearCache() argument. Core names the partial
+        // clears `*-only` and treats anything it doesn't recognise as a standard
+        // clear, so passing `images` straight through quietly cleared the wrong
+        // thing.
+        $scopeMap = [
+            'all' => 'all',
+            'standard' => 'standard',
+            'images' => 'images-only',
+            'assets' => 'assets-only',
+            'tmp' => 'tmp-only',
+        ];
+        if (!is_string($scope) || !isset($scopeMap[$scope])) {
+            $shown = is_string($scope) ? $scope : '(non-string)';
             throw new ValidationException(
-                "Invalid cache scope '{$scope}'. Allowed: " . implode(', ', $allowedScopes),
+                "Invalid cache scope '{$shown}'. Allowed: " . implode(', ', array_keys($scopeMap)),
             );
         }
 
-        $results = $this->grav['cache']->clearCache($scope);
+        $results = $this->grav['cache']->clearCache($scopeMap[$scope]);
 
         return ApiResponse::create([
             'scope' => $scope,
@@ -278,7 +304,7 @@ class SystemController extends AbstractApiController
 
         $logFile = $this->grav['locator']->findResource('log://' . $requested);
         if (!$logFile || !file_exists($logFile)) {
-            return ApiResponse::paginated([], 0, $pagination['page'], $pagination['per_page'], $this->getApiBaseUrl() . '/system/logs');
+            return ApiResponse::paginated([], 0, $pagination['page'], $pagination['per_page'], $this->getApiBaseUrl() . '/system/logs', query: $request->getQueryParams());
         }
 
         $content = file_get_contents($logFile);
@@ -337,7 +363,114 @@ class SystemController extends AbstractApiController
         $total = count($entries);
         $paged = array_slice($entries, $pagination['offset'], $pagination['limit']);
 
-        return ApiResponse::paginated($paged, $total, $pagination['page'], $pagination['per_page'], $this->getApiBaseUrl() . '/system/logs');
+        return ApiResponse::paginated($paged, $total, $pagination['page'], $pagination['per_page'], $this->getApiBaseUrl() . '/system/logs', query: $request->getQueryParams());
+    }
+
+    /**
+     * DELETE /system/logs?file=grav.log — empty out a log file.
+     *
+     * Super-admin only. Clearing a log destroys the forensic record of
+     * everything that happened before it — including the trail of an attack an
+     * operator may be in the middle of reviewing — so this sits above the
+     * api.system.read/write tiers that the rest of the log viewer uses, and
+     * above what a scoped API key minted on a super account can reach.
+     *
+     * The file is truncated rather than deleted, so the inode, ownership and
+     * mode survive and any handler holding it open keeps writing to the same
+     * place. A single marker entry is left behind recording who cleared it, in
+     * the same format the viewer parses — a wiped log that says nothing about
+     * being wiped is worse than one that does.
+     *
+     * The target accepts `file` from the JSON body or the query string, and is
+     * validated against the same whitelist GET /system/logs uses.
+     */
+    public function clearLog(ServerRequestInterface $request): ResponseInterface
+    {
+        $this->requireSuper($request);
+        $this->denyIfDemo($request, 'Clearing logs is disabled in demo mode.');
+
+        $body = $this->getRequestBody($request);
+        $query = $request->getQueryParams();
+        $requested = (string) ($body['file'] ?? $query['file'] ?? 'grav.log');
+
+        $registered = $this->getRegisteredLogFiles();
+        $allowed = array_column($registered, 'file');
+        if (!in_array($requested, $allowed, true)) {
+            throw new ValidationException('Unknown log file: ' . $requested, [
+                ['field' => 'file', 'message' => 'Must be one of: ' . implode(', ', $allowed)],
+            ]);
+        }
+
+        $logFile = $this->grav['locator']->findResource('log://' . $requested);
+        if (!$logFile || !file_exists($logFile)) {
+            // A curated core log is listed before its first write; nothing to
+            // clear is a success, not an error.
+            return ApiResponse::create([
+                'file' => $requested,
+                'cleared_bytes' => 0,
+                'message' => "Log is already empty: {$requested}",
+            ]);
+        }
+
+        if (!is_writable($logFile)) {
+            throw new ValidationException('Log file is not writable: ' . $requested, [
+                ['field' => 'file', 'message' => 'Check filesystem permissions on logs/' . $requested],
+            ]);
+        }
+
+        $size = (int) (@filesize($logFile) ?: 0);
+        $user = $this->getUser($request);
+        $username = (string) ($user->get('username') ?: 'unknown');
+        $marker = $this->buildClearedMarker($logFile, $username);
+
+        if (@file_put_contents($logFile, $marker, LOCK_EX) === false) {
+            throw new \RuntimeException('Failed to clear log file: ' . $requested);
+        }
+
+        // Audited separately from the log itself (the audit trail lives in its
+        // own store), so wiping a log cannot erase the record of the wipe.
+        $this->fireEvent('onApiLogCleared', [
+            'file' => $requested,
+            'bytes' => $size,
+            'user' => $user,
+        ]);
+
+        return ApiResponse::create([
+            'file' => $requested,
+            'cleared_bytes' => $size,
+            'message' => "Log cleared: {$requested}",
+        ]);
+    }
+
+    /**
+     * The one line left in a freshly cleared log. Mirrors Monolog's line format
+     * (`[datetime] channel.LEVEL: message [] []`) so the viewer's parser reads
+     * it like any other entry. The channel is taken from the log's own first
+     * line — grav.log is `grav`, security.log is `grav-security`, a plugin log
+     * is whatever that plugin uses — read with fgets rather than slurping the
+     * file, which can be very large.
+     */
+    private function buildClearedMarker(string $logFile, string $username): string
+    {
+        $channel = 'grav';
+        $handle = @fopen($logFile, 'rb');
+        if ($handle) {
+            $first = fgets($handle, 512);
+            fclose($handle);
+            if (is_string($first) && preg_match('/^\[[^\]]+\]\s+([^.\s]+)\./', $first, $m)) {
+                $channel = $m[1];
+            }
+        }
+
+        // The marker is only worth writing if it can be trusted, so the one
+        // caller-influenced part of it is reduced to characters that cannot
+        // forge a log line — no newlines, brackets or colons. Grav validates
+        // usernames anyway, so in practice this only ever trims.
+        $safeUser = substr((string) preg_replace('/[^\w.@\-]+/u', '', $username), 0, 64);
+
+        $date = (new \DateTimeImmutable('now'))->format('Y-m-d\TH:i:s.uP');
+
+        return sprintf('[%s] %s.NOTICE: Log cleared by %s [] []%s', $date, $channel, $safeUser ?: 'unknown', PHP_EOL);
     }
 
     /**
@@ -490,7 +623,11 @@ class SystemController extends AbstractApiController
             $items[] = [
                 'filename' => $b->filename ?? basename($b->path ?? ''),
                 'title' => $b->title ?? null,
-                'date' => $b->date ?? null,
+                // ISO 8601 like POST /system/backups returns. Core's `date` is
+                // RFC 2822, so format from the DateTime it keeps alongside.
+                'date' => ($b->time ?? null) instanceof \DateTimeInterface
+                    ? $b->time->format('c')
+                    : ($b->date ?? null),
                 'size' => $b->size ?? 0,
             ];
         }
@@ -523,7 +660,10 @@ class SystemController extends AbstractApiController
 
         // Validate filename (no path traversal)
         if (!$filename || $filename !== basename($filename) || !str_ends_with($filename, '.zip')) {
-            throw new ValidationException(['filename' => ['Invalid backup filename.']]);
+            throw new ValidationException(
+                'Invalid backup filename.',
+                [['field' => 'filename', 'message' => 'Invalid backup filename.']],
+            );
         }
 
         $backupDir = $this->grav['locator']->findResource('backup://', true);
@@ -555,7 +695,10 @@ class SystemController extends AbstractApiController
         $filename = $this->getRouteParam($request, 'filename');
 
         if (!$filename || $filename !== basename($filename) || !str_ends_with($filename, '.zip')) {
-            throw new ValidationException(['filename' => ['Invalid backup filename.']]);
+            throw new ValidationException(
+                'Invalid backup filename.',
+                [['field' => 'filename', 'message' => 'Invalid backup filename.']],
+            );
         }
 
         $backupDir = $this->grav['locator']->findResource('backup://', true);
@@ -607,38 +750,33 @@ class SystemController extends AbstractApiController
         // for `/translations/en` resolves to admin2's `en-US.yaml`.
         $lang = self::normalizeLangCode($lang);
 
-        /** @var \Grav\Common\Config\Languages $languages */
-        $languages = $this->grav['languages'];
+        $translations = $this->buildTranslationChain($lang);
 
-        try {
-            $translations = $languages->flattenByLang($lang);
-        } catch (\Throwable) {
-            $translations = [];
-        }
-
-        // Strip strings contributed only by disabled plugins. Grav core's
-        // `flattenByLang()` reads every plugin's lang yaml regardless of enabled
-        // state — fine for the legacy admin, broken for admin2: a disabled plugin
-        // would still influence what admin2 renders. The service walks each
-        // plugin's lang yaml to determine provenance and returns keys unique to
-        // disabled plugins. Keys also shipped by enabled sources stay.
-        if (is_array($translations)) {
-            $disabledIndex = new DisabledPluginLangIndex($this->grav);
-            foreach ($disabledIndex->disabledOnlyKeys($lang) as $key) {
-                unset($translations[$key]);
-            }
-        }
-
-        // Drop flat `<key>` entries when an `ICU.<key>` shadow exists. Admin2 ships
-        // the canonical PLUGIN_ADMIN.* vocabulary under ICU; if a 3rd-party plugin
-        // still using the Grav 1 flat convention is also installed, its values
-        // would otherwise leak into the dictionary served to the client. Keeping
-        // only the ICU side guarantees admin2 is the source of truth.
-        if (is_array($translations)) {
-            foreach (array_keys($translations) as $key) {
-                if (is_string($key) && !str_starts_with($key, 'ICU.') && isset($translations['ICU.' . $key])) {
-                    unset($translations[$key]);
+        // Backfill gaps from English. `flattenByLang()` returns the requested
+        // language *only* — it does not merge a base locale — so any key a
+        // translator hasn't reached yet simply vanishes from the response and the
+        // client humanizes it: `ADMIN_NEXT.CACHE_CLEAR_BUTTON.LABEL` rendered as
+        // "Label" instead of "Cache" (admin2#129). Worse, a humanized key reads as
+        // plausible English, so gaps stay invisible until someone runs the admin in
+        // another language. Merging here fixes it once for every client, needs no
+        // extra request, and keeps the checksum honest.
+        //
+        // The requested language always wins: we only add keys it doesn't already
+        // resolve. The `ICU.<key>` / `<key>` pair counts as one key for that test —
+        // backfilling `ICU.FOO` from English when the requested language only ships
+        // the flat `FOO` would shadow a real translation, because the client checks
+        // ICU first.
+        if ($lang !== self::FALLBACK_LANG) {
+            $base = $this->buildTranslationChain(self::FALLBACK_LANG);
+            foreach ($base as $key => $value) {
+                if (!is_string($key) || isset($translations[$key])) {
+                    continue;
                 }
+                $twin = str_starts_with($key, 'ICU.') ? substr($key, 4) : 'ICU.' . $key;
+                if (isset($translations[$twin])) {
+                    continue;
+                }
+                $translations[$key] = $value;
             }
         }
 
@@ -676,10 +814,10 @@ class SystemController extends AbstractApiController
     {
         $this->requirePermission($request, 'api.system.read');
 
-        $dir = GRAV_ROOT . '/user/plugins/admin2/languages';
+        $dir = $this->grav['locator']->findResource('plugins://admin2/languages', true);
         $languages = [];
 
-        if (is_dir($dir)) {
+        if ($dir && is_dir($dir)) {
             foreach (glob($dir . '/*.yaml') ?: [] as $file) {
                 $code = basename($file, '.yaml');
                 $languages[] = [
@@ -727,8 +865,8 @@ class SystemController extends AbstractApiController
                 }
             } else {
                 // Direct file read — bypasses Plugin::loadBlueprint() entirely.
-                $file = GRAV_ROOT . "/user/plugins/{$name}/blueprints.yaml";
-                if (is_file($file)) {
+                $file = $this->grav['locator']->findResource("plugins://{$name}/blueprints.yaml", true);
+                if ($file && is_file($file)) {
                     try {
                         $raw = \Symfony\Component\Yaml\Yaml::parseFile($file);
                         if (is_array($raw)) {
@@ -741,10 +879,15 @@ class SystemController extends AbstractApiController
                 }
             }
 
+            // Cast: YAML types bare scalars, so `version: 1.0` in a package's
+            // blueprint parses as the float 1, not the string "1.0". Shipping
+            // that through as a JSON number breaks every consumer that treats
+            // it as text — the admin's Info page went blank on any site with
+            // one such plugin installed. Same for a numeric `name`.
             $plugins[] = [
-                'name' => $bpName ?? $name,
-                'version' => $bpVersion ?? '0.0.0',
-                'enabled' => $this->config->get("plugins.{$name}.enabled", false),
+                'name' => (string) ($bpName ?? $name),
+                'version' => (string) ($bpVersion ?? '0.0.0'),
+                'enabled' => (bool) $this->config->get("plugins.{$name}.enabled", false),
             ];
         }
 
@@ -775,9 +918,11 @@ class SystemController extends AbstractApiController
             $blueprint = \Grav\Common\Yaml::parse(file_get_contents($blueprintFile));
             $themeName = $item->getFilename();
 
+            // See getPluginsInfo() — a bare `version: 1.0` in the theme's
+            // blueprint is a float, and must not leave here as one.
             $themes[] = [
-                'name' => $blueprint['name'] ?? $themeName,
-                'version' => $blueprint['version'] ?? '0.0.0',
+                'name' => (string) ($blueprint['name'] ?? $themeName),
+                'version' => (string) ($blueprint['version'] ?? '0.0.0'),
                 'active' => $themeName === $activeTheme,
             ];
         }
@@ -798,6 +943,117 @@ class SystemController extends AbstractApiController
      * so any lookup against it has to go through here when the input might
      * be region/script-qualified.
      */
+    /**
+     * Build the flat translation dictionary for a single language.
+     *
+     * Wraps core's `flattenByLang()` and applies the two filters admin2 relies on:
+     * disabled-plugin provenance stripping, and dropping flat `<key>` entries that
+     * an `ICU.<key>` already shadows. Both run per-language, before any cross-language
+     * merge, so each language is filtered against its own sources.
+     *
+     * @return array<string, string>
+     */
+    private function buildTranslationDictionary(string $lang): array
+    {
+        /** @var \Grav\Common\Config\Languages $languages */
+        $languages = $this->grav['languages'];
+
+        try {
+            $translations = $languages->flattenByLang($lang);
+        } catch (\Throwable) {
+            $translations = [];
+        }
+
+        if (!is_array($translations)) {
+            return [];
+        }
+
+        // Strip strings contributed only by disabled plugins. Grav core's
+        // `flattenByLang()` reads every plugin's lang yaml regardless of enabled
+        // state — fine for the legacy admin, broken for admin2: a disabled plugin
+        // would still influence what admin2 renders. The service walks each
+        // plugin's lang yaml to determine provenance and returns keys unique to
+        // disabled plugins. Keys also shipped by enabled sources stay.
+        $disabledIndex = new DisabledPluginLangIndex($this->grav);
+        foreach ($disabledIndex->disabledOnlyKeys($lang) as $key) {
+            unset($translations[$key]);
+        }
+
+        return self::stripIcuShadowedKeys($translations);
+    }
+
+    /**
+     * Build the dictionary for a language, merging every bucket in its chain.
+     *
+     * Grav keeps one bucket per language code exactly as spelled on disk, and
+     * `flattenByLang()` reads a single bucket with no fallback. Admin2 ships
+     * region-suffixed files (`en-US.yaml`) while Grav core and every plugin ship
+     * bare-code ones (`en.yaml`), and `normalizeLangCode()` coerces a request for
+     * `en` up to `en-US`. The result was that `/translations/en-US` returned
+     * admin2's own strings and nothing else: no core strings and no plugin
+     * strings at all, so `window.__GRAV_I18N.t('PLUGIN_*.KEY')` humanized for
+     * every plugin (git-sync#259).
+     *
+     * Merging a code with its primary subtag fixes both directions: `en-US`
+     * reaches `en` for core- and plugin-owned strings, and `ru-RU` reaches `ru`.
+     * The requested code always wins, so a region-specific translation still
+     * overrides the bare one.
+     *
+     * @return array<string, string>
+     */
+    private function buildTranslationChain(string $lang): array
+    {
+        $merged = [];
+
+        // Least specific first, so the requested code overwrites what it shares.
+        foreach (array_reverse(self::translationChainFor($lang)) as $code) {
+            $merged = array_merge($merged, $this->buildTranslationDictionary($code));
+        }
+
+        // Re-strip after merging. Each bucket was filtered against itself, so a
+        // flat `<key>` from the bare bucket can still land next to an `ICU.<key>`
+        // that only the region bucket ships.
+        return self::stripIcuShadowedKeys($merged);
+    }
+
+    /**
+     * Language codes to merge for a request, most specific first.
+     *
+     * @return array<int, string>
+     */
+    private static function translationChainFor(string $lang): array
+    {
+        $chain = [$lang];
+
+        $primary = self::primarySubtag($lang);
+        if ($primary !== '' && $primary !== $lang) {
+            $chain[] = $primary;
+        }
+
+        return $chain;
+    }
+
+    /**
+     * Drop flat `<key>` entries when an `ICU.<key>` shadow exists. Admin2 ships
+     * the canonical PLUGIN_ADMIN.* vocabulary under ICU; if a 3rd-party plugin
+     * still using the Grav 1 flat convention is also installed, its values would
+     * otherwise leak into the dictionary served to the client. Keeping only the
+     * ICU side guarantees admin2 is the source of truth.
+     *
+     * @param array<string, string> $translations
+     * @return array<string, string>
+     */
+    private static function stripIcuShadowedKeys(array $translations): array
+    {
+        foreach (array_keys($translations) as $key) {
+            if (is_string($key) && !str_starts_with($key, 'ICU.') && isset($translations['ICU.' . $key])) {
+                unset($translations[$key]);
+            }
+        }
+
+        return $translations;
+    }
+
     private static function primarySubtag(string $code): string
     {
         return strtolower(explode('-', $code, 2)[0]);

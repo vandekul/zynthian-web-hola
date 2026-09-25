@@ -82,7 +82,7 @@
     <section id="engines" class=" gray-section s-engine  target-section">
         <div class="row masonry-wrap">
             <div class="grid">
-                {% for engine in taxonomy.findTaxonomy({'tag': page.header.tag }) %}
+                {% for engine in taxonomy.findTaxonomy({'tag': page.header.tag }).shuffle().slice(0, 15) %}
                     <article class="product-card" data-cat="{{ engine.header.taxonomy.category|join(',') }}" data-tag="{{ engine.header.taxonomy.tag|join(',') }}">
                         <a class="product-card__link" href="{{ engine.url }}">
                             {{ engine.media[engine.header.media_thumb].forceResize(375, 375).html()|raw }}

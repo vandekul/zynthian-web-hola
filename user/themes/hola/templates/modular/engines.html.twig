@@ -17,7 +17,7 @@
 
     <div class="row masonry-wrap">
         <div class="grid">
-                {% for engine in page.collection('homepage').shuffle() %}
+                {% for engine in page.collection('homepage').shuffle().slice(0, 10) %}
                     <article class="product-card" data-cat="{{ engine.header.taxonomy.category|join(',') }}" data-tag="{{ engine.header.taxonomy.tag|join(',') }}">
                         <a class="product-card__link" href="{{ engine.url }}">
                             {{ engine.media[engine.header.media_thumb].forceResize(375, 375).html()|raw }}

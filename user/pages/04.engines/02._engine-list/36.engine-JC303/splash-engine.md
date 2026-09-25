@@ -10,6 +10,8 @@ taxonomy:
         - synth-sub
         - ucase-pr
         - synth-mono
+    homepage:
+        - 'yes'
 date: '17:38 29-01-2025'
 subtitle: 'Bassline Synthesizer'
 splash:
@@ -25,11 +27,10 @@ video:
     -
         videoType: youtube
         videoLink: 'https://www.youtube.com/watch?v=NmlQYTLP8ko'
-
 urls:
     -
         urlLink: 'https://midilab.co/jc303/'
-        urlLabel: 'JC303''s Website'
+        urlLabel: "JC303's Website"
     -
         urlLink: 'https://github.com/midilab/jc303'
         urlLabel: 'Source Code'

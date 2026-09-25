@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Grav\Plugin;
 
 use Grav\Common\Plugin;
+use Grav\Common\Uri;
+use Grav\Common\Utils;
 use Grav\Events\PermissionsRegisterEvent;
 use Grav\Framework\Acl\PermissionsReader;
 
@@ -280,7 +282,8 @@ class Admin2Plugin extends Plugin
         // not from a config knob: if a host relocates plugins (e.g. via a
         // custom stream override) the URL stays consistent with the files
         // Apache will actually be serving.
-        $this->assetsPath = $rootPath . '/user/plugins/' . $this->name . '/app';
+        $this->assetsPath = Utils::url('plugins://' . $this->name . '/app')
+            ?: $rootPath . '/user/plugins/' . $this->name . '/app';
 
         // Grav core strips known "page" extensions (html, json, xml, rss…)
         // from $uri->route(), per system.pages.types. Reattach the
@@ -349,6 +352,16 @@ class Admin2Plugin extends Plugin
 
         if (!$this->isAdmin2Route) {
             return;
+        }
+
+        // Core collapses doubled slashes when it matches the route, so `//admin`
+        // lands here too, but the browser keeps the raw path. The SPA router then
+        // sees a path outside its base and reloads the page forever (#177). Send
+        // the browser to the clean URL instead.
+        $requested = (string) $this->grav['uri']->uri(false);
+        [$path, $query] = array_pad(explode('?', $requested, 2), 2, null);
+        if (str_contains($path, '//')) {
+            $this->grav->redirect(Uri::cleanPath($path) . ($query !== null ? '?' . $query : ''));
         }
 
         $this->enable([
@@ -494,6 +507,10 @@ class Admin2Plugin extends Plugin
         if ($branding !== null) {
             $config['branding'] = $branding['branding'];
             $config['brandingUrls'] = $branding['brandingUrls'];
+            // The site's default look, so the sign-in screen and a first visit
+            // paint with the operator's accent, font and colour mode rather
+            // than the stock purple until the user has signed in once.
+            $config['appearance'] = $branding['appearance'];
             if ($branding['language'] !== '') {
                 $config['language'] = $branding['language'];
             }
@@ -513,7 +530,22 @@ class Admin2Plugin extends Plugin
             $config['admin']['version'] = $this->getBlueprint()->get('version');
         }
 
-        $config = json_encode($config, JSON_UNESCAPED_SLASHES);
+        // JSON_HEX_TAG/JSON_HEX_AMP are what make this safe to drop inside a
+        // <script> block. An HTML parser does not understand JavaScript string
+        // context: a literal `</script>` anywhere in this JSON closes the block
+        // early and everything after it is parsed as page markup. Branding title
+        // and subtitle are operator-supplied free text, so without escaping the
+        // angle brackets a value of `</script><img src=x onerror=...>` breaks out
+        // and executes on the pre-auth login page.
+        //
+        // Escaping the TAGS rather than relying on JSON_UNESCAPED_SLASHES being
+        // absent is deliberate: the `\/` form only protects the closing tag by
+        // accident, so anyone re-adding JSON_UNESCAPED_SLASHES for URL
+        // readability would silently reopen the hole. Here the slashes stay
+        // readable and the brackets are neutralised directly, which is the part
+        // that actually matters. The escapes decode back to the identical string,
+        // so the SPA still sees exactly what the operator typed.
+        $config = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);
 
         $configScript = "<script>window.__GRAV_CONFIG__ = {$config};</script>";
         $html = str_replace('<head>', '<head>' . "\n    " . $configScript, $html);
@@ -532,7 +564,7 @@ class Admin2Plugin extends Plugin
      * absent, config unreadable) returns null and the SPA falls back to its
      * built-in defaults.
      *
-     * @return array{branding: array<string, mixed>, brandingUrls: array<string, string>, language: string}|null
+     * @return array{branding: array<string, mixed>, appearance: array<string, mixed>, brandingUrls: array<string, string>, language: string}|null
      */
     private function resolveBrandingForBoot(): ?array
     {
@@ -546,9 +578,16 @@ class Admin2Plugin extends Plugin
             $branding = $resolver->siteBranding();
             $sitePrefs = $resolver->sitePreferences();
             $language = is_string($sitePrefs['adminLanguage'] ?? null) ? $sitePrefs['adminLanguage'] : '';
+            $appearance = [];
+            foreach (['colorMode', 'accentHue', 'accentSaturation', 'fontFamily', 'fontSize'] as $key) {
+                if (array_key_exists($key, $sitePrefs)) {
+                    $appearance[$key] = $sitePrefs[$key];
+                }
+            }
 
             return [
                 'branding' => $branding,
+                'appearance' => $appearance,
                 'brandingUrls' => [
                     'light' => $resolver->brandingMediaUrl((string) ($branding['logoLight'] ?? '')),
                     'dark' => $resolver->brandingMediaUrl((string) ($branding['logoDark'] ?? '')),

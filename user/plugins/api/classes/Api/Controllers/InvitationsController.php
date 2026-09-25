@@ -8,13 +8,14 @@ use Grav\Common\User\Authentication;
 use Grav\Common\User\DataUser\User as DataUser;
 use Grav\Common\User\Interfaces\UserCollectionInterface;
 use Grav\Common\User\Interfaces\UserInterface;
-use Grav\Plugin\Api\Auth\JwtAuthenticator;
+use Grav\Common\Utils;
 use Grav\Plugin\Api\Exceptions\ApiException;
 use Grav\Plugin\Api\Exceptions\ConflictException;
 use Grav\Plugin\Api\Exceptions\NotFoundException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Invitations\InviteStore;
 use Grav\Plugin\Api\Response\ApiResponse;
+use Grav\Plugin\Api\Services\PasswordPolicyService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -27,12 +28,15 @@ use Psr\Http\Message\ServerRequestInterface;
  * the access the admin pre-set — never more. Because the invitee never picks
  * their own access, they cannot make themselves a super admin.
  *
- * Admin endpoints require api.users.write (list requires api.users.read).
+ * Admin endpoints, the list included, require api.users.write.
  * The accept/validate endpoints live under /auth/ so they are public.
  */
 class InvitationsController extends AbstractApiController
 {
     use ResolvesAdminBaseUrl;
+
+    /** Longest an invite may stay valid: 30 days. */
+    private const MAX_EXPIRATION = 2592000;
 
     private ?InviteStore $store = null;
 
@@ -43,10 +47,14 @@ class InvitationsController extends AbstractApiController
 
     /**
      * GET /invitations — list pending (non-expired) invites.
+     *
+     * Needs api.users.write, like resend and revoke: each record carries its
+     * token, and the token alone accepts the invite with the access it was
+     * issued with, so a read-only user must not be able to list them.
      */
     public function index(ServerRequestInterface $request): ResponseInterface
     {
-        $this->requirePermission($request, 'api.users.read');
+        $this->requirePermission($request, 'api.users.write');
 
         $store = $this->store();
         $store->purgeExpired();
@@ -91,8 +99,10 @@ class InvitationsController extends AbstractApiController
         // Permissions the invitee will receive. Strip super flags unless the
         // inviting admin is itself super — an admin cannot grant authority it
         // does not hold, and this is the core "can't make yourself super" gate.
+        // isSuperWithinScope() also rejects a scoped key on a super account, which
+        // a bare isSuperAdmin() would have let seed super access (GHSA-wvpj-fg8h-843q).
         $access = is_array($body['access'] ?? null) ? $body['access'] : [];
-        if (!$this->isSuperAdmin($actor)) {
+        if (!$this->isSuperWithinScope($request)) {
             $access = $this->stripSuperFlags($access);
         }
 
@@ -103,19 +113,20 @@ class InvitationsController extends AbstractApiController
         // api.users.write caller could invite an account straight into a
         // super-admin group (GHSA-m86m-jjcg-gcvv).
         $groups = [];
-        if ($this->isSuperAdmin($actor) && is_array($body['groups'] ?? null)) {
+        if ($this->isSuperWithinScope($request) && is_array($body['groups'] ?? null)) {
             $groups = array_values(array_filter(
                 $body['groups'],
                 static fn($g) => is_string($g) && $g !== '',
             ));
         }
 
-        // Expiration: clamp to a sane window; default 7 days.
+        // Expiration: clamp to a sane window (5 minutes to 30 days); default 7 days.
         $default = (int) $this->config->get('plugins.api.invitations.expiration', 604800);
         $expiration = (int) ($body['expiration'] ?? $default);
         if ($expiration < 300) {
             $expiration = $default;
         }
+        $expiration = min($expiration, self::MAX_EXPIRATION);
 
         $store = $this->store();
 
@@ -167,7 +178,7 @@ class InvitationsController extends AbstractApiController
 
         return ApiResponse::created(
             data: $payload,
-            location: $this->getApiBaseUrl() . '/invitations/' . $token,
+            location: $this->getApiBaseUrl() . '/auth/invite/' . $token,
             headers: $this->invalidationHeaders(['invitations:list']),
         );
     }
@@ -277,24 +288,12 @@ class InvitationsController extends AbstractApiController
         if ($length < 3 || $length > 64 || !DataUser::isValidUsername($username)) {
             throw new ValidationException(
                 'Invalid username format.',
-                [['field' => 'username', 'message' => 'Username must be 3-64 characters and contain only letters, numbers, periods, hyphens, and underscores (and cannot start with a period).']],
+                [['field' => 'username', 'message' => 'Username must be 3-64 characters, cannot start with a period or contain "..", and cannot contain \\ / ? * : ; { } or a line break.']],
             );
         }
 
-        // Password policy — mirror SetupController.
-        $pwdRegex = (string) $this->config->get('system.pwd_regex', '');
-        if ($pwdRegex !== '' && !@preg_match('#^(?:' . $pwdRegex . ')$#', $password)) {
-            throw new ValidationException(
-                'Password does not meet the required policy.',
-                [['field' => 'password', 'message' => 'Password does not meet the required policy.']],
-            );
-        }
-        if ($pwdRegex === '' && strlen($password) < 8) {
-            throw new ValidationException(
-                'Password is too short.',
-                [['field' => 'password', 'message' => 'Password must be at least 8 characters.']],
-            );
-        }
+        // Password policy — the same check setup and password reset apply.
+        PasswordPolicyService::assertValid($this->config, $password);
 
         /** @var UserCollectionInterface $accounts */
         $accounts = $this->grav['accounts'];
@@ -335,9 +334,10 @@ class InvitationsController extends AbstractApiController
 
         $store->remove($token);
 
-        // Auto-login the new user (same token pair as /auth/setup).
-        $jwt = new JwtAuthenticator($this->grav, $this->config);
-        $response = $this->issueTokenPair($jwt, $user);
+        // Auto-login the new user through the same gate a password login runs,
+        // so an invite whose access grants no API or admin login creates the
+        // account but hands back no tokens (403), exactly like /auth/token would.
+        $response = ApiResponse::create($this->finalizeAuthenticatedUser($user, $request));
 
         return $response->withHeader('X-Invalidates', 'users:list');
     }
@@ -345,16 +345,33 @@ class InvitationsController extends AbstractApiController
     /**
      * Strip super-admin flags from an access tree.
      *
+     * Both access-tree shapes have to be handled. PermissionResolver::buildFlatAccess()
+     * runs the account's access map through Utils::arrayFlattenDotNotation(), which
+     * collapses the nested form (['api' => ['super' => true]]) into exactly the literal
+     * key the dot-keyed form (['api.super' => true]) already is, so resolveExact() and
+     * isSuperAdmin() cannot tell them apart. Stripping only the nested form let an
+     * api.users.write inviter smuggle super past this gate and mint a super-admin
+     * through the public accept endpoint. UsersController::accessGrantsSuper() has
+     * always checked both shapes; this guard now matches it.
+     *
      * @param array<string, mixed> $access
      * @return array<string, mixed>
      */
     private function stripSuperFlags(array $access): array
     {
         foreach (['admin', 'api'] as $scope) {
+            // Scalar parent grants are ambiguous at this boundary and older
+            // authorization code inherited them into `*.super`. Drop a
+            // positive parent grant rather than minting an over-broad invite.
+            if (isset($access[$scope]) && !is_array($access[$scope]) && Utils::isPositive($access[$scope])) {
+                unset($access[$scope]);
+            }
             if (isset($access[$scope]) && is_array($access[$scope])) {
                 unset($access[$scope]['super']);
             }
+            unset($access["{$scope}.super"]);
         }
+
         return $access;
     }
 

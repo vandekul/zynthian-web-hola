@@ -13,6 +13,8 @@ taxonomy:
         - fx-mod
         - fx-other
         - ucase-fx
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: Granulator
 splash:
@@ -35,10 +37,10 @@ audio:
 urls:
     -
         urlLink: 'http://mourednik.github.io/argotlunar/)'
-        urlLabel: 'Argotlunar''s Website'
+        urlLabel: "Argotlunar's Website"
     -
         urlLink: 'https://www.kvraudio.com/product/argotlunar-by-michael-ourednik'
-        urlLabel: 'KVRAudio''s Page'
+        urlLabel: "KVRAudio's Page"
     -
         urlLink: 'https://github.com/mourednik/argotlunar'
         urlLabel: 'Source Code'

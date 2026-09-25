@@ -1,3 +1,99 @@
+# v3.9.10
+## 09/22/2026
+
+1. [](#new)
+    * The German translation now covers the rest of the plugin's messages. Thanks @Tanzzwerg [#342](https://github.com/getgrav/grav-plugin-login/pull/342)
+
+1. [](#improved)
+    * The fields on the registration, profile, forgot-password and magic-link pages carry an id, so clicking a field's label puts the cursor in it and screen readers announce the two together. Thanks @Tanzzwerg [#342](https://github.com/getgrav/grav-plugin-login/pull/342)
+
+1. [](#bugfix)
+    * The two-factor setup on the profile page works on themes that write their scripts into the page head. The jQuery library it needs was registered too late to reach those pages, so the button that generates a new secret did nothing. Thanks @onetrev [grav-plugin-form#656](https://github.com/getgrav/grav-plugin-form/issues/656)
+
+# v3.9.9
+## 09/17/2026
+
+1. [](#bugfix)
+    * **[security] Someone who has entered a correct password but not yet answered the two-factor prompt can no longer change the account's profile.** The profile form only checked that a user was in the session, not that they had finished logging in, so the second factor could be sidestepped by editing the account it protects. Thanks to @redwolf1919
+    * **[security] "Remember me" no longer skips the two-factor prompt.** The cookie was written as soon as the password was accepted, and returning with it logged you straight in. It is now written only after the second factor succeeds, and restoring a session from it asks for the code again. Devices remembered before this release will ask for a code on their next visit. Thanks to @redwolf1919
+    * **[security] The password reset page is now always the one this plugin ships.** A reset link carries a credential in its URL, and a page authored in the site's own content could be placed on that route and read it. Any custom body on the reset page is no longer rendered. Thanks to @redwolf1919
+
+# v3.9.8
+## 09/13/2026
+
+1. [](#bugfix)
+    * Clearing an optional field on the frontend profile form now actually clears it, instead of silently keeping the previous value. Thanks @sridharkalaibala [#340](https://github.com/getgrav/grav-plugin-login/pull/340)
+    * A profile form that fails validation now says so, rather than reporting the profile as updated while discarding the changes
+
+# v3.9.7
+## 09/09/2026
+
+1. [](#improved)
+    * **Content hidden behind the `authenticated()` Twig function or the `[authenticated]` shortcode is no longer shown to someone who has entered a correct password but has not yet answered the two-factor prompt.** Thanks to @geoffrey-diederichs and @AlpetGexha
+    * **Logging out now requires the request to have come from your own site**, so another site can no longer sign your visitors out by linking to it. This also stopped a forged link from clearing a person's "remember me" login on their other devices. Thanks to @manus-use
+
+1. [](#new)
+    * The titles and headings on the login, forgot, reset, register, profile and unauthorized pages now come from translation keys, so they follow the visitor's language instead of always showing English. Thanks to @NoNoNo [#300](https://github.com/getgrav/grav-plugin-login/issues/300)
+1. [](#bugfix)
+    * Media stored in a modular subfolder of a login-protected page is no longer served to visitors who are not logged in. Thanks to @clesmian [#294](https://github.com/getgrav/grav-plugin-login/issues/294)
+    * The password reset page no longer jumps from a first-level to a third-level heading
+1. [](#improved)
+    * The description of the "Protect a login-protected page media" setting now explains that it covers media requested through the page route, and cannot cover a request made straight to the file's own path. Thanks to @complanar [#45](https://github.com/getgrav/grav-plugin-login/issues/45)
+
+# v3.9.6
+## 09/03/2026
+
+1. [](#improved)
+    * An account file with no `state` set is treated as enabled when a login is refused, matching how Grav itself reads it, so the refusal message is right either way
+
+# v3.9.5
+## 09/02/2026
+
+1. [](#improved)
+    * The German login screens no longer show English for the profile-updated message, the email and password field labels, and the two Submit buttons. Thanks to @nerdyjan [#338](https://github.com/getgrav/grav-plugin-login/issues/338)
+1. [](#bugfix)
+    * A stray quotation mark no longer appears after the German label for protecting media on login-protected pages.
+
+# v3.9.4
+## 08/24/2026
+
+1. [](#new)
+    * Added German and French translations for the magic-link login screens, emails and settings. Thanks to @nerdyjan for contributing the German and French wording [#337](https://github.com/getgrav/grav-plugin-login/issues/337)
+1. [](#bugfix)
+    * The German and French "password reset sent" message no longer confirms whether an account exists for the address entered, matching the English wording
+
+# v3.9.3
+## 08/21/2026
+
+1. [](#bugfix)
+    * [security] The two-factor step now limits how many wrong codes may be submitted for an account, with its own counter that a fresh password login does not reset, so a six-digit code can no longer be guessed without limit by someone who already has the password ([GHSA-9j6w-2q6c-q3q8](https://github.com/getgrav/grav-plugin-login/security/advisories/GHSA-9j6w-2q6c-q3q8)).
+    * [security] Administrators who hold super access only through a group are now recognised as super when guarding account actions, so a lower-privileged user manager can no longer act on them ([GHSA-vv8m-jqpm-38x4](https://github.com/getgrav/grav-plugin-login/security/advisories/GHSA-vv8m-jqpm-38x4)).
+
+# v3.9.2
+## 08/07/2026
+
+1. [](#bugfix)
+    * [security] Invitation emails now honour the Site Host setting like the other login emails do, so an invitation link can no longer be pointed at a spoofed host by the address the request arrived on ([GHSA-69vf-mjxw-x79j](https://github.com/getgrav/grav/security/advisories/GHSA-69vf-mjxw-x79j)).
+    * [security] With Require Trusted Host enabled, activation, magic login and invitation emails are now held back as well, where previously only password reset emails were ([GHSA-69vf-mjxw-x79j](https://github.com/getgrav/grav/security/advisories/GHSA-69vf-mjxw-x79j)).
+    * [security] An account that can manage users but is not a super admin can no longer clear a super admin's login lockout from the Users list ([GHSA-985r-mpj8-5rqw](https://github.com/getgrav/grav/security/advisories/GHSA-985r-mpj8-5rqw)).
+    * The Site Host and Require Trusted Host settings now describe every kind of email they affect, rather than naming only password reset and activation.
+
+# v3.9.1
+## 08/05/2026
+
+1. [](#bugfix)
+    * [security] Password reset and account activation links are now checked with a routine that takes the same amount of time whichever characters differ, so the check can no longer hint at how much of a guess was right ([GHSA-x239-6jqx-5hjh](https://github.com/getgrav/grav/security/advisories/GHSA-x239-6jqx-5hjh)).
+    * [security] Repeatedly submitting a wrong password reset or activation link for the same account is now refused after a handful of tries, configurable under the plugin's security settings.
+    * [security] When registration finishes over email, submitting an address that already has an account now gives the same answer as any other address, and a notice goes to the account holder instead, so the form no longer confirms who is registered ([GHSA-crh8-xm27-j9g9](https://github.com/getgrav/grav/security/advisories/GHSA-crh8-xm27-j9g9)).
+    * [security] Registration attempts from one address are now capped over a time window, configurable under the plugin's user registration settings.
+
+# v3.9.0
+## 07/30/2026
+
+1. [](#new)
+    * Added a `bin/plugin login unlock-user` command to clear the temporary lockout applied after too many failed logins, by username, by IP address, or all at once.
+    * The Admin Next users list now shows which accounts are locked out, with a button to clear the lockout.
+
 # v3.8.13
 ## 07/14/2026
 

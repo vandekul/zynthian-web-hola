@@ -10,6 +10,7 @@ use Grav\Common\User\Interfaces\UserInterface;
 use Grav\Plugin\Api\Exceptions\NotFoundException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Response\ApiResponse;
+use Grav\Plugin\Api\Services\BlueprintLoader;
 use Grav\Plugin\Api\Services\ConfigScopes;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,19 +22,11 @@ class BlueprintController extends AbstractApiController
     use TranslatesAdminLabels;
 
     /**
-     * Whitelist of callable patterns allowed by the resolve endpoint.
-     * Only static methods from known Grav namespaces are permitted.
-     */
-    private const RESOLVE_ALLOWED_NAMESPACES = [
-        'Grav\\Common\\',
-        'Grav\\Plugin\\',
-    ];
-
-    /**
      * GET /data/resolve?callable=\Grav\Common\Page\Pages::pageTypes
      *
-     * Generic endpoint for resolving data-options@ directives used in blueprints.
-     * Returns the array result of calling a whitelisted static PHP method.
+     * Generic endpoint for resolving `data-*@` directives used in blueprints.
+     * Returns the array result of calling one of core's approved dynamic-data
+     * providers ({@see Blueprint::isSafeDynamicCall()}).
      * Client should cache responses — these are effectively static data.
      */
     public function resolveData(ServerRequestInterface $request): ResponseInterface
@@ -44,30 +37,45 @@ class BlueprintController extends AbstractApiController
         $callable = $query['callable'] ?? null;
 
         if (!$callable || !is_string($callable)) {
-            throw new ValidationException(['callable' => ['The callable query parameter is required.']]);
+            throw new ValidationException(
+                'The callable query parameter is required.',
+                [['field' => 'callable', 'message' => "A 'callable' query parameter is required."]],
+            );
         }
 
         $callable = ltrim($callable, '\\');
 
-        // Validate against whitelist
-        $allowed = false;
-        foreach (self::RESOLVE_ALLOWED_NAMESPACES as $ns) {
-            if (str_starts_with($callable, $ns)) {
-                $allowed = true;
-                break;
-            }
+        // Format check runs BEFORE the safety gate below: isSafeDynamicCall()
+        // only consults its allowlist for strings containing `::`, and falls
+        // back to a bare-function *denylist* otherwise — so a plain function
+        // name would pass the gate. Rejecting non-`Class::method` input up
+        // front keeps that branch unreachable from here.
+        if (!str_contains($callable, '::')) {
+            throw new ValidationException(
+                "Callable '{$callable}' must be in Class::method format.",
+                [['field' => 'callable', 'message' => 'Callable must be in Class::method format.']],
+            );
         }
-        if (!$allowed) {
-            throw new ValidationException(['callable' => ['Callable is not in the allowed namespace list.']]);
+
+        // Defer to core's approved dynamic-data provider allowlist rather than
+        // testing a namespace prefix. Prefix-trust accepted ANY public no-arg
+        // static under Grav\Common\ / Grav\Plugin\ — broader than core, which
+        // switched to an exact-match allowlist for GHSA-7pgq-cr25-xvc8 /
+        // GHSA-cxv3-5jj3-cpgr (Grav 2.0.11). That gap let this read-only
+        // endpoint reach side-effecting statics that its own `api.pages.read`
+        // permission was never meant to cover. Delegating keeps the two lists
+        // from drifting again, and lets a theme or plugin opt its own provider
+        // in via Blueprint::addAllowedDynamicCallable().
+        if (!Blueprint::isSafeDynamicCall($callable, [])) {
+            throw new ValidationException(
+                "Callable '{$callable}' is not an approved data provider.",
+                [['field' => 'callable', 'message' => 'Callable is not an approved data provider.']],
+            );
         }
 
         // Ensure Pages subsystem for Page-related callables
         if (str_contains($callable, 'Page')) {
             $this->ensurePagesEnabled();
-        }
-
-        if (!str_contains($callable, '::')) {
-            throw new ValidationException(['callable' => ['Callable must be in Class::method format.']]);
         }
 
         [$class, $method] = explode('::', $callable, 2);
@@ -88,7 +96,10 @@ class BlueprintController extends AbstractApiController
                 // default when it's absent, so a modular page doesn't get the
                 // standard list and an empty template selector (admin2#41).
                 $type = $query['type'] ?? ($method === 'pagesModularTypes' ? 'modular' : 'standard');
-                return ApiResponse::create($this->normalizeOptions(Pages::pageTypes($type)));
+
+                return ApiResponse::create($this->normalizeOptions(
+                    $this->filterPageTypes(Pages::pageTypes($type), $type === 'modular')
+                ));
             }
 
             throw new NotFoundException("Callable '{$callable}' not found.");
@@ -106,7 +117,123 @@ class BlueprintController extends AbstractApiController
             return ApiResponse::create([]);
         }
 
+        // Core's Pages::pageTypes() is a plain lookup, so the customisation
+        // hooks have to be applied here. Classic admin's own pagesTypes() and
+        // pagesModularTypes() already fire them, so those are left alone rather
+        // than being filtered twice.
+        if ($method === 'pageTypes') {
+            $result = $this->filterPageTypes($result, ($query['type'] ?? 'standard') === 'modular');
+        }
+
         return ApiResponse::create($this->normalizeOptions($result));
+    }
+
+    /**
+     * Apply the admin's template-hiding configuration, then let plugins rename
+     * or remove entries before the list is returned.
+     *
+     * Classic admin exposed the template list through Admin::pagesTypes() and
+     * Admin::pagesModularTypes(), and plugins have customised it for years by
+     * subscribing to `onAdminPageTypes` / `onAdminModularPageTypes` and editing
+     * `$event['types']`. The new admin builds the list here instead, so it
+     * fires the same two events with the same payload and honours the same two
+     * configuration keys, and an existing handler keeps working unchanged.
+     *
+     * @param array<string|int, mixed> $types
+     * @return array<string|int, mixed>
+     */
+    private function filterPageTypes(array $types, bool $modular): array
+    {
+        $key = $modular ? 'plugins.admin.hide_modular_page_types' : 'plugins.admin.hide_page_types';
+
+        // Exact key first, otherwise treat the entry as a pattern — the same
+        // order and semantics as classic admin, so existing configuration
+        // continues to behave identically.
+        foreach ((array) $this->grav['config']->get($key) as $hide) {
+            $hide = (string) $hide;
+            if (isset($types[$hide])) {
+                unset($types[$hide]);
+                continue;
+            }
+            foreach (array_keys($types) as $type) {
+                if (preg_match('#' . $hide . '#i', (string) $type)) {
+                    unset($types[$type]);
+                }
+            }
+        }
+
+        $name = $modular ? 'onAdminModularPageTypes' : 'onAdminPageTypes';
+        $event = new Event(['types' => &$types]);
+
+        $this->grav->fireEvent($name, $event);
+        $this->notifyUnsubscribedPageTypeHandlers($name, $event);
+
+        // Classic passes `types` by reference, and handlers commonly assign a
+        // rebuilt array back to `$event['types']` rather than mutating in
+        // place. Read it back so both styles are honoured.
+        $updated = $event['types'] ?? $types;
+
+        return is_array($updated) ? $updated : $types;
+    }
+
+    /**
+     * Call page-type handlers belonging to plugins that never got the chance to
+     * subscribe.
+     *
+     * Plugins written for classic admin register these two handlers inside an
+     * `isAdmin()` check in onPluginsInitialized. `isAdmin()` is simply
+     * `isset($grav['admin'])`, and during an API request the admin proxy is not
+     * registered until routing, which happens after every plugin has already
+     * initialised. Those plugins therefore never subscribed, and firing the
+     * event alone would reach nobody — the customisation would silently stop
+     * working the moment a site moved to the new admin.
+     *
+     * Rather than register the admin proxy earlier, which would put every API
+     * request into admin scope before it has been authenticated, this bridges
+     * only these two events: any enabled plugin exposing a matching method that
+     * is not already listening gets called directly. Plugins that did subscribe
+     * are skipped, so nothing runs twice.
+     */
+    private function notifyUnsubscribedPageTypeHandlers(string $name, Event $event): void
+    {
+        $plugins = $this->grav['plugins'] ?? null;
+        if (!$plugins) {
+            return;
+        }
+
+        $subscribed = [];
+        foreach ($this->grav['events']->getListeners($name) as $listener) {
+            if (is_array($listener) && isset($listener[0]) && is_object($listener[0])) {
+                $subscribed[spl_object_id($listener[0])] = true;
+            }
+        }
+
+        foreach ($plugins as $plugin) {
+            if (!is_object($plugin)
+                || isset($subscribed[spl_object_id($plugin)])
+                || !method_exists($plugin, $name)) {
+                continue;
+            }
+
+            // Disabled plugins are still instantiated in the collection, and
+            // Plugins::init() skips them when subscribing. Do the same here.
+            $slug = $plugin->name ?? null;
+            if (!$slug || !$this->grav['config']->get("plugins.{$slug}.enabled", false)) {
+                continue;
+            }
+
+            try {
+                $plugin->{$name}($event);
+            } catch (Throwable $e) {
+                // One misbehaving plugin must not take the template list down.
+                $this->grav['log']->warning(sprintf(
+                    '[api] %s handler in %s failed: %s',
+                    $name,
+                    get_class($plugin),
+                    $e->getMessage()
+                ));
+            }
+        }
     }
 
     /**
@@ -146,7 +273,10 @@ class BlueprintController extends AbstractApiController
         $modular = isset($params['modular'])
             && in_array(strtolower((string) $params['modular']), ['1', 'true', 'yes'], true);
 
-        $types = $modular ? Pages::modularTypes() : Pages::types();
+        $types = $this->filterPageTypes(
+            $modular ? Pages::modularTypes() : Pages::types(),
+            $modular
+        );
         $result = [];
 
         foreach ($types as $type => $label) {
@@ -169,7 +299,7 @@ class BlueprintController extends AbstractApiController
 
         $template = $this->getRouteParam($request, 'template');
 
-        $blueprint = $this->loadPageBlueprint($template, $this->getUser($request));
+        $blueprint = $this->loadPageBlueprint($request, $template, $this->getUser($request));
 
         if (!$blueprint) {
             throw new NotFoundException("Blueprint for template '{$template}' not found.");
@@ -184,7 +314,7 @@ class BlueprintController extends AbstractApiController
         // admin-classic permissions, so it drops Twig for API/Admin-Next users
         // even when they could save it. We re-add it against the same authority
         // the write guard enforces. See grav-admin-next#5.
-        $this->applyTwigProcessOption($data['fields'], $this->getUser($request));
+        $this->applyTwigProcessOption($request, $data['fields'], $this->getUser($request));
 
         // Fire event to allow plugins to modify the serialized blueprint fields
         // (e.g., editor-pro overrides editor/markdown field types). The
@@ -217,8 +347,7 @@ class BlueprintController extends AbstractApiController
             throw new NotFoundException("Blueprint for plugin '{$pluginName}' not found.");
         }
 
-        $blueprint = new Blueprint($pluginPath . '/blueprints.yaml');
-        $blueprint->load();
+        $blueprint = $this->loadConfigBlueprint($pluginPath . '/blueprints.yaml');
 
         $data = $this->serializeBlueprint($blueprint, $pluginName);
 
@@ -251,8 +380,7 @@ class BlueprintController extends AbstractApiController
             throw new NotFoundException("Blueprint for theme '{$themeName}' not found.");
         }
 
-        $blueprint = new Blueprint($themePath . '/blueprints.yaml');
-        $blueprint->load();
+        $blueprint = $this->loadConfigBlueprint($themePath . '/blueprints.yaml');
 
         $data = $this->serializeBlueprint($blueprint, $themeName);
 
@@ -282,18 +410,19 @@ class BlueprintController extends AbstractApiController
         $this->requirePermission($request, 'api.access');
         $this->primeAdminLanguages($request);
 
-        $blueprintPath = $this->grav['locator']->findResource('blueprints://user/account.yaml');
+        // Resolve only to confirm the blueprint exists — a clean 404 beats a
+        // Blueprint-internal exception — but load from the stream URL, never
+        // from the resolved path. A concrete path makes Blueprint::getFiles()
+        // return that single file, dropping the rest of the blueprints://
+        // cascade; a site override using `extends@: parent@` then has no parent
+        // left to extend and core throws "Parent blueprint missing".
+        $blueprintUri = $this->blueprintLoader()->accountUri();
 
-        if (!$blueprintPath) {
-            $blueprintPath = $this->grav['locator']->findResource('system://blueprints/user/account.yaml');
-        }
-
-        if (!$blueprintPath) {
+        if ($blueprintUri === null) {
             throw new NotFoundException('User account blueprint not found.');
         }
 
-        $blueprint = new Blueprint($blueprintPath);
-        $blueprint->load();
+        $blueprint = $this->loadConfigBlueprint($blueprintUri);
 
         $data = $this->serializeBlueprint($blueprint, 'account');
 
@@ -336,15 +465,19 @@ class BlueprintController extends AbstractApiController
         $this->requirePermission($request, 'api.users.read');
         $this->primeAdminLanguages($request);
 
-        $path = $this->grav['locator']->findResource("blueprints://user/{$name}.yaml")
-            ?: $this->grav['locator']->findResource("system://blueprints/user/{$name}.yaml");
+        // Existence check only — the stream URL is what gets loaded, so the
+        // full cascade stays available to `extends@: parent@`.
+        $uri = "blueprints://user/{$name}.yaml";
 
-        if (!$path) {
-            throw new NotFoundException("Group blueprint '{$name}' not found.");
+        if (!$this->grav['locator']->findResource($uri)) {
+            $uri = "system://blueprints/user/{$name}.yaml";
+
+            if (!$this->grav['locator']->findResource($uri)) {
+                throw new NotFoundException("Group blueprint '{$name}' not found.");
+            }
         }
 
-        $blueprint = new Blueprint($path);
-        $blueprint->load();
+        $blueprint = $this->loadConfigBlueprint($uri);
 
         $data = $this->serializeBlueprint($blueprint, $name);
 
@@ -487,8 +620,7 @@ class BlueprintController extends AbstractApiController
             throw new NotFoundException("Page blueprint '{$pageId}' not found for plugin '{$plugin}'.");
         }
 
-        $blueprint = new Blueprint($blueprintFile);
-        $blueprint->load();
+        $blueprint = $this->loadConfigBlueprint($blueprintFile);
 
         $data = $this->serializeBlueprint($blueprint, $pageId);
 
@@ -526,21 +658,22 @@ class BlueprintController extends AbstractApiController
             throw new NotFoundException("Config blueprint scope '{$scope}' not found.");
         }
 
-        // Use the blueprints:// stream to find config blueprints so that
-        // plugin overrides (e.g., admin's media.yaml) are resolved correctly.
-        $realPath = $this->grav['locator']->findResource("blueprints://config/{$scope}.yaml");
+        // Use the blueprints:// stream so that plugin overrides (e.g. admin's
+        // media.yaml) are resolved correctly. findResource() is the existence
+        // check only — the loader is handed the stream URL, because a resolved
+        // path would collapse the cascade and break `extends@: parent@`.
+        $uri = "blueprints://config/{$scope}.yaml";
 
-        if (!$realPath) {
+        if (!$this->grav['locator']->findResource($uri)) {
             // Fallback to system blueprints directly
-            $realPath = $this->grav['locator']->findResource("system://blueprints/config/{$scope}.yaml");
+            $uri = "system://blueprints/config/{$scope}.yaml";
+
+            if (!$this->grav['locator']->findResource($uri)) {
+                throw new NotFoundException("Config blueprint for '{$scope}' not found.");
+            }
         }
 
-        if (!$realPath) {
-            throw new NotFoundException("Config blueprint for '{$scope}' not found.");
-        }
-
-        $blueprint = new Blueprint($realPath);
-        $blueprint->load();
+        $blueprint = $this->loadConfigBlueprint($uri);
 
         return ApiResponse::create($this->serializeBlueprint($blueprint, $scope));
     }
@@ -560,38 +693,116 @@ class BlueprintController extends AbstractApiController
      * and the hand-rolled path silently dropped most BlueprintForm directives
      * (see grav-plugin-admin2#3).
      */
-    private function loadPageBlueprint(string $template, ?UserInterface $user = null): ?Blueprint
+    private function loadPageBlueprint(ServerRequestInterface $request, string $template, ?UserInterface $user = null): ?Blueprint
     {
         $this->ensurePagesEnabled();
 
-        /** @var Pages $pages */
-        $pages = $this->grav['pages'];
-
-        try {
-            $blueprint = $pages->blueprints($template);
-        } catch (\RuntimeException) {
+        // An orphan template (one with no blueprint of its own, e.g. a page
+        // left on a template the current theme doesn't define after a theme
+        // switch) resolves to an empty blueprint. Core only falls back to
+        // `default` when the lookup throws, so the loader mirrors
+        // admin-classic and falls back itself, keeping the editor on the
+        // standard page form rather than a blank pane.
+        $blueprint = $this->blueprintLoader()->page($template);
+        if ($blueprint === null) {
             return null;
         }
 
-        // An orphan template — one with no blueprint of its own, e.g. a page
-        // left on a template that the current theme doesn't define after a
-        // theme switch — resolves to an empty blueprint with no fields. Grav
-        // core only falls back to `default` when the lookup *throws*, which a
-        // missing blueprint file does not: it returns the empty blueprint
-        // instead. Mirror admin-classic and fall back to the default page
-        // blueprint so the editor always shows the standard page form rather
-        // than a blank pane.
-        if (!$blueprint->fields()) {
-            try {
-                $blueprint = $pages->blueprints('default');
-            } catch (\RuntimeException) {
-                return null;
-            }
-        }
-
-        $this->injectSecurityTab($blueprint, $user);
+        $this->injectSecurityTab($request, $blueprint, $user);
 
         return $blueprint;
+    }
+
+    private ?BlueprintLoader $blueprintLoader = null;
+
+    private function blueprintLoader(): BlueprintLoader
+    {
+        return $this->blueprintLoader ??= new BlueprintLoader($this->grav);
+    }
+
+    /**
+     * Load a non-page blueprint (plugin, theme, account, group, config scope)
+     * with its dynamic directives resolved.
+     *
+     * `Blueprint::load()` only parses and merges the YAML. It is `init()` that
+     * walks the `data-*@` / `config-*@` / `security@` directives collected during
+     * the parse and actually applies them — the same step core's own
+     * {@see \Grav\Common\Data\Blueprints::loadFile()} performs, and admin-classic
+     * therefore gets for free. Loading without it left every one of those
+     * unresolved, so a fieldset built by `data-fields@` reached admin-next with
+     * no children at all, and a `config-pattern@` validation rule never made it
+     * into the form. The failure was silent, since an unresolved directive just
+     * looks like an empty field (grav-plugin-api#21).
+     *
+     * @param string $file Blueprint to load. Pass a `blueprints://` stream URL
+     *                     whenever the file can be layered over by a site, so
+     *                     `extends@: parent@` can still find its parents.
+     */
+    private function loadConfigBlueprint(string $file): Blueprint
+    {
+        // Loading (load + init, logging a provider that throws) is shared with
+        // the blueprint-upload endpoint, which reads the same blueprints back
+        // to check a file field's own settings.
+        $blueprint = $this->blueprintLoader()->config($file);
+
+        $this->clearGatedIgnores($blueprint);
+
+        return $blueprint;
+    }
+
+    /**
+     * Drop the `validate: ignore` that a failed `security@` gate stamps on a
+     * field and its children.
+     *
+     * Core resolves `security@` against `$grav['user']`, which during a
+     * token-authenticated API request is the guest — so every gate fails and the
+     * gated subtree (the account form's Access Levels section, a group's
+     * permission map) comes back flagged for everyone, super-admins included.
+     * The flag exists for core's own form processing, which the API never runs:
+     * each API write authorizes the caller itself. Rather than ship a flag that
+     * is both wrong and unread, clear it from the subtrees a gate produced it on.
+     * A `validate: ignore` an author wrote by hand sits outside any `security@`
+     * field and is left alone.
+     */
+    private function clearGatedIgnores(Blueprint $blueprint): void
+    {
+        $fields = $blueprint->get('form/fields');
+        if (!is_array($fields)) {
+            return;
+        }
+
+        if ($this->stripGatedIgnores($fields)) {
+            $blueprint->set('form/fields', $fields);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     * @return bool Whether anything was cleared.
+     */
+    private function stripGatedIgnores(array &$fields): bool
+    {
+        $changed = false;
+
+        foreach ($fields as &$field) {
+            if (!is_array($field)) {
+                continue;
+            }
+
+            if (isset($field['security@'])) {
+                // The gate stamps the whole subtree, so clear the whole subtree.
+                $this->clearValidateIgnore($field);
+                $changed = true;
+                continue;
+            }
+
+            if (isset($field['fields']) && is_array($field['fields'])) {
+                $changed = $this->stripGatedIgnores($field['fields']) || $changed;
+            }
+        }
+        unset($field);
+
+        return $changed;
     }
 
     /**
@@ -616,7 +827,7 @@ class BlueprintController extends AbstractApiController
      * (api.super / api.config): authorized users get the section clean and
      * editable, everyone else only sees the ungated Page Access section.
      */
-    private function injectSecurityTab(Blueprint $blueprint, ?UserInterface $user = null): void
+    private function injectSecurityTab(ServerRequestInterface $request, Blueprint $blueprint, ?UserInterface $user = null): void
     {
         // Only page blueprints that wrap their fields in a `tabs` container can
         // host the Security tab. Skip anything with a different layout.
@@ -645,8 +856,16 @@ class BlueprintController extends AbstractApiController
 
         // Gate the Page Permissions section on API authority. `_site` (Page
         // Access) is ungated and always shown.
+        //
+        // Both routes to a "yes" clear the API-key scope cap. The super branch
+        // goes through isSuperWithinScope() and the ACL branch through
+        // scopeAllows(), because either one on its own is an independent path to
+        // unlocking the section: a bare isSuperAdmin() let a scoped key minted on
+        // a super-admin account edit page permissions without carrying admin.super
+        // (or api.config) in its scopes at all (GHSA-mcx6-4rvg-7r8v).
         $canManagePermissions = $user !== null
-            && ($this->isSuperAdmin($user) || $this->hasPermission($user, 'api.config'));
+            && ($this->isSuperWithinScope($request)
+                || $this->hasPermissionWithinScope($request, 'api.config'));
 
         if (isset($securityFields['_admin'])) {
             if ($canManagePermissions) {
@@ -712,7 +931,7 @@ class BlueprintController extends AbstractApiController
      *
      * @param array<int, array<string, mixed>> $fields Serialized field tree (by ref).
      */
-    private function applyTwigProcessOption(array &$fields, UserInterface $user): void
+    private function applyTwigProcessOption(ServerRequestInterface $request, array &$fields, UserInterface $user): void
     {
         $config = $this->grav['config'];
 
@@ -726,7 +945,14 @@ class BlueprintController extends AbstractApiController
             return;
         }
 
-        // Same authority the write guard requires to persist process.twig:true.
+        // Same authority the write guard requires to persist process.twig:true,
+        // including the API-key scope cap — PagesController::guardTwigContent()
+        // caps this decision (GHSA-96xv-p87j-58mx) and the two must agree, or a
+        // scoped key is offered a Twig checkbox that the write path will refuse.
+        if (!$this->scopeAllows($request, 'admin.pages_twig')) {
+            return;
+        }
+        // @scope-cap-exempt: capped by the scopeAllows() early-return directly above.
         if (!$this->isSuperAdmin($user) && !$this->hasPermission($user, 'admin.pages_twig')) {
             return;
         }
@@ -896,6 +1122,9 @@ class BlueprintController extends AbstractApiController
         if (!$accessList && !$groupList) {
             return true;
         }
+        // @scope-cap-exempt: evaluates the privileges of a TARGET account being
+        // inspected, not the authority of the calling credential. The API-key scope
+        // cap governs what the CALLER may do and does not apply to this question.
         if ($this->isSuperAdmin($account) || (bool) $account->get('access.admin.super')) {
             return true;
         }
@@ -1062,6 +1291,21 @@ class BlueprintController extends AbstractApiController
 
             // Parse Class::method format
             if (str_contains($callable, '::')) {
+                // The same gate core applies in Blueprint::dynamicData(). Core
+                // refuses a provider that isn't on the allowlist, and resolving it
+                // here anyway would silently override that refusal and repopulate
+                // the options core declined to build. The directive reaches us from
+                // an on-disk blueprint rather than a query parameter, so this is not
+                // the page-edit vector core hardened, but leaving it ungated keeps
+                // this path more permissive than both core and /data/resolve, and
+                // turns it into an arbitrary-static-call sink the moment a
+                // user-influenced blueprint is routed through the serializer.
+                // Providers opt in via Blueprint::addAllowedDynamicCallable().
+                // (GHSA-7pgq-cr25-xvc8, GHSA-cxv3-5jj3-cpgr)
+                if (!Blueprint::isSafeDynamicCall($callable, [])) {
+                    return null;
+                }
+
                 [$class, $method] = explode('::', $callable, 2);
                 $class = '\\' . $class;
 
@@ -1167,6 +1411,13 @@ class BlueprintController extends AbstractApiController
             $props = [
                 'label', 'help', 'placeholder', 'default', 'description', 'content',
                 'size', 'classes', 'id', 'style', 'title', 'text',
+                // Documented common field attributes. Classic admin's
+                // forms/field.html.twig renders every one of these, so a blueprint
+                // written for 1.7 expects them to survive the trip to the SPA;
+                // missing from this list they were dropped server-side and never
+                // reached the browser at all (grav-admin-next#18).
+                'sublabel', 'sublabelclasses', 'labelclasses', 'outerclasses',
+                'display_label', 'autocomplete', 'autofocus', 'novalidate',
                 'disabled', 'readonly', 'toggleable', 'highlight',
                 'minlength', 'maxlength', 'min', 'max', 'step',
                 'rows', 'cols', 'multiple', 'yaml',
@@ -1184,6 +1435,8 @@ class BlueprintController extends AbstractApiController
                 // pagemediaselect / filepicker
                 'preview_images', 'preview_image', 'on_demand', 'folder', 'filter',
                 'self', 'display', 'resize', 'media_picker_field',
+                // media — which pickers the field offers (page / site / url).
+                'sources',
                 // colorpicker — opt out of the alpha slider with `alpha: false`.
                 'alpha',
             ];
@@ -1199,7 +1452,7 @@ class BlueprintController extends AbstractApiController
             // without translating them here the SPA receives the raw key and
             // humanizes it to "Day Plural" (admin2#64) — the GRAV.* core
             // namespace isn't in the SPA's client string table.
-            foreach (['label', 'title', 'description', 'help', 'placeholder', 'text', 'content', 'success_msg', 'error_msg', 'append', 'prepend'] as $textProp) {
+            foreach (['label', 'sublabel', 'title', 'description', 'help', 'placeholder', 'text', 'content', 'success_msg', 'error_msg', 'append', 'prepend'] as $textProp) {
                 if (isset($serialized[$textProp]) && is_string($serialized[$textProp])) {
                     $serialized[$textProp] = $this->translateLabel($serialized[$textProp]);
                 }
@@ -1258,6 +1511,19 @@ class BlueprintController extends AbstractApiController
             // Validation rules
             if (isset($field['validate']) && is_array($field['validate'])) {
                 $serialized['validate'] = $field['validate'];
+            }
+
+            // `data-fields@` — a container whose children come from a PHP callable.
+            // Core materializes these in Blueprint::init(); this is the safety net
+            // for a blueprint that reaches the serializer without that step, so a
+            // fieldset never renders empty purely because of how it was loaded.
+            // Only fills an empty container, so it can't duplicate what init()
+            // already resolved, and it goes through the same allowlist gate.
+            if (empty($field['fields']) && isset($field['data-fields@'])) {
+                $dynamicFields = $this->resolveDataDirective($field['data-fields@']);
+                if (!empty($dynamicFields)) {
+                    $field['fields'] = $dynamicFields;
+                }
             }
 
             // Handle nested fields (structural containers)

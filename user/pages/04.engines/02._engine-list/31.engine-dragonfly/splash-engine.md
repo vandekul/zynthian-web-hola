@@ -1,7 +1,7 @@
 ---
 title: Dragonfly
 media_order: dragonfly.png
-description: 'Reverb Plugin Suit'
+description: 'Reverb Plugin Suit composed of 4 specialized plugins: hall, room, plate and early reflections.'
 taxonomy:
     category:
         - effect
@@ -13,6 +13,8 @@ taxonomy:
         - fx-delay
         - ucase-fx
         - fx-reverb
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Reverb Plugin Suit'
 splash:
@@ -22,10 +24,10 @@ media_thumb: dragonfly.png
 urls:
     -
         urlLink: 'https://michaelwillis.github.io/dragonfly-reverb/'
-        urlLabel: 'Dragonfly''s Website'
+        urlLabel: "Dragonfly's Website"
     -
         urlLink: 'https://michaelwillis.github.io/dragonfly-reverb/manuals.html'
-        urlLabel: 'Dragonfly''s Documentation'
+        urlLabel: "Dragonfly's Documentation"
     -
         urlLink: 'https://www.kvraudio.com/product/dragonfly-reverb-by-dragonfly-reverb'
         urlLabel: 'KVRAudio Page'

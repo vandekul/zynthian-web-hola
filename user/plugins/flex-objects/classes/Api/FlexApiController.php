@@ -40,6 +40,18 @@ class FlexApiController extends AbstractApiController
     private const ADMIN_NEXT_DEDICATED_TYPES = ['pages', 'user-accounts', 'user-groups'];
 
     /**
+     * User/group directories must NOT be written through the generic Flex route.
+     * That route authorizes only against the directory blueprint permission
+     * (e.g. admin.users.update) and skips the super-admin-target and per-field
+     * (password/access/state/groups) guards the dedicated Users and Groups API
+     * controllers enforce — so a delegated user-manager could otherwise reset a
+     * super-admin's password or elevate an account to super (GHSA-pc8m-jxvh-vmrc).
+     * Admin Next edits these types through their dedicated endpoints, not this
+     * route, so refusing generic writes here changes no legitimate flow.
+     */
+    private const DEDICATED_WRITE_ONLY_TYPES = ['user-accounts', 'user-groups'];
+
+    /**
      * Recursively translate language-key-looking label values within an admin
      * config subtree. {@see translateLabel()} is a no-op for anything that
      * isn't a translation key, so non-label strings pass through unchanged.
@@ -151,11 +163,11 @@ class FlexApiController extends AbstractApiController
             }
 
             // Skip directories the user cannot list
-            if (!$this->isDirectoryAuthorized($directory, 'list', $user)) {
+            if (!$this->isDirectoryAuthorized($directory, 'list', $user, $request)) {
                 continue;
             }
 
-            $result[] = $this->serializeDirectoryMetadata($directory, $user);
+            $result[] = $this->serializeDirectoryMetadata($directory, $user, $request);
         }
 
         return ApiResponse::create($result);
@@ -176,13 +188,13 @@ class FlexApiController extends AbstractApiController
         $directory = $this->resolveDirectory($this->getRouteParam($request, 'type'));
         $user = $this->getUser($request);
 
-        if (!$this->isDirectoryAuthorized($directory, 'list', $user)) {
+        if (!$this->isDirectoryAuthorized($directory, 'list', $user, $request)) {
             throw new \Grav\Plugin\Api\Exceptions\ForbiddenException('Missing required permission to list this Flex directory.');
         }
 
         $this->primeAdminLanguages($request);
 
-        return ApiResponse::create($this->serializeDirectoryMetadata($directory, $user));
+        return ApiResponse::create($this->serializeDirectoryMetadata($directory, $user, $request));
     }
 
     /**
@@ -271,7 +283,7 @@ class FlexApiController extends AbstractApiController
 
         // Get list field names from config
         $listFields = array_keys($directory->getConfig('admin.list.fields') ?? []);
-        $detail = $this->normalizeDetailConfig($directory, $directory->getConfig('admin.list.detail'), $this->getUser($request));
+        $detail = $this->normalizeDetailConfig($directory, $directory->getConfig('admin.list.detail'), $this->getUser($request), $request);
 
         $data = [];
         foreach ($objects as $object) {
@@ -313,6 +325,7 @@ class FlexApiController extends AbstractApiController
     {
         $type = $this->getRouteParam($request, 'type');
         $directory = $this->resolveDirectory($type);
+        $this->assertGenericWriteAllowed($directory);
         $this->requireFlexPermission($request, $directory, 'create');
 
         $body = $this->getRequestBody($request);
@@ -347,6 +360,7 @@ class FlexApiController extends AbstractApiController
     {
         $type = $this->getRouteParam($request, 'type');
         $directory = $this->resolveDirectory($type);
+        $this->assertGenericWriteAllowed($directory);
         $this->requireFlexPermission($request, $directory, 'update');
 
         $key = $this->getRouteParam($request, 'key');
@@ -394,6 +408,7 @@ class FlexApiController extends AbstractApiController
     {
         $type = $this->getRouteParam($request, 'type');
         $directory = $this->resolveDirectory($type);
+        $this->assertGenericWriteAllowed($directory);
         $this->requireFlexPermission($request, $directory, 'delete');
 
         $key = $this->getRouteParam($request, 'key');
@@ -422,7 +437,20 @@ class FlexApiController extends AbstractApiController
     {
         $type = $this->getRouteParam($request, 'type');
         $directory = $this->resolveDirectory($type);
-        $this->requireFlexPermission($request, $directory, 'list');
+
+        // Export returns every field of every object, which is read-grade data.
+        // `list` only covers the minimised column view index() serves, and the
+        // classic admin export controller gated on `read` for the same reason
+        // (GHSA-3v3h-qxj8-43p3).
+        $this->requireFlexPermission($request, $directory, 'read');
+
+        // Honour the directory's export switch. A directory that never opted in
+        // (user accounts, groups, pages) has no export feature to offer, and must
+        // not be dumped wholesale through this endpoint.
+        $exportConfig = $directory->getConfig('admin.export') ?? [];
+        if (empty($exportConfig['enabled'])) {
+            throw new NotFoundException("Export is not enabled for '{$type}'.");
+        }
 
         $collection = $directory->getCollection();
         $data = [];
@@ -576,8 +604,16 @@ class FlexApiController extends AbstractApiController
      * Delegates to {@see DirectoryPermission} so this check stays in sync with
      * the sidebar registration in flex-objects.php.
      */
-    private function isDirectoryAuthorized(FlexDirectory $directory, string $action, UserInterface $user): bool
+    private function isDirectoryAuthorized(FlexDirectory $directory, string $action, UserInterface $user, ?ServerRequestInterface $request = null): bool
     {
+        // API-key scope cap first, as requireFlexPermission() does. Without it a
+        // key scoped to one directory could list every other directory and read
+        // related records in a detail panel, because the super-admin
+        // short-circuit below reads the account behind the key.
+        if ($request !== null && !$this->flexScopeAllows($request, $directory, $action)) {
+            return false;
+        }
+
         if ($this->isSuperAdmin($user)) {
             return true;
         }
@@ -800,6 +836,21 @@ class FlexApiController extends AbstractApiController
     }
 
     /**
+     * Refuse a generic Flex write to a user/group directory. Those types carry
+     * privilege-bearing fields (password, access, state, groups) and have
+     * dedicated API controllers that gate them; the generic route does not.
+     * See DEDICATED_WRITE_ONLY_TYPES / GHSA-pc8m-jxvh-vmrc.
+     */
+    private function assertGenericWriteAllowed(FlexDirectory $directory): void
+    {
+        if (in_array($directory->getFlexType(), self::DEDICATED_WRITE_ONLY_TYPES, true)) {
+            throw new \Grav\Plugin\Api\Exceptions\ForbiddenException(
+                "The '{$directory->getFlexType()}' directory must be modified through its dedicated API endpoint.",
+            );
+        }
+    }
+
+    /**
      * Check the directory-specific permission derived from the blueprint.
      *
      * Checks both api.* and admin.* prefixed permissions (OR logic) so users
@@ -877,9 +928,22 @@ class FlexApiController extends AbstractApiController
         FlexDirectory $directory,
         string $action,
     ): void {
+        if (!$this->flexScopeAllows($request, $directory, $action)) {
+            throw new \Grav\Plugin\Api\Exceptions\ForbiddenException(
+                "API key is not authorized for the '{$action}' action on '{$directory->getFlexType()}'.",
+            );
+        }
+    }
+
+    /**
+     * Non-throwing form of requireFlexScope(), for checks that skip or hide
+     * rather than reject.
+     */
+    private function flexScopeAllows(ServerRequestInterface $request, FlexDirectory $directory, string $action): bool
+    {
         $scopes = $request->getAttribute('api_key_scopes');
         if (!is_array($scopes) || $scopes === []) {
-            return;
+            return true;
         }
 
         $candidates = [];
@@ -890,13 +954,11 @@ class FlexApiController extends AbstractApiController
 
         foreach ($candidates as $permission) {
             if ($this->scopesPermitPermission($scopes, $permission)) {
-                return;
+                return true;
             }
         }
 
-        throw new \Grav\Plugin\Api\Exceptions\ForbiddenException(
-            "API key is not authorized for the '{$action}' action on '{$directory->getFlexType()}'.",
-        );
+        return false;
     }
 
     /**
@@ -963,7 +1025,7 @@ class FlexApiController extends AbstractApiController
      * @param mixed $user
      * @return array<string, mixed>
      */
-    private function serializeDirectoryMetadata(FlexDirectory $directory, $user): array
+    private function serializeDirectoryMetadata(FlexDirectory $directory, $user, ?ServerRequestInterface $request = null): array
     {
         $config = $directory->getConfig('admin') ?? [];
         $menu = $config['menu']['list'] ?? [];
@@ -977,7 +1039,7 @@ class FlexApiController extends AbstractApiController
         $list = $config['list'] ?? [];
         $listFields = $list['fields'] ?? [];
         [$fieldTypes, $fieldOptions] = $this->describeListFields($directory, $listFields);
-        $detail = $this->normalizeDetailConfig($directory, $list['detail'] ?? null, $user);
+        $detail = $this->normalizeDetailConfig($directory, $list['detail'] ?? null, $user, $request);
         if ($detail !== null) {
             $list['detail'] = $detail;
         }
@@ -1042,7 +1104,7 @@ class FlexApiController extends AbstractApiController
      * @param mixed $user
      * @return array<string, mixed>|null
      */
-    private function normalizeDetailConfig(FlexDirectory $directory, $detail, $user): ?array
+    private function normalizeDetailConfig(FlexDirectory $directory, $detail, $user, ?ServerRequestInterface $request = null): ?array
     {
         if (!is_array($detail) || empty($detail['enabled'])) {
             return null;
@@ -1061,16 +1123,16 @@ class FlexApiController extends AbstractApiController
             return null;
         }
 
-        if (!$this->isDirectoryAuthorized($relatedDirectory, 'list', $user)) {
+        if (!$this->isDirectoryAuthorized($relatedDirectory, 'list', $user, $request)) {
             return null;
         }
 
         $actionsEnabled = (bool) ($detail['actions'] ?? false);
         $canEdit = $actionsEnabled
             && $this->hasAdminNextFlexEditRoute($relatedDirectory)
-            && $this->isDirectoryAuthorized($relatedDirectory, 'update', $user);
+            && $this->isDirectoryAuthorized($relatedDirectory, 'update', $user, $request);
         $canDelete = $actionsEnabled
-            && $this->isDirectoryAuthorized($relatedDirectory, 'delete', $user);
+            && $this->isDirectoryAuthorized($relatedDirectory, 'delete', $user, $request);
 
         $fields = $this->resolveDetailFields($relatedDirectory, $detail['fields'] ?? null);
         [$fieldTypes, $fieldOptions] = $this->describeListFields($relatedDirectory, $fields);
@@ -1269,7 +1331,19 @@ class FlexApiController extends AbstractApiController
 
         if ($listFields) {
             foreach ($listFields as $field) {
-                $data[$field] = $object->getProperty($field);
+                // A directory whose storage nests its data (FolderStorage with a
+                // MarkdownFormatter keeps everything under `header`) has to declare
+                // its list columns as dotted paths, and getProperty() only ever
+                // reads the top level. Fall back to the nested lookup, but only
+                // when the flat read came back null: the built-in directories then
+                // keep resolving exactly what they resolve today, and a column that
+                // legitimately holds `false` is never re-read (#237).
+                $value = $object->getProperty($field);
+                if ($value === null) {
+                    $value = $object->getNestedProperty($field);
+                }
+
+                $data[$field] = $value;
             }
         } else {
             // No list config — return all data

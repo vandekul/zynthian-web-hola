@@ -10,6 +10,8 @@ taxonomy:
         - ucase-kb
         - synth-sample
         - synth-emu
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Electric Piano Emulator'
 splash:

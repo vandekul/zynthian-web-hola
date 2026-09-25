@@ -16,6 +16,6 @@ background: _DSC4452_01_web_legal.jpg
 
 Zynthian.org project pages don't collect any user data.
 
-[Click here for viewing Zynthian Shop (shop.zynthian.org) privacy policy](https://shop.zynthian.org/privacy-policy)
+[Click here](https://shop.zynthian.org/privacy-policy) for viewing Zynthian Shop privacy policy.
 
 

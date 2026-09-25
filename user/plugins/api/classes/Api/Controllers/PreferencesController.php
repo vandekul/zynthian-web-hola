@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Grav\Plugin\Api\Controllers;
 
-use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Plugin\Api\Services\PreferencesResolver;
@@ -320,12 +319,16 @@ class PreferencesController extends AbstractApiController
 
     private function requireSiteEditor(ServerRequestInterface $request): void
     {
-        $user = $this->getUser($request);
-        if (!$this->canEditSite($user)) {
-            throw new ForbiddenException('Only super-admins can edit site-wide admin preferences.');
-        }
+        // requireSuper() applies the API-key scope cap before the super check, so a
+        // scoped key on a super account can't save site preferences/branding or
+        // upload logos uncapped (GHSA-jqgq-v53x-x99g). A bare canEditSite() check
+        // (isSuperAdmin) would skip the cap. canEditSite() is still used for the
+        // read-only can_edit_site flag on GET responses.
+        $this->requireSuper($request);
     }
 
+    // @scope-cap-exempt: read-only display flag (can_edit_site) on GET responses.
+    // The actual write gate is requireSiteEditor() -> requireSuper(), which caps.
     private function canEditSite(\Grav\Common\User\Interfaces\UserInterface $user): bool
     {
         return $this->isSuperAdmin($user);

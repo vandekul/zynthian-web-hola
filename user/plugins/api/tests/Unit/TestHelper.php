@@ -186,14 +186,16 @@ final class TestHelper
         string $username = 'testuser',
         array $data = [],
         bool $exists = true,
+        ?object $blueprint = null,
     ): UserInterface {
-        return new class ($username, $data, $exists) implements UserInterface {
+        return new class ($username, $data, $exists, $blueprint) implements UserInterface {
             public readonly string $username;
 
             public function __construct(
                 string $username,
                 private array $data,
                 private readonly bool $existsFlag,
+                private readonly ?object $blueprint = null,
             ) {
                 $this->username = $username;
             }
@@ -222,18 +224,41 @@ final class TestHelper
             {
                 return null;
             }
+
+            /**
+             * Classic (DataUser) accounts expose the account blueprint via
+             * blueprints(); UsersController::accountBlueprint() reads it to
+             * apply and validate custom account fields (admin2#138). Returns
+             * null unless a test injects one, keeping every other test's mock
+             * blueprint-less exactly as before.
+             */
+            public function blueprints(): ?object
+            {
+                return $this->blueprint;
+            }
         };
     }
 
     /**
      * Create a Grav container instance with given services.
      *
-     * Returns the Grav singleton (reset between calls).
+     * Returns the Grav singleton (reset between calls). A minimal 'config'
+     * service that answers every get() with the caller's default is always
+     * present unless the test supplies its own, so plugin code may read
+     * config anywhere without the container blowing up mid-test.
      */
     public static function createMockGrav(array $services = []): Grav
     {
         Grav::resetInstance();
         $grav = Grav::instance();
+        if (!array_key_exists('config', $services)) {
+            $services['config'] = new class {
+                public function get(string $key, mixed $default = null): mixed
+                {
+                    return $default;
+                }
+            };
+        }
         foreach ($services as $key => $value) {
             $grav[$key] = $value;
         }

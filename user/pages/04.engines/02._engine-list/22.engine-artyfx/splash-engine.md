@@ -17,6 +17,8 @@ taxonomy:
         - fx-filter
         - fx-dynamics
         - fx-distortion
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'Minimalistic Plugin Collection'
 splash:
@@ -26,10 +28,10 @@ media_thumb: artyfx.png
 urls:
     -
         urlLink: 'http://openavproductions.com/artyfx/'
-        urlLabel: 'ArtyFX''s Website'
+        urlLabel: "ArtyFX's Website"
     -
         urlLink: 'http://openavproductions.com/doc/artyfx.html'
-        urlLabel: 'ArtyFX''s Documentation'
+        urlLabel: "ArtyFX's Documentation"
     -
         urlLink: 'https://github.com/openAVproductions/openAV-ArtyFX'
         urlLabel: 'Source Code'

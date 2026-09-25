@@ -51,6 +51,33 @@ namespace Grav\Common\Config {
             }
         }
     }
+
+    if (!class_exists(\Grav\Common\Config\Setup::class, false)) {
+        /**
+         * Minimal setup stub for environment-aware services. Grav exposes the
+         * booted environment as a static value during bootstrap; the tests only
+         * need that value and a small Data-like getter for stream metadata.
+         */
+        class Setup
+        {
+            public static ?string $environment = null;
+
+            public function __construct(private array $items = []) {}
+
+            public function get(string $key, mixed $default = null): mixed
+            {
+                $current = $this->items;
+                foreach (explode('.', $key) as $segment) {
+                    if (!is_array($current) || !array_key_exists($segment, $current)) {
+                        return $default;
+                    }
+                    $current = $current[$segment];
+                }
+
+                return $current;
+            }
+        }
+    }
 }
 
 namespace Grav\Common {
@@ -207,6 +234,13 @@ namespace Grav\Common\Page\Interfaces {
         interface PageInterface
         {
             public function route($var = null): ?string;
+            // The structural route, which unlike route() is never rewritten by
+            // a `routes.default` alias, and root(), which is how the listings
+            // identify Grav's virtual pages-root container. Both are declared
+            // on the real PageRoutableInterface (getgrav/grav-plugin-api#34).
+            public function rawRoute($var = null): ?string;
+            public function root(): bool;
+            public function exists(): bool;
             public function slug($var = null): string;
             public function order($var = null): ?int;
             public function path($var = null): ?string;
@@ -217,6 +251,11 @@ namespace Grav\Common\Page\Interfaces {
             public function visible(): bool;
             public function routable(): bool;
             public function template(): string;
+            // Needed by the per-page ACL resolver, which reads a page's own
+            // frontmatter and walks up its parents.
+            public function header($var = null);
+            public function parent(?PageInterface $var = null): ?PageInterface;
+            public function language($var = null);
         }
     }
 }
@@ -608,6 +647,41 @@ namespace Grav\Common {
                     }
                 }
                 return $results;
+            }
+
+            /**
+             * Inverse of arrayFlattenDotNotation. Exercised by
+             * TranslationOverrideStore, which stores flat keys but writes real
+             * nested language files. Mirrors core's behaviour of skipping a
+             * segment that would have to treat an existing scalar as an array.
+             */
+            public static function arrayUnflattenDotNotation($array, $separator = '.')
+            {
+                $newArray = [];
+                foreach ($array as $key => $value) {
+                    $dots = explode($separator, (string) $key);
+                    if (count($dots) > 1) {
+                        $last = &$newArray[$dots[0]];
+                        foreach ($dots as $k => $dot) {
+                            if ($k === 0) {
+                                continue;
+                            }
+                            if (null !== $last && !is_array($last)) {
+                                continue 2;
+                            }
+                            $last = &$last[$dot];
+                        }
+                        if (null !== $last && !is_array($last)) {
+                            continue;
+                        }
+                        $last = $value;
+                    } else {
+                        $newArray[$key] = $value;
+                    }
+                }
+                unset($last);
+
+                return $newArray;
             }
 
             public static function isPositive($value): bool

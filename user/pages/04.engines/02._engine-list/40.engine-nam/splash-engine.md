@@ -11,6 +11,8 @@ taxonomy:
         - effect
         - ucase-fx
         - fx-distortion
+    homepage:
+        - 'yes'
 date: '17:38 24-04-2020'
 subtitle: 'powering the next generation of digital audio effects'
 splash:
@@ -30,14 +32,13 @@ video:
     -
         videoType: youtube
         videoLink: 'https://www.youtube.com/watch?v=fCa_OvSByhU'
-
 urls:
     -
         urlLink: 'https://www.neuralampmodeler.com'
-        urlLabel: 'NAM''s Website'
+        urlLabel: "NAM's Website"
     -
         urlLink: 'https://tonehunt.org'
-        urlLabel: 'NAM''s Models in ToneHunt'
+        urlLabel: "NAM's Models in ToneHunt"
     -
         urlLink: 'https://github.com/mikeoliphant/neural-amp-modeler-lv2'
         urlLabel: 'Source Code'

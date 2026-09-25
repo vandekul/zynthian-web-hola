@@ -6,6 +6,7 @@ use Composer\Autoload\ClassLoader;
 use DateTime;
 use Doctrine\Common\Cache\Cache;
 use Exception;
+use Grav\Common\Data\Data;
 use Grav\Common\Data\ValidationException;
 use Grav\Common\Filesystem\Folder;
 use Grav\Common\Page\Interfaces\PageInterface;
@@ -568,13 +569,22 @@ class FormPlugin extends Plugin
                 break;
             case 'redirect':
                 $this->grav['session']->setFlashObject('form', $form);
-                $url = ((string) $params);
+                $template = ((string) $params);
                 $vars = array(
                     'form' => $form
                 );
                 /** @var Twig $twig */
                 $twig = $this->grav['twig'];
-                $url = $twig->processString($url, $vars);
+                $url = $twig->processString($template, $vars);
+
+                // The redirect target is authored by the site, but the values it interpolates are
+                // submitted by the visitor. Only honor an off-site jump where the site asked for one:
+                // the authored template was already external, or the rendered URL still points here.
+                // Anything else means the off-site part arrived in form data.
+                if (Uri::isExternal($url) && !Uri::isExternal($template) && !$this->isSameHost($url)) {
+                    $this->grav['log']->warning(sprintf('plugin.form: blocked off-site redirect to "%s" coming from form data (redirect: "%s")', $url, $template));
+                    $url = $this->getCurrentPageRoute();
+                }
 
                 $message = $form->message;
                 if ($message) {
@@ -674,14 +684,18 @@ class FormPlugin extends Plugin
 
                 // Final containment check: the resolved target must stay within user-data://. The target dir may
                 // not exist yet on first save, so resolve the nearest existing ancestor instead of $dir itself.
-                $dataRoot = realpath($path);
-                $ancestor = $dir;
+                // Separators are normalized to '/' throughout: the locator emits '/'-style paths while DS and
+                // realpath() use '\' on Windows, so $dir is mixed-separator. realpath() on a mixed-separator path
+                // is unreliable on Windows, and a mismatched separator would break the prefix compare (#637).
+                $normalize = static fn($p) => is_string($p) ? str_replace('\\', '/', $p) : $p;
+                $dataRoot = $normalize(realpath($path));
+                $ancestor = $normalize($dir);
                 while ($ancestor && !file_exists($ancestor) && dirname($ancestor) !== $ancestor) {
                     $ancestor = dirname($ancestor);
                 }
-                $realAncestor = $ancestor ? realpath($ancestor) : false;
+                $realAncestor = $ancestor ? $normalize(realpath($ancestor)) : false;
                 if ($dataRoot === false || $realAncestor === false
-                    || ($realAncestor !== $dataRoot && !str_starts_with($realAncestor, $dataRoot.DS))) {
+                    || ($realAncestor !== $dataRoot && !str_starts_with($realAncestor, $dataRoot.'/'))) {
                     throw new RuntimeException('Form save: Resolved path escapes the data directory.');
                 }
 
@@ -721,7 +735,7 @@ class FormPlugin extends Plugin
                 $form->copyFiles();
 
                 if ($operation === 'create') {
-                    $body = $twig->processString($params['body'] ?? '{% include "forms/data.txt.twig" %}', $vars);
+                    $body = $twig->processString($params['body'] ?? '{% include "forms/data.save.txt.twig" %}', $vars);
                     $file->save($body);
                 } elseif ($operation === 'add') {
                     if (!empty($params['body'])) {
@@ -973,6 +987,20 @@ class FormPlugin extends Plugin
             [$route, $name, $form] = $first;
 
             $page = $pages->find($route);
+
+            // The form lives on a different page than the one being requested.
+            // Page access rules are only ever evaluated against the requested
+            // page, so without this check an anonymous visitor could POST to any
+            // public route with `__form-name__` set to a form that lives behind a
+            // login wall and run its process actions (GHSA-33m4-m988-5fvh).
+            if (null === $page || !$this->isPageAccessible($page)) {
+                $this->grav['debugger']->addMessage(sprintf(
+                    'Form %s was found on page %s, but that page is not accessible to the current user',
+                    $name, $route
+                ), 'warning');
+
+                return null;
+            }
         }
 
         // Form can be saved as an array or an object. If it's an array, we need to create object from it.
@@ -1107,11 +1135,72 @@ class FormPlugin extends Plugin
     }
 
     /**
+     * Check if a URL points back at this site.
+     *
+     * Both the requested host and the host of the configured base URL count as our own, as the
+     * two differ when `system.custom_base_url` is set or the site runs behind a reverse proxy.
+     *
+     * @param  string $url
+     * @return bool
+     */
+    protected function isSameHost(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!is_string($host) || $host === '') {
+            return false;
+        }
+
+        /** @var Uri $uri */
+        $uri = $this->grav['uri'];
+
+        $own_hosts = [$uri->host(), parse_url((string) $uri->rootUrl(true), PHP_URL_HOST)];
+
+        foreach ($own_hosts as $own_host) {
+            if (is_string($own_host) && $own_host !== '' && strcasecmp($host, $own_host) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Return all forms matching the given name.
      *
      * @param  string  $name
      * @return array
      */
+    /**
+     * Can the current user reach the page that owns a form?
+     *
+     * Access rules belong to the Login plugin, so ask it rather than re-reading
+     * the `access:` header here: rules can be inherited from a parent when
+     * `parent_acl` is enabled, a session that has not completed its 2FA challenge
+     * must still be denied, and other plugins can veto through the same event.
+     * With no Login plugin installed there are no page access rules on the site
+     * at all, so there is nothing to enforce. (GHSA-33m4-m988-5fvh)
+     *
+     * @param  PageInterface  $page
+     * @return bool
+     */
+    protected function isPageAccessible(PageInterface $page): bool
+    {
+        if (!$page->published()) {
+            return false;
+        }
+
+        $login = $this->grav['login'] ?? null;
+        if (null === $login || !method_exists($login, 'isUserAuthorizedForPage')) {
+            return true;
+        }
+
+        return $login->isUserAuthorizedForPage(
+            $this->grav['user'],
+            $page,
+            new Data((array) $this->grav['config']->get('plugins.login'))
+        );
+    }
+
     protected function findFormByName(string $name): array
     {
         $list = [];

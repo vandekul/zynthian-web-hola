@@ -20,12 +20,14 @@ ICU:
     CLOSE: Close
     COLLAPSE_SIDEBAR: Collapse sidebar
     EXPAND_SIDEBAR: Expand sidebar
+    CONFIRM: Confirm
     CONFIRM_DELETE: Delete "{title}" at {route}?
     DELETE: Delete
     DONE: Done
     EDIT: Edit
     LOADING: Loading...
     NO_CHANGES: No changes to save
+    RETRY: Retry
     SAVE: Save
     SAVING: Saving...
     SEARCH: Search
@@ -33,6 +35,16 @@ ICU:
     TOGGLE_DARK_MODE: Toggle dark mode
     TOGGLE_MENU: Toggle menu
     UNSAVED_CHANGES: Unsaved changes
+    NOTICES:
+      HEADING: '{count, plural, one {Notice} other {Notices}}'
+      SHOW: Show notices
+      HIDE: Hide notices
+    UNSAVED_CHANGES_DIALOG:
+      LEAVE_MESSAGE: You have unsaved changes. Leave anyway?
+      LEAVE: Leave
+      STAY: Stay
+      SWITCH_LANGUAGE_MESSAGE: You have unsaved changes. Switch language anyway?
+      SWITCH_LANGUAGE: Switch
     VALIDATION:
       FIELD_REQUIRED: '{label} is required'
       REQUIRED_GENERIC: This field is required
@@ -40,7 +52,18 @@ ICU:
     SECURITY_CHECK:
       USER_FOLDER_EXPOSED_TITLE: 'Your web server is not applying Grav''s access rules'
       USER_FOLDER_EXPOSED_BODY: 'Your web server is not applying Grav''s recommended access rules, so files in user/ can be reached directly over the web. It is worth tightening up, since some plugins do store data here.'
+      STORAGE_EXPOSED_BODY: 'The web server served test files from directories that should be private. The file types listed below may expose stored submissions, backups or temporary files. Ask your host to block direct access, or move private storage outside the web root.'
       USER_FOLDER_EXPOSED_LEARN_MORE: How to fix this
+      STORAGE_EXPOSED_TITLE: 'Files that should be private can be downloaded from this site'
+      STORAGE_EXPOSED_COUNT: '{n, plural, one {# file type} other {# file types}}'
+      STORAGE_EXPOSED_TMP: 'Test files in tmp/ could be downloaded, while the other folders were blocked. Your server rules probably date from before Grav 2.1.7, which added tmp/ to the list of blocked folders. Add tmp to that list in your .htaccess, or in your nginx, Caddy or IIS configuration, to match the rules Grav ships.'
+      STORAGE_EXPOSED_BY_TYPE: 'Some file types were blocked in these folders while others could be downloaded. That usually means something in front of Grav''s rules, such as nginx serving static files ahead of Apache, answers for common file types like .zip before the rules are checked. Block these folders in that layer''s configuration as well.'
+      STORAGE_EXPOSED_ALL: 'Every test file could be downloaded, so your web server is not applying Grav''s access rules at all. On Apache, check that AllowOverride lets the site''s .htaccess take effect. On nginx, Caddy or IIS, add the security rules from Grav''s webserver-configs folder.'
+      STORAGE_EXPOSED_CDN: 'If the site is behind a CDN such as Cloudflare, purge its cache after fixing this. Copies it already stored stay downloadable until you do.'
+      COLLAPSE: Collapse
+      SHOW_DETAILS: Show details
+      SNOOZE: Snooze
+      SNOOZE_HINT: 'Hide this warning for 24 hours. It comes back sooner if different files are found.'
     DASHBOARD:
       TITLE: Dashboard
       CUSTOMIZE: Customize
@@ -128,6 +151,12 @@ ICU:
       DRAFT: Draft
       PUBLISH: Publish
       UNPUBLISH: Unpublish
+      STATUS:
+        SCHEDULED: Scheduled
+        EXPIRED: Expired
+        SCHEDULED_FOR: 'Scheduled to publish on {date}'
+        EXPIRED_ON: 'Unpublished since {date}'
+        TOGGLE_TITLE: '{action} ({status})'
       SORT_ORDER: Order
       SORT_TITLE_AZ: Title A-Z
       SORT_TITLE_ZA: Title Z-A
@@ -183,6 +212,7 @@ ICU:
         CONNECTING_TO_COLLAB: Connecting to collaboration session…
         RESET_TRANSLATION: Reset Translation
         PAGE_PREVIEW: Page Preview
+        PREVIEW_SHOWING_HOST_PAGE: shown in its parent page
         INVALID_YAML_FRONTMATTER: Invalid YAML frontmatter
         INVALID_YAML_FRONTMATTER_FIX_SYNTAX: Invalid YAML frontmatter — fix syntax before saving
         PAGE_SAVED_AND_MOVED: Page saved and moved
@@ -220,6 +250,8 @@ ICU:
         ROOT: <root> /
         PAGE_TEMPLATE: Page Template
         LOADING_TEMPLATES: Loading templates...
+        CHILD_TYPE_HINT: 'The parent page suggests "{template}" for its children. You can still choose a different template.'
+        STATUS_HELP: Drafts are saved but not visible on the site until you publish them
         VISIBLE: Visible
         CONTROLS_WHETHER_THIS_PAGE_APPEARS_IN: Controls whether this page appears in navigation menus
         CONTINUE: Continue
@@ -236,8 +268,13 @@ ICU:
       SUBTITLE: Manage your site content and structure
     FIELDS:
       CLEAR_DATE: Clear date
+      SET_DATE_NOW: Set to now
       REGENERATE_SLUG: Auto-regenerate from page title
       ADD_ENTRY: Add entry
+      ADD_ITEM: Add item
+      SELECTIZE_PLACEHOLDER: Type and press Enter...
+      SELECT_A_PAGE: Select a page...
+      SELECT_AN_ICON: Select an icon...
       NO_TAXONOMY_TYPES: No taxonomy types configured
       FILE_PICKER_SOON: File picker — coming soon
       CRON:
@@ -247,6 +284,7 @@ ICU:
         MIN_HR_DOM_MON_DOW: min hr dom mon dow
       CRON_STATUS:
         FAILED_TO_LOAD_SCHEDULER_STATUS: Failed to load scheduler status
+        PROCESS_UNAVAILABLE: "Jobs cannot be run from here on this host, because PHP's proc_open function is disabled. They still run whenever your scheduler is triggered by cron or a webhook."
         SCHEDULER_RUN_COMPLETED: Scheduler run completed
         FAILED_TO_RUN_SCHEDULER: Failed to run scheduler
         LOADING_SCHEDULER_STATUS: Loading scheduler status...
@@ -267,6 +305,13 @@ ICU:
         NO_TRIGGERS_ACTIVE_ENABLE_WEBHOOKS_OR: No triggers active! Enable webhooks or configure cron.
         RUNNING: Running...
         RUN_ALL: Run All
+        RUN_ALL_HELP: Run every enabled job now, whatever its schedule says.
+        RUN_PENDING: Run Pending
+        RUN_NOW: Run this job now
+        PENDING: Pending
+        NEVER: Never
+        BY_HAND: by hand
+        MANUAL_RUN_HELP: "Run Pending runs the jobs that have missed their last scheduled time, which is what you want on a site with no cron entry. Runs you start here are recorded as manual, and do not count towards the cron status above."
       CUSTOM_FIELD_WRAPPER:
         LOADING_CUSTOM_FIELD: Loading custom field...
       DATE_FORMAT:
@@ -279,6 +324,10 @@ ICU:
         SEARCH_ICONS: Search icons...
         NO_ICONS_FOUND: No icons found
         SHOWING_FIRST_200_RESULTS_TYPE_TO_NARROW: Showing first 200 results — type to narrow
+        FAMILY_ALL: All
+        FAMILY_SOLID: Solid
+        FAMILY_REGULAR: Regular
+        FAMILY_BRANDS: Brands
       PAGE_EXISTS:
         CHECKING_PAGE: Checking page...
       PAGE_MEDIA:
@@ -316,6 +365,16 @@ ICU:
         SELECT_FILES: Select files…
       FILE:
         LIMIT_REACHED: "This field accepts at most {limit} file(s)."
+      MEDIA:
+        TITLE: Select media
+        SELECT: Select media…
+        ADD: Add media…
+        CHANGE: Change
+        REMOVE: Remove
+        MOVE_EARLIER: Move earlier
+        MOVE_LATER: Move later
+        DONE: Done
+        SELECTED_COUNT: "{count, plural, =0 {Nothing selected} one {# selected} other {# selected}}"
     NAV:
       DASHBOARD: Dashboard
       CONFIGURATION: Configuration
@@ -324,6 +383,7 @@ ICU:
       USERS: Users
       PLUGINS: Plugins
       THEMES: Themes
+      TRANSLATIONS: Translations
       TOOLS: Tools
       SYSTEM: System
       SETTINGS: Settings
@@ -366,6 +426,11 @@ ICU:
       FAILED_TO_LOAD_AVAILABLE_THEMES_FROM_GPM: Failed to load available themes from GPM
       ADD_THEME: Add Theme
       SELECT_A_THEME_TO_VIEW_DETAILS: Select a theme to view details
+    API_CLIENT:
+      INVALID_JSON_TITLE: Unexpected response from the server
+      INVALID_JSON_DETAIL: "The server's reply could not be read because it is not valid JSON. Something on the server may be printing extra output, such as a PHP warning, alongside the API response. The browser console has the details."
+      UNEXPECTED_RESPONSE_TITLE: Unexpected response from the server
+      UNEXPECTED_RESPONSE_DETAIL: The server replied with data in a format this screen does not expect. The browser console has the details.
     API_KEYS_FIELD:
       REVOKE_KEY: Revoke key
       E_G_MY_CLI_TOOL: e.g. My CLI Tool
@@ -441,6 +506,7 @@ ICU:
     REAUTH_MODAL:
       SESSION_EXPIRED: Session expired
       PLEASE_RE_ENTER_YOUR_PASSWORD_TO: Please re-enter your password to continue. Your work has been preserved.
+      SIGN_IN_AGAIN_TO_CONTINUE: Sign in again to continue. Your work has been preserved.
     USERNAME: Username
     PASSWORD: Password
     REMOVE: Remove
@@ -530,6 +596,15 @@ ICU:
     FLOATING_WIDGET_LOADER:
       CLOSE_WIDGETS_MENU: Close widgets menu
     MEDIA:
+      FILE_DETAILS:
+        TITLE: File details
+        PATH: Path
+        TYPE: Type
+        SIZE: Size
+        URL: URL
+        MEDIA_PATH: Media path
+        MARKDOWN: Markdown
+        OPEN: Open
       MEDIA_INSPECTOR:
         PREVIOUS_FILE: Previous file
         NEXT_FILE: Next file
@@ -539,6 +614,14 @@ ICU:
         DIMENSIONS: Dimensions
       MEDIA_MANAGER:
         ROOT: Media
+        NO_RESULTS_FOUND: No results found
+        TRY_A_DIFFERENT_SEARCH_TERM: Try a different search term
+        FOLDER_IS_EMPTY: This folder is empty
+        DROP_FILES_OR_CLICK_UPLOAD: Drop files here or click Upload to get started
+        DROP_FILES_TO_UPLOAD: Drop files to upload
+        # Rendered with tHtml so the path can be emphasised without splitting the
+        # sentence into fragments translators can't reorder.
+        DROP_FILES_TO_UPLOAD_TO_PATH: Drop files to upload to **{path}**
         FOLDER_NAME: Folder name
         FILES_DELETED: Files deleted
         UPLOAD_FILES: Upload Files
@@ -559,6 +642,9 @@ ICU:
       MANAGE_SITE_WIDE_MEDIA_FILES: Manage site-wide media files
       PAGE_MEDIA:
         PAGE_MEDIA: Page Media
+        DROP_FILES_HERE: Drop files here
+        DROP_OR_CLICK_TO_ADD_MORE: Drop or click to add more
+        DROP_FILES_OR_CLICK_TO_UPLOAD: Drop files or click to upload
         DRAG_INTO_EDITOR: Drag into editor
         REORDER: Drag to reorder
         REORDER_MODE: Reorder
@@ -600,6 +686,117 @@ ICU:
         LOCKED: Read-only — {owner} is editing with **{editor}**. Mixed editor types can't co-edit; [switch your editor preference]({href}) to collaborate live.
         BUILTIN_MARKDOWN_EDITOR: the built-in markdown editor
     DOWNLOAD: Download
+    TRANSLATIONS:
+      TITLE: Translations
+      DESCRIPTION: "Reword any string this site displays, in any language. Changes are stored as overrides in user/languages and never touch a plugin or theme's own files, so an update can't wipe them."
+      IMPORT_TITLE: Overrides waiting in the Translation Strings plugin
+      IMPORT_BODY: "{count, plural, one {# override is still stored inside the Translation Strings plugin. Import it to manage it here.} other {# overrides across {languages, plural, one {# language} other {# languages}} are still stored inside the Translation Strings plugin. Import them to manage them here.}}"
+      IMPORT_CONFLICTS: "{count, plural, one {# key is} other {# keys are}} set in both places with different wording. The plugin's version wins, because that is what your site shows today."
+      IMPORT_ACTION: Import overrides
+      IMPORT_DONE: "Imported {count, plural, one {# override} other {# overrides}}"
+      IMPORT_FAILED: Import failed
+      IMPORT_UNKNOWN_WARNING: "{count, plural, one {# imported key names a string} other {# imported keys name strings}} nothing on this site provides. Find them with the Unknown filter."
+      IMPORT_UNKNOWN_NOTE: "{count, plural, one {# key names a string no plugin, theme or core file provides. It is kept so you can review it, but it has no effect.} other {# keys name strings no plugin, theme or core file provides. They are kept so you can review them, but they have no effect.}}"
+      IMPORT_ALREADY_DONE: "All {count, plural, one {# override is} other {# overrides are}} already here"
+      IMPORT_STILL_ENABLED_TITLE: The Translation Strings plugin is still enabled
+      IMPORT_STILL_ENABLED_BODY: It applies its strings after this editor does, so it still overrides anything you change here. Check the site reads correctly, then disable it to finish the switch. Its settings are left in place, so this is reversible.
+      IMPORT_DISABLE_ACTION: Disable the plugin
+      IMPORT_DISABLE_BLOCKED: Import the overrides first, or they will drop off the site.
+      IMPORT_DISABLE_FAILED: Could not disable the plugin
+      IMPORT_PLUGIN_DISABLED: Translation Strings disabled. This editor is now in charge.
+      IMPORT_SHOW_DETAIL: Show what will be imported
+      IMPORT_HIDE_DETAIL: Hide detail
+      IMPORT_COL_LANGUAGE: Language
+      IMPORT_COL_NEW: New
+      IMPORT_COL_CONFLICT: Conflicting
+      IMPORT_COL_ALREADY: Already here
+      IMPORT_COL_SHIPPED: Same as original
+      IMPORT_COL_UNKNOWN: Unknown
+      IMPORT_LEGEND: Strings marked "same as original" match what the plugin or theme already ships, so they are dropped rather than stored as overrides that do nothing.
+      IMPORT_NO_PERMISSION: You do not have permission to write translation overrides, so the import is unavailable.
+      IMPORT_NO_CONFIG_PERMISSION: You do not have permission to change plugin settings, so the plugin has to be disabled by an administrator.
+      TRANSLATE_UNAVAILABLE_NOT_INSTALLED: AI-powered translation of missing strings is available with the AI Translate premium plugin.
+      TRANSLATE_UNAVAILABLE_NOT_ENABLED: AI Translate is installed but switched off, so machine translation is unavailable.
+      TRANSLATE_UNAVAILABLE_NOT_CONFIGURED: AI Translate has no translation provider set up yet, so machine translation is unavailable.
+      TRANSLATE_UNAVAILABLE_FIND_IT: Get the plugin
+      TRANSLATE_UNAVAILABLE_OPEN_IT: Open its settings
+      SUPERSEDED_TITLE: Built into Grav 2.0
+      SUPERSEDED_BODY: The Translations section does everything this plugin does, and adds search across every string on the site, per-language coverage, machine translation and a report of keys nothing provides any more. This plugin stays supported on Grav 1.7.
+      SUPERSEDED_PENDING: "{count, plural, one {# override is} other {# overrides are}} still stored here and can be imported."
+      SUPERSEDED_ACTION: Open Translations
+      SEARCH_PLACEHOLDER: Search text or key...
+      SOURCE_LANGUAGE: Source
+      SOURCE: source
+      LANGUAGES: Languages
+      FILTER_LANGUAGES: Filter languages
+      EDITED: edited
+      KEY: Key
+      ALL_SOURCES: All sources
+      KIND_SYSTEM: Core
+      KIND_PLUGINS: Plugins
+      KIND_THEMES: Themes
+      KIND_USER: This site
+      INACTIVE: inactive
+      INACTIVE_HELP: This plugin is disabled or this theme is not the active one, so its strings are not used on the site.
+      STATUS_ALL: All
+      STATUS_MISSING: Missing
+      STATUS_OVERRIDDEN: Overridden
+      STATUS_UNKNOWN: Unknown
+      STATE_OVERRIDDEN: overridden
+      STATE_MISSING: missing
+      STATE_MISSING_FALLBACK: falling back
+      UNKNOWN_KEY_HELP: No plugin, theme or core file provides this key. It is probably a typo, or left over from something no longer installed.
+      SHIPPED_VALUE: "Originally: {value}"
+      REVERT: Revert
+      REVERT_HELP: Remove this override and go back to what the plugin or theme provides.
+      REVERTED_TO_SHIPPED: Reverted to the original wording
+      OVERRIDE_REMOVED: Override removed
+      SAVED_UNKNOWN_KEY: "Saved, but nothing provides {key} — check the spelling"
+      EDIT_HINT: Enter to save, Escape to cancel, Shift+Enter for a new line. Clear the box to remove your override.
+      REFRESH: Refresh
+      LOADING: Loading translations...
+      NO_RESULTS: No strings match these filters.
+      NO_RESULTS_FILTERED: "You are looking inside: {filters}"
+      FILTERED_BY: Showing only
+      REMOVE_FILTER: Remove this filter
+      CLEAR_ALL_FILTERS: Clear filters
+      FAILED_TO_LOAD: Failed to load translations
+      FAILED_TO_SAVE: Failed to save that change
+      SHOWING: "Showing {from}–{to} of {total}"
+      PREVIOUS: Previous
+      NEXT: Next
+      EDIT_AS_YAML: Edit as YAML
+      EDIT_AS_GRID: Back to grid
+      EDITING_LANGUAGE: Editing
+      SCOPED_TO: "Only {namespace}"
+      SCOPE_WHOLE_FILE: Editing every override for this language
+      SAVE: Save
+      SAVING: Saving...
+      YAML_SAVED: "{count, plural, =0 {No overrides left in {lang}} one {# override saved in {lang}} other {# overrides saved in {lang}}}"
+      YAML_PLACEHOLDER: "MY_PLUGIN:\n  SOME_KEY: Your wording here"
+      YAML_HELP: Paste or edit overrides directly. Values matching what the plugin or theme already provides are dropped, so the file only ever holds real changes.
+      UNKNOWN_KEYS_SAVED: Saved, but nothing provides these keys
+      TRANSLATE_MISSING: Translate missing
+      TRANSLATING: Translating...
+      TRANSLATE_FAILED: Translation failed
+      PICK_A_TARGET_LANGUAGE: Add a language column first — there is nothing to translate into.
+      NOTHING_TO_TRANSLATE: Nothing on this page is missing a translation.
+      PROPOSALS_PENDING: "{count, plural, one {# suggestion to review} other {# suggestions to review}}"
+      SKIPPED_COUNT: "{count, plural, one {# skipped} other {# skipped}}"
+      ACCEPT_ALL: Accept all
+      DISCARD_ALL: Discard
+      ACCEPTED_ALL: "{count, plural, one {# translation saved} other {# translations saved}}"
+      SUGGESTED: Suggested
+      ACCEPT: Accept
+      DISCARD: Discard
+      TRANSLATE_THIS: Suggest a translation for this string
+      TRANSLATE_ROW: Suggest translations for this string in every language shown
+      SKIP_NO_SOURCE: There is no wording in the source language to translate from.
+      SKIP_ICU: This message changes with a number or a choice, and each language needs its own set of forms. Write this one by hand.
+      SKIP_NOTHING: This string is only placeholders, so there are no words to translate.
+      SKIP_EMPTY: The translation service returned nothing for this string.
+      SKIP_PLACEHOLDERS: The translation came back with its placeholders altered, so it was discarded rather than saved.
+
     TOOLS:
       BACKUPS:
         DELETE_BACKUP: Delete Backup
@@ -644,6 +841,10 @@ ICU:
         REFRESH: Refresh
         LOADING_LOGS: Loading logs...
         MESSAGE: Message
+        CLEAR_LOG: Clear log
+        CLEAR_LOG_CONFIRM: 'Permanently delete every entry in {file}? This cannot be undone, and any record of what went wrong before now goes with it.'
+        LOG_CLEARED: Cleared {file}
+        FAILED_TO_CLEAR_LOG: Failed to clear log
       AUDIT:
         DESCRIPTION: "A record of API activity: logins, content, user, configuration, and package changes. Admin Next routes through the API, so this covers the admin plus any external API clients."
         COVERAGE_DETAILED: Detailed
@@ -680,8 +881,6 @@ ICU:
           GATE_OFF: Twig in content disabled
           SANDBOX_ON: Sandbox on
           SANDBOX_OFF: Sandbox off
-          XSS_SCAN_ON: XSS output scan on
-          XSS_SCAN_OFF: XSS output scan off
           SECTION_LEAKS: Pages leaking raw Twig
           SECTION_EVENTS: Recent blocks
           LEAK_GATE_OFF: "The site gate is off, so this page's Twig markup renders as raw text to visitors."
@@ -694,7 +893,6 @@ ICU:
           CLEAR_FAILED: Could not clear blocks
           OPEN_SECURITY_SETTINGS: Open Security settings
           EVENT_GATE_BLOCKED: Gate blocked Twig in this page's content
-          EVENT_XSS_BLANKED: Output blanked by the XSS scan
           EVENT_SANDBOX_TAG: "Sandbox blocked tag"
           EVENT_SANDBOX_FILTER: "Sandbox blocked filter"
           EVENT_SANDBOX_FUNCTION: "Sandbox blocked function"
@@ -707,16 +905,36 @@ ICU:
           SCAN_TAGS: Blocked tags in content
           SCAN_FILTERS: Blocked filters in content
           SCAN_FUNCTIONS: Blocked functions in content
+          POLICY_INTRO: "The sandbox baseline ships in code; your config only widens or tightens it."
+          POLICY_VIEW: View effective policy
+          POLICY_HIDE: Hide effective policy
+          POLICY_FAILED: Could not load the sandbox policy
+          POLICY_TAGS: Tags
+          POLICY_FILTERS: Filters
+          POLICY_FUNCTIONS: Functions
+          POLICY_METHODS: Methods
+          POLICY_PROPERTIES: Properties
+          POLICY_EFFECTIVE_COUNT: "{count} effective"
+          POLICY_CLASS_COUNT: "{count, plural, one {# class} other {# classes}}"
+          POLICY_ADDED: "+{count} added"
+          POLICY_DENIED: "−{count} denied"
+          POLICY_ALL_DEFAULTS: All defaults, unchanged
           GLOBAL_REQUEST_GATED: "system.pages.process.twig is on, but Twig in content is disabled site-wide, so those pages render raw. Pick a profile above to enable it, or remove the global flag."
           FRONTMATTER_REQUEST_GATED: "Frontmatter Twig is requested (pages.frontmatter.process_twig), but Twig in content is disabled site-wide, so it won't run. Pick a profile above to enable it."
       SCHEDULER:
         FAILED_TO_LOAD_SCHEDULER_CONFIGURATION: Failed to load scheduler configuration.
+        STATUS_UNAVAILABLE: Scheduler status could not be read on this host. Your jobs are still listed below and can be edited as usual.
+        PROCESS_UNAVAILABLE: "This host has PHP's proc_open function disabled, so jobs cannot be started from the admin. They still run whenever your scheduler is triggered by cron or a webhook."
+        CRON_UNDETERMINED: Grav cannot inspect this server's crontab, so it cannot confirm how the scheduler is being triggered.
+        LAST_TRIGGERED: Last triggered
+        LAST_MANUAL_RUN: Last run by hand
+        ENVIRONMENT_MISMATCH: "The scheduler last ran under the **{last}** environment, but this site is using **{current}**, which has its own configuration in user/env/{current}/config. Custom jobs and settings defined only there never run from that trigger. Update the bin/grav scheduler line in your crontab to the command below (it passes --env={current}), or export GRAV_ENVIRONMENT={current} before it runs."
         SCHEDULER_CONFIGURATION_SAVED: Scheduler configuration saved
         FAILED_TO_SAVE: Failed to save
         LOADING_SCHEDULER: Loading scheduler...
         NOT_ENABLED_FOR_USER: "Not Enabled for user:"
         GRAV_SCHEDULER: Grav Scheduler
-        INFO_BANNER: The scheduler can use either system crontab or webhook triggers to execute commands. Webhooks are recommended for cloud environments. Only advanced users should configure custom jobs. Misconfiguration or abuse can lead to security vulnerabilities.
+        INFO_BANNER: The scheduler can use either system crontab or webhook triggers to execute commands. Webhooks are recommended for cloud environments.
         CRONTAB_INSTRUCTIONS: To enable the Scheduler's functionality, you must add the **Grav Scheduler** to your system's crontab file for the **{user}** user. Run the command above from the terminal to add it automatically. Once saved, refresh this page to see the status.
         WEBHOOK_ALTERNATIVE: Alternatively, install the **scheduler-webhook** plugin to use webhook-based cron firing, which is recommended for cloud environments where system crontab access is not available.
         SECURITY_WARNING: Only advanced users should configure custom scheduler jobs. Incorrect configuration can cause performance issues or security vulnerabilities.
@@ -789,6 +1007,8 @@ ICU:
       TITLE: Configuration
       TITLE_SCROLLED: "Configuration: {scope}"
       LOADING_CONFIGURATION: Loading configuration...
+      FAILED_TO_LOAD_CONFIGURATION: Failed to load configuration.
+      SCOPE_NOT_FOUND: No configuration scope named {scope} was found.
       TWIG_PROFILE:
         LABEL: Twig in Content
         HELP: Choose who can run Twig inside page content. This sets the advanced toggles below.
@@ -824,6 +1044,7 @@ ICU:
         RESET_CONFIRM: Reset
         RESET_DONE: Overrides reset
     FLEX_OBJECTS:
+      ADD: Add
       SEARCH: Search...
       PREVIOUS: Previous
       DELETE_OBJECT: Delete Object
@@ -889,6 +1110,11 @@ ICU:
       OR_CONTINUE_WITH: Or continue with
       CONTINUE_WITH: Continue with {provider}
       SSO_FAILED: Could not sign in with that provider. Please try again.
+      INVALID_AUTHENTICATION_CODE: Invalid authentication code
+      CAPTCHA_VERIFYING: Checking you're human...
+      CAPTCHA_VERIFIED: Verified you're human
+      CAPTCHA_NOT_COMPLETED: Please complete the challenge to continue
+      CAPTCHA_FAILED_TO_LOAD: The challenge could not be loaded. Reload the page and try again.
     PLUGIN:
       BACK_TO_DASHBOARD: Back to Dashboard
       NO_CONTENT_AVAILABLE_FOR_THIS_PLUGIN: No content available for this plugin page.
@@ -950,6 +1176,10 @@ ICU:
       LIGHT_MODE_LOGO: Light Mode Logo
       USED_ON_LIGHT_BACKGROUNDS: Used on light backgrounds
       DARK_MODE_LOGO: Dark Mode Logo
+      SIDEBAR_LOGO_HEIGHT: Sidebar Logo Height
+      SIDEBAR_LOGO_HEIGHT_DESC: How tall your logo appears at the top of the sidebar.
+      LOGO_HEIGHT_DEFAULT: Default
+      LOGO_HEIGHT_CUSTOM: Custom
       USED_ON_DARK_BACKGROUNDS: Used on dark backgrounds
       APPEARANCE: Appearance
       CUSTOMIZE_THE_LOOK_AND_FEEL_OF_THE_ADMIN: Customize the look and feel of the admin
@@ -958,6 +1188,8 @@ ICU:
       ACCENT_COLOR: Accent Color
       PRIMARY_COLOR_USED_FOR_BUTTONS_LINKS: Primary color used for buttons, links, and highlights
       SATURATION: Saturation
+      CURRENT_COLOR: Color
+      COPY_COLOR: Copy this color
       TYPEFACE_USED_THROUGHOUT_THE_ADMIN: Typeface used throughout the admin
       FONT_SIZE: Font Size
       TEXT_SIZE_USED_THROUGHOUT_THE_ADMIN: Text size used throughout the admin
@@ -1143,7 +1375,7 @@ ICU:
       PERMISSIONS: Permissions
       SELECT_A_USER_TO_VIEW_DETAILS: Select a user to view details
       DELETE_USER: Delete User
-      CONFIRM_DELETE_USER: "Delete user '{username}'? This cannot be undone."
+      CONFIRM_DELETE_USER: "Delete user ''{username}''? This cannot be undone."
       USER_WAS_MODIFIED_ELSEWHERE_PLEASE: User was modified elsewhere. Please reload.
       FAILED_TO_SAVE_USER: Failed to save user.
       YOU_CANNOT_DELETE_YOUR_OWN_ACCOUNT: You cannot delete your own account.
@@ -1237,7 +1469,7 @@ ICU:
     USERS_TABLE:
       USERNAME: Username
       EMAIL: Email
-      FULL_NAME: Full name
+      FULL_NAME: Full Name
       STATUS: Status
       PERMISSIONS: Permissions
       ACTIONS: Actions
@@ -1276,10 +1508,10 @@ ICU:
       ADD_GROUP: Add Group
       NEW_GROUP: New Group
       NEW_GROUP_GRAV_ADMIN: New Group — Grav Admin
-      GROUP_NAME: Group name
+      GROUP_NAME: Group Name
       GROUP_NAME_PLACEHOLDER: e.g. editors
       GROUP_NAME_HELP: 1–200 characters of letters, numbers, hyphens or underscores. Used as the storage key.
-      DISPLAY_NAME: Display name
+      DISPLAY_NAME: Display Name
       DESCRIPTION: Description
       SEARCH_GROUPS: Search groups...
       NO_GROUPS: No groups found
@@ -1288,15 +1520,15 @@ ICU:
       BACK_TO_GROUPS: Back to Groups
       CREATE: Create
       DELETE_GROUP: Delete Group
-      CONFIRM_DELETE_GROUP: "Delete group '{name}'? This cannot be undone."
+      CONFIRM_DELETE_GROUP: "Delete group ''{name}''? This cannot be undone."
       FAILED_TO_LOAD_GROUPS: Failed to load groups
-      FAILED_TO_LOAD_GROUP: "Failed to load group '{name}'."
+      FAILED_TO_LOAD_GROUP: "Failed to load group ''{name}''."
       FAILED_TO_SAVE_GROUP: Failed to save group.
       FAILED_TO_CREATE_GROUP: Failed to create group.
-      GROUP_SAVED: "Group '{name}' saved"
-      GROUP_CREATED: "Group '{name}' created"
-      GROUP_DELETED: "Group '{name}' deleted"
-      GROUP_DELETE_FAILED: "Failed to delete group '{name}'"
+      GROUP_SAVED: "Group ''{name}'' saved"
+      GROUP_CREATED: "Group ''{name}'' created"
+      GROUP_DELETED: "Group ''{name}'' deleted"
+      GROUP_DELETE_FAILED: "Failed to delete group ''{name}''"
       GROUP_MODIFIED_ELSEWHERE: Group was modified elsewhere. Please reload.
       GROUP_PAGE_TITLE: "{name} — Groups — Grav Admin"
       GROUP_COUNT_ONE: "{n} group"
@@ -1457,6 +1689,8 @@ ICU:
     DEBUGGER_CENSORED_HELP: "Clockwork Provider ONLY: If Yes, censor potentially sensitive information (POST parameters, cookies, files, configuration and most array/object data in log messages)"
     DEBUGGER_CLOCKWORK: Clockwork Browser Extension
     DEBUGGER_DEBUGBAR: PHP Debug Bar
+    DEBUGGER_FLEX_RENDER_HINTS: Flex Render Hints
+    DEBUGGER_FLEX_RENDER_HINTS_HELP: Wrap every rendered Flex object and collection in an HTML comment naming it, so the source of a block can be found in the page markup. Only applies to HTML pages
     DEBUGGER_HELP: Enable Grav debugger and following settings
     DEBUGGER_PROVIDER: Debugger Provider
     DEBUGGER_PROVIDER_HELP: Default is PHP Debug Bar, but Clockwork browser extension provides for a less intrusive approach
@@ -1573,6 +1807,11 @@ ICU:
     HOME_PAGE_HELP: The page that Grav will use as the default landing page
     HTTP_ACCEPT_LANGUAGE: Set language from browser
     HTTP_ACCEPT_LANGUAGE_HELP: You can opt to try to set the language based on `http_accept_language` header tag in the browser
+    HTTP_ACCEPT_LANGUAGE_FALLBACK: Browser Language Fallbacks
+    HTTP_ACCEPT_LANGUAGE_FALLBACK_HELP: Map unsupported browser languages to supported languages when setting the language from the `http_accept_language` header. This does not add supported languages or create language routes.
+    HTTP_ACCEPT_LANGUAGE_FALLBACK_SOURCE_HELP: Specify an unsupported browser language code, e.g. `hr` or `sr-Latn`.
+    HTTP_ACCEPT_LANGUAGE_FALLBACK_TARGETS: Fallback Languages
+    HTTP_ACCEPT_LANGUAGE_FALLBACK_TARGETS_HELP: Please enter a list of supported language codes. The first supported language will be used.
     HTTP_CONNECTIONS: HTTP Connections
     HTTP_CONNECTIONS_HELP: The number of concurrent HTTP connections during multiplexed requests
     HTTP_HEADERS: HTTP Headers
@@ -1606,6 +1845,8 @@ ICU:
     IMAGES_LOADING_HELP: "The loading attribute allows a browser to defer loading offscreen images and iframes until users scroll near them. loading supports three values: auto, lazy, eager"
     IMAGES_MAX_PIXELS: Maximum image pixels
     IMAGES_MAX_PIXELS_HELP: "Total-pixel ceiling (width x height) for URL-based resize actions. Requests above this limit are refused. Set to 0 to disable the check."
+    IMAGES_PROGRESSIVE_JPEG: Progressive JPEGs
+    IMAGES_PROGRESSIVE_JPEG_HELP: "Save resized and cached JPEGs as progressive, so they appear as a whole blurry image that sharpens rather than filling in from the top. Usually smaller too. Does not affect PNG, WebP or AVIF."
     IMAGES_SEOFRIENDLY: SEO-Friendly Image names
     IMAGES_SEOFRIENDLY_HELP: When enabled, the image name is displayed first, then a smaller hash to reflect processed operations
     IMAGES_URL_ACTIONS: Allow URL-based image actions
@@ -1698,6 +1939,19 @@ ICU:
     PAGE_INHERIT_PERMISSIONS_HELP: Inherit ACL from parent page.
     PAGE_MEDIA: Page Media
     PAGE_SUMMARY: Page Summary
+    MARKDOWN_OUTPUT: Markdown Output
+    MARKDOWN_OUTPUT_ENABLED: Serve Pages as Markdown
+    MARKDOWN_OUTPUT_ENABLED_HELP: Any page can be fetched as Markdown by adding `.md` to its URL, or by sending an `Accept:&nbsp;text/markdown` request header. Built for AI agents and other text clients. The page is rendered through the theme, reduced to its main content region and converted, so listings, shops and modular pages read the way they display.
+    MARKDOWN_OUTPUT_FRONTMATTER: Frontmatter Block
+    MARKDOWN_OUTPUT_FRONTMATTER_HELP: Start the Markdown with a YAML block holding the title, URL, date, description and taxonomy.
+    MARKDOWN_OUTPUT_LINKS: Navigation Links
+    MARKDOWN_OUTPUT_LINKS_HELP: End the Markdown with links to the parent, neighbouring and child pages, so an agent can walk the site without leaving Markdown.
+    MARKDOWN_OUTPUT_MAX_LINKS: Most Child Links
+    MARKDOWN_OUTPUT_MAX_LINKS_HELP: The most child pages listed in the navigation section. Zero lists them all.
+    MARKDOWN_OUTPUT_ABSOLUTE_URLS: Absolute URLs
+    MARKDOWN_OUTPUT_ABSOLUTE_URLS_HELP: Turn root-relative links and images into full URLs, so they still work once the Markdown has left the site.
+    MARKDOWN_OUTPUT_TOKEN_HEADER: Token Count Header
+    MARKDOWN_OUTPUT_TOKEN_HEADER_HELP: Send an `X-Markdown-Tokens` response header with an estimated token count, the same header Cloudflare's Markdown for Agents uses.
     PAGE_TYPES: Page Types
     PAGE_TYPES_HELP: Determines the page types that Grav supports and the order determines which type to fall back to if the request is ambiguous
     PAGE_VISIBILITY_REQUIRES_ACCESS: Menu Visibility Requires Access
@@ -1979,7 +2233,6 @@ ICU:
     SCHEDULER_WEBHOOK_TOKEN: Webhook Security Token
     SCHEDULER_WEBHOOK_TOKEN_HELP: Secret token for authenticating webhook requests. Keep this secret!
     SCHEDULER_WORKER_CONFIG: Worker Configuration
-    TRANSLATIONS: Translations
     USER_ACCOUNTS: User Accounts
     TWIG_CONTENT: Twig in Content
     TWIG_CONTENT_HELP: Controls for editor-authored Twig embedded in page content. Theme templates on disk are not affected by these settings; they only apply to Twig that authors put into page bodies or frontmatter.
@@ -1989,6 +2242,17 @@ ICU:
     TWIG_CONTENT_EDITOR_ENABLED_HELP: "When off (default), the Twig checkbox in the page editor's Advanced tab is only visible to users granted the <code>admin.pages_twig</code> permission, and pages that already have Twig enabled can only be edited by those users. When on, anyone with page-edit access can toggle Twig on individual pages."
     TWIG_CONTENT_CONFIG_ACCESS: Allow config variable access in Twig
     TWIG_CONTENT_CONFIG_ACCESS_HELP: "Whether the <code>config</code> Twig variable is readable from page content. When off (default), reading <code>config.system.title</code> from a page returns nothing. When on, <code>config</code> is exposed but still filtered by <code>config_denied_paths</code> (see Twig Sandbox below) so credentials and other sensitive subtrees stay hidden."
+    GRAV_UPGRADE:
+      CONFIRM_TITLE: "Upgrade Grav core?"
+      CONFIRM_MESSAGE: "This will upgrade Grav from v{current} to v{target}. The site may be briefly unavailable during the upgrade."
+      UPGRADING: "Upgrading Grav to v{version}…"
+      FAILED: "Grav upgrade failed: {detail}"
+      NO_DETAIL: "the server gave no reason"
+      PREFLIGHT_TITLE: "Grav can't upgrade to v{version} yet"
+      PREFLIGHT_MESSAGE: "The checks that run before an upgrade stopped it for these reasons. Fix them and try again, or upgrade anyway if you know these plugins and themes work with the new version."
+      INCOMPATIBLE_PACKAGE: "{name} {version} is marked compatible with Grav {compatible}"
+      UPGRADE_ANYWAY: "Upgrade anyway"
+      STILL_BLOCKED: "Grav upgrade is still blocked: {detail}"
     TOASTS:
       CONFIG_SAVED: "{name} configuration saved"
       CONFIG_MODIFIED_ELSEWHERE: Configuration was modified elsewhere — reload to see latest

@@ -16,6 +16,7 @@ use Grav\Plugin\Api\Exceptions\DemoModeException;
 use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\UnauthorizedException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
+use Grav\Plugin\Api\PageAcl;
 use Grav\Plugin\Api\PermissionResolver;
 use Grav\Plugin\Api\Response\ApiResponse;
 use Grav\Plugin\Api\Serializers\UserSerializer;
@@ -96,6 +97,53 @@ abstract class AbstractApiController
     }
 
     /**
+     * Require super-admin for a privileged write, with the API-key scope cap applied.
+     *
+     * Prefer this over a bare `isSuperAdmin()` check on super-only endpoints. A
+     * bare check reads the authenticated user's super flag directly, so a scoped
+     * key minted on a super-admin account passes it and reaches the sink without
+     * the `api_key_scopes` cap ever running (GHSA-jqgq-v53x-x99g). Routing through
+     * requirePermission() enforces the cap first: an unscoped credential (session,
+     * JWT, or unscoped key) on a super account still passes, but a scoped key must
+     * carry `admin.super` (or `*`) in its scopes or it is rejected here.
+     */
+    protected function requireSuper(ServerRequestInterface $request): void
+    {
+        $this->requirePermission($request, 'admin.super');
+    }
+
+    /**
+     * Non-throwing form of the API-key scope cap: whether the request's key is
+     * permitted to exercise $permission. An unscoped credential (session, JWT, or
+     * unscoped key) always returns true; a scoped key must carry the permission
+     * (or a parent scope, or `*`) in its scopes.
+     *
+     * Use this for SOFT gates that strip or branch rather than reject — e.g. a
+     * "may this caller grant super?" decision that must fall back to stripping the
+     * super flag for a legitimate non-super, instead of throwing. A bare
+     * isSuperAdmin() on such a gate skips the cap (GHSA-jqgq-v53x-x99g class).
+     */
+    protected function scopeAllows(ServerRequestInterface $request, string $permission): bool
+    {
+        $scopes = $request->getAttribute('api_key_scopes');
+
+        return !is_array($scopes) || $scopes === [] || $this->scopesPermit($scopes, $permission);
+    }
+
+    /**
+     * Whether the caller is a super-admin AND the API-key scope cap permits super
+     * authority. Equivalent to isSuperAdmin() but honoring the scope cap, so a
+     * scoped key minted on a super account returns false unless it carries
+     * `admin.super` (or `*`). Use where the code needs super-ness as a boolean to
+     * assemble a response rather than to hard-gate (which is requireSuper()).
+     */
+    protected function isSuperWithinScope(ServerRequestInterface $request): bool
+    {
+        return $this->isSuperAdmin($this->getUser($request))
+            && $this->scopeAllows($request, 'admin.super');
+    }
+
+    /**
      * Whether a non-empty API-key scope list grants the requested permission.
      *
      * A scope grants its own permission and everything beneath it — scope
@@ -121,16 +169,26 @@ abstract class AbstractApiController
     }
 
     /**
-     * Check if user is an API super user via direct access array lookup.
+     * Check if user is an API super user.
      *
      * API authority is strictly scoped to access.api.super — admin.super
      * (admin-classic's legacy global super) is intentionally NOT honored
      * here. Grav 2.0 separates admin-classic and API/Admin-Next authority
      * so operators can grant one without implicitly granting the other.
+     *
+     * Resolved through the PermissionResolver so a grant from one of the user's
+     * groups counts, exactly like every other api.* permission (admin2#57). A
+     * direct `$user->get('access.api.super')` read only ever saw the account's
+     * own access map, so a group-based super admin — the normal setup for
+     * directory-backed logins such as login-ldap, whose access model is entirely
+     * group-driven — was silently demoted to their granular permissions.
+     *
+     * `resolveExact()` rather than `resolve()`: super must be granted
+     * deliberately and must not be inherited from a blanket parent `api` key.
      */
     protected function isSuperAdmin(UserInterface $user): bool
     {
-        return (bool) $user->get('access.api.super');
+        return $this->getPermissionResolver()->resolveExact($user, 'api.super') === true;
     }
 
     /**
@@ -186,6 +244,12 @@ abstract class AbstractApiController
      */
     protected function hasPermission(UserInterface $user, string $permission): bool
     {
+        // Super is an explicit tier, never an inherited child permission.
+        // A blanket `admin: true` or `api: true` grant must not satisfy it.
+        if ($permission === 'admin.super' || $permission === 'api.super') {
+            return (bool) $this->getPermissionResolver()->resolveExact($user, $permission);
+        }
+
         return (bool) $this->getPermissionResolver()->resolve($user, $permission);
     }
 
@@ -197,22 +261,27 @@ abstract class AbstractApiController
      *   - string → user must have that permission.
      *   - array  → user must have at least ONE of the listed permissions.
      *
-     * Super-admins pass regardless of the requirement.
+     * Super-admins pass regardless of the requirement, but the API-key scope cap
+     * applies to BOTH exits: the super short-circuit and the ACL lookup are
+     * independent routes to a "yes", so each has to clear the cap or a scoped key
+     * inherits the whole account ACL through the back door (GHSA-p57v-xhv3-mf2w).
+     * The request is required for that reason — deriving authority from the
+     * account alone is what skipped the cap.
      */
-    protected function userPassesAuthorize(UserInterface $user, mixed $authorize, bool $isSuperAdmin): bool
+    protected function userPassesAuthorize(UserInterface $user, mixed $authorize, ServerRequestInterface $request): bool
     {
         if ($authorize === null) {
             return true;
         }
-        if ($isSuperAdmin) {
+        if ($this->isSuperWithinScope($request)) {
             return true;
         }
         if (is_string($authorize)) {
-            return $this->hasPermission($user, $authorize);
+            return $this->hasPermission($user, $authorize) && $this->scopeAllows($request, $authorize);
         }
         if (is_array($authorize)) {
             foreach ($authorize as $perm) {
-                if (is_string($perm) && $this->hasPermission($user, $perm)) {
+                if (is_string($perm) && $this->hasPermission($user, $perm) && $this->scopeAllows($request, $perm)) {
                     return true;
                 }
             }
@@ -222,11 +291,202 @@ abstract class AbstractApiController
         return false;
     }
 
+    /**
+     * Whether the caller holds $permission AND the API-key scope cap permits it.
+     *
+     * The non-throwing twin of requirePermission(), for gates that live outside a
+     * controller and so cannot see the request themselves. A plain service can be
+     * handed the result instead of re-deriving authority from the account ACL,
+     * which skips the cap entirely (GHSA-435x-66r2-jwv2).
+     */
+    protected function hasPermissionWithinScope(ServerRequestInterface $request, string $permission): bool
+    {
+        return $this->hasPermission($this->getUser($request), $permission)
+            && $this->scopeAllows($request, $permission);
+    }
+
+    /**
+     * Whether this request may act on a `users/<someone-else>` blueprint scope.
+     *
+     * Handed to BlueprintPathResolver, which cannot see the request and so cannot
+     * apply the scope cap itself. Both routes to a "yes" run through the cap, so a
+     * key scoped to `api.media.write` no longer inherits users-management authority
+     * from its owning account (GHSA-435x-66r2-jwv2).
+     */
+    protected function mayWriteUsersScope(ServerRequestInterface $request): bool
+    {
+        return $this->isSuperWithinScope($request)
+            || $this->hasPermissionWithinScope($request, 'api.users.write');
+    }
+
     private ?PermissionResolver $permissionResolver = null;
 
     protected function getPermissionResolver(): PermissionResolver
     {
         return $this->permissionResolver ??= new PermissionResolver($this->grav['permissions']);
+    }
+
+    private ?PageAcl $pageAcl = null;
+
+    protected function getPageAcl(): PageAcl
+    {
+        return $this->pageAcl ??= new PageAcl();
+    }
+
+    /**
+     * Authorize an action against a single page, honoring the rules in its own
+     * `header.permissions` frontmatter (getgrav/grav-plugin-admin2#150).
+     *
+     * The page's verdict, when it has one, replaces the account-wide
+     * `api.pages.*` check in BOTH directions — that is the whole point of a
+     * page-level rule:
+     *
+     *   - deny  → refused even for an account that holds `api.pages.write`
+     *   - grant → allowed for an account that does not, so "this group may edit
+     *             these pages and nothing else" works without handing out
+     *             site-wide write access
+     *
+     * What a page-level grant can never do is widen a credential beyond its own
+     * limits: the API-key scope cap, the demo write-lock and the `api.access`
+     * gate still run, exactly as requirePermission() applies them. Super admins
+     * are unaffected by page rules, matching every other gate in this plugin.
+     *
+     * @param object|null $page Page being acted on. Anything that isn't a real
+     *                          PageInterface (a null parent, a test double)
+     *                          carries no frontmatter and falls through to the
+     *                          plain permission check.
+     * @param string $action  crudl action: create, read, update, delete, publish, list
+     * @param string $permission Account-wide permission this action normally needs.
+     */
+    protected function authorizePageAction(
+        ServerRequestInterface $request,
+        ?object $page,
+        string $action,
+        string $permission,
+    ): void {
+        $user = $this->getUser($request);
+
+        // Super short-circuits inside requirePermission(), but only AFTER the
+        // scope cap and demo lock — so route supers through it rather than
+        // returning early here.
+        if (!$page instanceof PageInterface || $this->isSuperAdmin($user)) {
+            $this->requirePermission($request, $permission);
+            return;
+        }
+
+        $verdict = $this->getPageAcl()->authorize($page, $user, $action);
+
+        if ($verdict === false) {
+            throw new ForbiddenException(
+                "Page permissions deny '{$action}' on this page."
+            );
+        }
+
+        if ($verdict !== true) {
+            $this->requirePermission($request, $permission);
+            return;
+        }
+
+        // Page-level grant. It stands in for the account's `api.pages.*`
+        // permission and for nothing else.
+        $scopes = $request->getAttribute('api_key_scopes');
+        if (is_array($scopes) && $scopes !== [] && !$this->scopesPermit($scopes, $permission)) {
+            throw new ForbiddenException("API key is not authorized for: {$permission}");
+        }
+
+        if ($this->isDemoUser($request) && $this->demoWriteBlocked($permission)) {
+            throw new DemoModeException();
+        }
+
+        if (!$this->hasPermission($user, 'api.access')) {
+            throw new ForbiddenException('API access is not enabled for this user.');
+        }
+    }
+
+    /**
+     * Refuse an action that a page's own frontmatter explicitly denies, without
+     * letting a page-level grant stand in for the account permission.
+     *
+     * Used by bulk endpoints and by page-media writes, where the caller has
+     * already cleared the account-wide gate: those paths honor a page deny but
+     * don't try to derive authority from a page grant.
+     *
+     * Several actions may be listed, in order of specificity — the first one the
+     * page has an opinion about decides. `('publish', 'update')` reads as "a
+     * publish rule if there is one, otherwise the update rule", which is how a
+     * page that simply denies editing also stops a bulk publish.
+     */
+    protected function assertPageNotDenied(
+        ServerRequestInterface $request,
+        object $page,
+        string ...$actions,
+    ): void {
+        $user = $this->getUser($request);
+        if (!$page instanceof PageInterface || $this->isSuperAdmin($user)) {
+            return;
+        }
+
+        foreach ($actions as $action) {
+            $verdict = $this->getPageAcl()->authorize($page, $user, $action);
+            if ($verdict === null) {
+                continue;
+            }
+            if ($verdict === false) {
+                throw new ForbiddenException("Page permissions deny '{$action}' on this page.");
+            }
+
+            return;
+        }
+    }
+
+    /**
+     * The caller's effective per-page capabilities, for clients that need to
+     * show or hide edit/delete affordances. Keys are PageAcl::ACTIONS.
+     *
+     * @return array<string, bool>
+     */
+    protected function pageCapabilities(ServerRequestInterface $request, PageInterface $page): array
+    {
+        $user = $this->getUser($request);
+
+        if ($this->isSuperWithinScope($request)) {
+            return array_fill_keys(PageAcl::ACTIONS, true);
+        }
+
+        if (!$this->hasPermission($user, 'api.access')) {
+            return array_fill_keys(PageAcl::ACTIONS, false);
+        }
+
+        $read = $this->hasPermissionWithinScope($request, 'api.pages.read');
+        $write = $this->hasPermissionWithinScope($request, 'api.pages.write')
+            && !($this->isDemoUser($request) && $this->demoWriteBlocked('api.pages.write'));
+
+        $base = [
+            'create' => $write,
+            'read' => $read,
+            'update' => $write,
+            'delete' => $write,
+            'publish' => $write,
+            'list' => $read,
+        ];
+
+        $capabilities = $this->getPageAcl()->capabilities($page, $user, $base);
+
+        // A page grant never escapes the credential's own limits (see
+        // authorizePageAction()), so cap writes the same way here — otherwise
+        // the UI offers a Save button the server would reject.
+        if (!$this->scopeAllows($request, 'api.pages.write')
+            || ($this->isDemoUser($request) && $this->demoWriteBlocked('api.pages.write'))) {
+            foreach (['create', 'update', 'delete', 'publish'] as $action) {
+                $capabilities[$action] = false;
+            }
+        }
+        if (!$this->scopeAllows($request, 'api.pages.read')) {
+            $capabilities['read'] = false;
+            $capabilities['list'] = false;
+        }
+
+        return $capabilities;
     }
 
     /**
@@ -566,6 +826,35 @@ abstract class AbstractApiController
     protected function generateEtag(mixed $data): string
     {
         return md5(json_encode($data));
+    }
+
+    /**
+     * Whether an If-None-Match header — possibly a comma-separated list, possibly
+     * carrying weak-validator (W/) prefixes — matches our ETag.
+     *
+     * The read-side counterpart of validateEtag(): that one guards a write with
+     * If-Match, this one answers a conditional GET with a 304. Both are here so
+     * every endpoint that caches gets the same parsing.
+     */
+    protected function etagMatches(string $ifNoneMatch, string $etag): bool
+    {
+        $ifNoneMatch = trim($ifNoneMatch);
+        if ($ifNoneMatch === '') {
+            return false;
+        }
+        if ($ifNoneMatch === '*') {
+            return true;
+        }
+        foreach (explode(',', $ifNoneMatch) as $candidate) {
+            $candidate = trim($candidate);
+            if (str_starts_with($candidate, 'W/')) {
+                $candidate = substr($candidate, 2);
+            }
+            if ($candidate === $etag) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

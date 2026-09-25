@@ -15,6 +15,9 @@ background: _DSC4578_02_web_use_case_production.jpg
 video:
     -
         videoType: youtube
+        videoLink: 'https://www.youtube.com/watch?v=fVEJqswo_1s'
+    -
+        videoType: youtube
         videoLink: 'https://www.youtube.com/watch?v=4wJpog5Z5qQ'
     -
         videoType: youtube
@@ -38,10 +41,6 @@ audio:
         audioType: local
         audioFile: xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3
         audioLabel: 'The Seas of Mars, by Nicolaz'
-    -
-        audioType: local
-        audioFile: xcontest23-02-Inneremerald_by_Aethermind.mp3
-        audioLabel: 'Inneremerald, by Aethermind'
     -
         audioType: local
         audioFile: zcontest23-03-Everything_must_flow_by_Nicolaz.mp3
@@ -77,7 +76,7 @@ engines: true
 tag: ucase-pr
 ---
 
-Zynthian is also a powerful tool for production. It includes more than 30 synth-engines, hundreds of effects and thousands of presets.
+Zynthian is also a powerful tool for production. It includes more than 100 synth-engines with and thousands of presets and over 1000 audio & MIDI effects.
 
 [figure class=""]![zui_vangelis_add_chain](zui_vangelis_add_chain.png "zui_vangelis_add_chain")[/figure]
 
@@ -151,8 +150,6 @@ And there is a lot more:
 + MOD-UI integration
 
 Regarding latency and jitter, the default configuration (<10ms) is enough for most players, but if you are looking for extra-low latency, audio configuration can be tweaked.
-
-Read the full specifications [here](/technical-specifications).
 
 <!--
 <small>Trip Jazz Demo, by Humi</small>

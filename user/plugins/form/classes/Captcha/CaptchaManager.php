@@ -67,11 +67,22 @@ class CaptchaManager
             return true;
         }
 
+        $captchaFieldName = $captchaField['name'] ?? $fieldName;
+
         // --- 2. Get provider and validate ---
         $provider = CaptchaFactory::getProvider($providerName);
         if (!$provider) {
             Grav::instance()['log']->error("Form Captcha: Unknown provider '{$providerName}' requested");
             return false;
+        }
+
+        // A per-form reCAPTCHA version override comes from the blueprint field
+        // definition, on the server -- never from the submitted payload. Hand it to the
+        // provider as a validation parameter so it does not have to sniff the request to
+        // find it (GHSA-89j6-8h38-2cc3).
+        if (!isset($params['recaptcha_version']) && is_array($captchaField) && isset($captchaField['recaptcha_version'])) {
+            $params = (array) $params;
+            $params['recaptcha_version'] = $captchaField['recaptcha_version'];
         }
 
         // Allow plugins to modify the validation parameters
@@ -96,6 +107,7 @@ class CaptchaManager
                 Grav::instance()->fireEvent('onFormValidationError', new Event([
                     'form' => $form,
                     'message' => $errorMessage,
+                    'messages' => array_merge($form->messages ?? [], [$captchaFieldName => [$errorMessage]]),
                     'provider' => $providerName
                 ]));
 
@@ -127,6 +139,7 @@ class CaptchaManager
             Grav::instance()->fireEvent('onFormValidationError', new Event([
                 'form' => $form,
                 'message' => $errorMessage,
+                'messages' => array_merge($form->messages ?? [], [$captchaFieldName => [$errorMessage]]),
                 'provider' => $providerName,
                 'exception' => $e
             ]));

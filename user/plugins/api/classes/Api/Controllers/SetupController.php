@@ -8,6 +8,7 @@ use Grav\Common\User\Authentication;
 use Grav\Common\User\DataUser\User as DataUser;
 use Grav\Common\User\Interfaces\UserCollectionInterface;
 use Grav\Plugin\Api\Auth\JwtAuthenticator;
+use Grav\Plugin\Api\Captcha\LoginCaptcha;
 use Grav\Plugin\Api\Exceptions\ConflictException;
 use Grav\Plugin\Api\Exceptions\TooManyRequestsException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
@@ -36,6 +37,12 @@ class SetupController extends AbstractApiController
     {
         $this->enforceSetupRateLimit($request);
 
+        (new LoginCaptcha($this->grav, $this->config))->verify(
+            LoginCaptcha::FLOW_SETUP,
+            $this->getRequestBody($request),
+            $this->getRequestIp($request),
+        );
+
         if (!$this->noAccountsExist()) {
             throw new ConflictException('Setup has already been completed.');
         }
@@ -49,15 +56,15 @@ class SetupController extends AbstractApiController
 
         // Validate username format. Delegate the character rules to the core
         // helper (Grav\Common\User\DataUser\User::isValidUsername) so setup
-        // accepts exactly what admin-classic does: letters, numbers, periods,
-        // hyphens and underscores, while still blocking path traversal,
-        // leading dots and filesystem-dangerous characters. Keep a 3-64 length
+        // accepts exactly what admin-classic does: anything except path
+        // traversal (`..`), a leading dot and the filesystem-dangerous
+        // characters \ / ? * : ; { } and line breaks. Keep a 3-64 length
         // bound for a friendlier message and to match the admin-next UI hint.
         $length = mb_strlen($username);
         if ($length < 3 || $length > 64 || !DataUser::isValidUsername($username)) {
             throw new ValidationException(
                 'Invalid username format.',
-                [['field' => 'username', 'message' => 'Username must be 3-64 characters and contain only letters, numbers, periods, hyphens, and underscores (and cannot start with a period).']],
+                [['field' => 'username', 'message' => 'Username must be 3-64 characters, cannot start with a period or contain "..", and cannot contain \\ / ? * : ; { } or a line break.']],
             );
         }
 
@@ -68,18 +75,7 @@ class SetupController extends AbstractApiController
             );
         }
 
-        $pwdRegex = (string) $this->config->get('system.pwd_regex', '');
-        if ($pwdRegex !== '' && !@preg_match('#^(?:' . $pwdRegex . ')$#', $password)) {
-            throw new ValidationException(
-                'Password does not meet the required policy.',
-                [['field' => 'password', 'message' => 'Password does not meet the required policy.']],
-            );
-        } elseif ($pwdRegex === '' && strlen($password) < 8) {
-            throw new ValidationException(
-                'Password is too short.',
-                [['field' => 'password', 'message' => 'Password must be at least 8 characters.']],
-            );
-        }
+        PasswordPolicyService::assertValid($this->config, $password);
 
         /** @var UserCollectionInterface $accounts */
         $accounts = $this->grav['accounts'];

@@ -263,13 +263,31 @@ class SsoController extends AbstractApiController
         return $root . $route;
     }
 
+    /**
+     * Make sure a real, writable PHP session is running for this request.
+     *
+     * `Session::init()` alone was not enough: it only starts a session while
+     * `autoStart` is still armed, and Grav disarms it as soon as the boot
+     * processor starts the session — so by the time a controller calls it the
+     * method is inert. On the SSO endpoints that left every write below going
+     * into an unstarted (or already committed) session, which is never
+     * persisted, so the provider's CSRF state was gone by callback time and
+     * every admin SSO login failed with `sso_state_mismatch` (#22).
+     *
+     * Re-arm `autoStart` rather than calling `start()` directly so the session
+     * still honours `system.session.read_and_close` (a read-only start plus a
+     * transparent re-open on first write).
+     */
     private function startSession(): void
     {
         /** @var Session $session */
         $session = $this->grav['session'];
-        if (!$session->isStarted()) {
-            $session->init();
+        if ($session->isStarted()) {
+            return;
         }
+
+        $session->setAutoStart(true);
+        $session->init();
     }
 
     /**
@@ -282,6 +300,17 @@ class SsoController extends AbstractApiController
         if ($returnTo === '' || !str_starts_with($returnTo, '/') || str_starts_with($returnTo, '//')) {
             return '';
         }
+
+        // A leading single slash is not sufficient on its own. For http(s) URLs
+        // the WHATWG parser every browser implements treats a backslash exactly
+        // like a slash, and strips tab, LF and CR before parsing at all. So
+        // `/\evil.com` and "/\t/evil.com" both resolve to `//evil.com` and leave
+        // the site (GHSA-x72c-4jc4-8rh6). Reject the whole control range plus
+        // backslash rather than trying to enumerate the variants.
+        if (preg_match('/[\x00-\x1F\x7F\\\\]/', $returnTo)) {
+            return '';
+        }
+
         return $returnTo;
     }
 }

@@ -16,8 +16,8 @@ class ThumbnailService
         $this->maxSize = $maxSize;
         $this->quality = $quality;
 
-        if (!is_dir($this->cacheDir)) {
-            mkdir($this->cacheDir, 0755, true);
+        if (!is_dir($this->cacheDir) && !@mkdir($this->cacheDir, 0775, true) && !is_dir($this->cacheDir)) {
+            throw new \RuntimeException(sprintf('Unable to create thumbnail cache directory "%s"', $this->cacheDir));
         }
     }
 
@@ -146,7 +146,6 @@ class ThumbnailService
 
         $thumb = imagecreatetruecolor($newWidth, $newHeight);
         if (!$thumb) {
-            imagedestroy($sourceImage);
             return null;
         }
 
@@ -159,7 +158,6 @@ class ThumbnailService
         }
 
         imagecopyresampled($thumb, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
-        imagedestroy($sourceImage);
 
         return $this->saveImage($thumb, $cachePath, $mime, $newWidth, $newHeight);
     }
@@ -184,15 +182,16 @@ class ThumbnailService
      */
     private function saveImage(\GdImage $image, string $cachePath, string $mime, int $width, int $height): ?string
     {
+        // Suppressed so the caller's null check is reached: an unwritable
+        // thumbnail cache should degrade to serving no thumbnail, not fatal the
+        // whole media listing on an unsilenced GD warning (#30).
         $result = match ($mime) {
-            'image/png' => imagepng($image, $cachePath, 6),
-            'image/gif' => imagegif($image, $cachePath),
-            'image/webp' => imagewebp($image, $cachePath, $this->quality),
-            'image/avif' => function_exists('imageavif') ? imageavif($image, $cachePath, $this->quality) : false,
-            default => imagejpeg($image, $cachePath, $this->quality),
+            'image/png' => @imagepng($image, $cachePath, 6),
+            'image/gif' => @imagegif($image, $cachePath),
+            'image/webp' => @imagewebp($image, $cachePath, $this->quality),
+            'image/avif' => function_exists('imageavif') ? @imageavif($image, $cachePath, $this->quality) : false,
+            default => @imagejpeg($image, $cachePath, $this->quality),
         };
-
-        imagedestroy($image);
 
         return $result ? $cachePath : null;
     }

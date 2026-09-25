@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Grav\Plugin\Api\Serializers;
 
+use Closure;
 use Grav\Common\GPM\Licenses;
 use Parsedown;
 
@@ -11,14 +12,32 @@ class PackageSerializer implements SerializerInterface
 {
     private static ?Parsedown $parsedown = null;
 
+    /**
+     * @param Closure(string):?string|null $translator Resolves a package-level
+     *        string that is a translation key to its translation, returning
+     *        null for anything it can't positively translate — literal prose
+     *        included. Supplied by GpmController from TranslatesAdminLabels;
+     *        absent everywhere else, which leaves values untouched.
+     */
+    public function __construct(private readonly ?Closure $translator = null)
+    {
+    }
+
     public function serialize(object $resource, array $options = []): array
     {
-        $description = $resource->description ?? null;
+        // Translate before rendering: the markdown in a description belongs to
+        // the translated text, not to the key (#39).
+        $description = self::text($this->translateValue($resource->description ?? null));
 
+        // Cast: YAML types bare scalars, so a blueprint carrying `version: 1.0`
+        // hands us the float 1, not the string "1.0". Emitting that as a JSON
+        // number breaks every client that treats a version as text — one such
+        // package installed was enough to blank the admin's Plugins and Info
+        // pages for the whole site.
         $data = [
             'slug' => $resource->slug ?? null,
-            'name' => $resource->name ?? null,
-            'version' => $resource->version ?? null,
+            'name' => self::text($this->translateValue($resource->name ?? null)),
+            'version' => self::text($resource->version ?? null),
             'type' => $options['type'] ?? null,
             'description' => $description,
             'description_html' => $this->renderMarkdown($description),
@@ -52,12 +71,35 @@ class PackageSerializer implements SerializerInterface
         if (!empty($resource->premium)) {
             $slug = $resource->slug ?? $options['slug_key'] ?? '';
             $premium = $resource->premium;
-            $permalink = is_object($premium) ? ($premium->permalink ?? null) : ($premium['permalink'] ?? null);
+            $premiumValue = static function (string $key) use ($premium) {
+                $value = is_object($premium) ? ($premium->{$key} ?? null) : ($premium[$key] ?? null);
+
+                return is_string($value) && $value !== '' ? $value : null;
+            };
 
             $data['premium'] = true;
-            $data['licensed'] = !empty(Licenses::get($slug));
+            // Not against the slug alone: a package sold inside a wider licence
+            // names that licence's product in `premium.license_product`, and the
+            // key filed under it covers this one. Checking only the slug reads a
+            // licence the customer holds as one they do not, and the admin
+            // offers them a Buy button for something they have already bought.
+            $data['licensed'] = Licenses::resolve($slug, $premium) !== '';
 
-            if ($permalink) {
+            // Not every premium package is sold from the Grav Premium store.
+            // A package may name its own storefront, in which case the client
+            // sends the buyer there instead of to licensing.getgrav.org/buy.
+            // `vendor` is purely cosmetic — it lets the admin say who sells
+            // this, rather than implying everything premium is Grav Premium.
+            $vendor = $premiumValue('vendor');
+            if ($vendor) {
+                $data['vendor'] = $vendor;
+            }
+
+            $checkoutUrl = $premiumValue('checkout_url');
+            $permalink = $premiumValue('permalink');
+            if ($checkoutUrl) {
+                $data['purchase_url'] = $checkoutUrl;
+            } elseif ($permalink) {
                 $data['purchase_url'] = 'https://licensing.getgrav.org/buy/' . $permalink;
             }
         }
@@ -169,6 +211,47 @@ class PackageSerializer implements SerializerInterface
         // For themes, check if it's the active theme
         $activeTheme = \Grav\Common\Grav::instance()['config']->get('system.pages.theme');
         return $slug === $activeTheme;
+    }
+
+    /**
+     * Resolve a package-level string that may be a translation key.
+     *
+     * A package's `name` and `description` come from its own blueprints.yaml,
+     * where an author may write literal prose or — following the same
+     * convention every other label in that file follows — a translation key.
+     * Both have to work: the value is handed to the translator, and anything it
+     * can't positively translate comes back exactly as authored (#39).
+     *
+     * `author.name` and `keywords` are left out on purpose. They are proper
+     * nouns and tag words, never keyed, and running a person's name through a
+     * translation lookup is not something anyone asked for.
+     */
+    /**
+     * Normalize a blueprint scalar to a string, preserving null.
+     *
+     * Only strings are left alone; ints, floats and bools become their text
+     * form. Anything non-scalar (a stray array in the blueprint) is dropped to
+     * null rather than coerced into "Array".
+     */
+    private static function text(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (is_string($value)) {
+            return $value;
+        }
+
+        return is_scalar($value) ? (string) $value : null;
+    }
+
+    private function translateValue(mixed $value): mixed
+    {
+        if (!is_string($value) || $value === '' || $this->translator === null) {
+            return $value;
+        }
+
+        return ($this->translator)($value) ?? $value;
     }
 
     /**

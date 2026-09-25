@@ -104,7 +104,7 @@ a {
 }
 
 a:hover, a:focus, a:active {
-    color: #191A3F;
+    color: #B65151;
 }
 
 a:focus {
@@ -1663,6 +1663,10 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     color: #FFFFFF;
 }
 
+.header-nav li a:hover {
+    color: #A0E0A0;
+}
+
 .header-nav li.current a {
     font-family: var(--font-base-extra-bold)var(--font-base-extra-bold);
     color: #af2b2b;
@@ -1828,6 +1832,10 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     padding-right: 2rem;
     margin-top: 3rem;
     margin-bottom: 6rem;
+}
+
+.usecase-content__scroll a:hover {
+    color: #922424;
 }
 
 .usecase-content__scroll a::after {
@@ -2078,6 +2086,10 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     display: inline-block;
     line-height: 3rem;
     padding-right: 2rem;
+}
+
+.home-content__scroll a:hover {
+    color: #922424;
 }
 
 .home-content__scroll a::after {
@@ -2654,6 +2666,9 @@ html.no-csstransitions .home-content__main {
     margin-bottom: 3rem;
 }
 
+.engines-content__scroll a:hover {
+    color: #922424;
+}
 
 .engines-content__scroll a::after {
     border-top: 2px solid #922424;
@@ -4241,11 +4256,17 @@ article.blog-single .blog-content {
 h3.page-header__title {
     font-family: var(--font-base-extra-bold);
     font-size: 2rem;
-    color: #862121;
+    color: #A63131;
     text-transform: uppercase;
     letter-spacing: .15rem;
     margin-top: 0;
     margin-bottom: 0;
+    text-shadow:
+        0 0  4px rgba(0, 0, 0, 1),
+        0 0  8px rgba(0, 0, 0, 0.9),
+        0 0 16px rgba(0, 0, 0, 0.8),
+        0 0 32px rgba(0, 0, 0, 0.6),
+        0 0 64px rgba(0, 0, 0, 0.3);
 }
 
 .page-header__title a {
@@ -5319,6 +5340,14 @@ figure {
     padding-bottom: 3%;
 }
 
+#hardandsoft .usecase-content__main a {
+    color: #90E090;
+}
+
+#hardandsoft .usecase-content__main a:hover {
+    color: #70C070;
+}
+
 @media only screen and (max-width: 900px) {
     #hardandsoft [class*="col-"] {
         width: 100% !important;
@@ -5332,5 +5361,5 @@ figure {
     .features {
         padding-bottom: 3%;
         padding-top: 3%;
-}
+    }
 }

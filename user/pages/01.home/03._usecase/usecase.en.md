@@ -1,5 +1,5 @@
 ---
-title: 'Many tools. One instrument.'
+title: 'Use Cases'
 subtitle: 'Expand your sound'
 media_order: 'use-cases-1-new.jpg,use-cases-3-new.jpg,always-with-me-always-with-you.wav,use-cases-2-new.jpg,BodySoulByJoostRhodes.mp3,CrunchGuitarByRodrigoAmaral.mp3,night_track.ogg,zcontest23-01-Zynesthesia_by_kosro.mp3,_DSC4481_02_web_use_case_production.jpg,_DSC4578_02_web_use_case_production.jpg,_DSC4534_01_web_use_case_fx_unit.jpg,_DSC4362_01_web_use_case_kb_expander.jpg'
 background: use-cases-1-new.jpg
@@ -10,19 +10,19 @@ bullet:
         icon: 'fa fa-list-alt'
 button3Text: 'Learn More'
 icon: 'fa fa-th-list'
-menu: Use-Cases
+menu: 'Use Cases'
 visible: true
-smallTitle: Use-Cases
+smallTitle: 'Ọ̀pọ̀lọpọ̀ irinṣẹ́.<br/>Ohun èlò orin kan ṣoṣo.'
 usecase:
     -
-        icon: 'fa fa-th-list'
+        icon: 'fa fa-music'
         subtitle: 'Expand your keys'
         title: 'Keyboard Expander'
         description: "Let your fingers play the sound you want.\nAcoustic & electric pianos, organs, vintage synthesizers, virtual analog synthesizers, soundfonts, ...<br>\n<br>\nMIDI learning is quick & easy, allowing you to manage everything from your MIDI keyboard/controller, including fast instrument changes and controlling the sound parameters you want."
         learnmoretext: 'Learn more'
         learnmorelink: /use-case/keyboard-expander
         audiourl: night_track.ogg
-        background: _DSC4481_02_web_use_case_production.jpg
+        background: _DSC4481_web_use_case_kb_expander2.jpg
     -
         icon: 'fa fa-sliders'
         subtitle: 'Shape your sound'
