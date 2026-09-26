@@ -30,3 +30,4 @@ media_order: 'circle-video.png,video.png'
 <!--[div class="col-four"] [plugin:youtube](https://youtu.be/QPQT5gviZbo) [/div]-->
 <!--[div class="col-four"] [plugin:youtube](https://youtu.be/hiCLN25199M)[/div]-->
 <!--[div class="col-four"] [plugin:youtube](https://youtu.be/T3izkId4KS0)[/div]-->
+<center><a href="https://www.youtube.com/channel/UCc9Tv__HdwQjPjKUd5mIhaw">more videos</a></center>
