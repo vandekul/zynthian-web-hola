@@ -1544,8 +1544,8 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 .header-menu-toggle {
     display: none;
     position: absolute;
-    right: 29px;
-    top: 18px;
+    right: 20px;
+    top: 8px;
     height: 42px;
     width: 42px;
     line-height: 42px;
@@ -1601,7 +1601,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 }
 
 .s-header.sticky .header-menu-toggle {
-    top: 12px;
+    top: 8px;
 }
 
 .header-menu-toggle.is-clicked span {
@@ -1679,19 +1679,28 @@ button::-moz-focus-inner, input::-moz-focus-inner {
  * ------------------------------------------------------------------- */
 
 @media only screen and (max-width: 1000px) {
+    .s-header.sticky {
+        height: 56px;
+    }
+
     .header-logo {
-        left: 30px;
+        left: 22px;
     }
 
     .header-logo a {
-        margin: 8px 0 0;
-        padding: 8px 0 0px;
+        margin-top: 0px;
+        margin-bottom: 0;
+        padding: 0;
     }
 
     .header-logo img {
         width: auto;
         max-width: none;
         max-height: 28px;
+    }
+
+    .s-header.sticky .header-logo a {
+        margin-top: 12px;
     }
 
     .s-header.sticky .header-logo img {

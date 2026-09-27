@@ -2,10 +2,10 @@
 title: 'Get Zynthian'
 hidemenu: true
 titleLink: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5&pk_vid=462c13278f5e30e41781257411b29b24'
-buttonText1: 'Check the Build Instructions'
+buttonText1: 'Build Instructions'
 buttonLink1: 'https://wiki.zynthian.org/index.php/Assembling_Zynthian_Kit_V5.1?pk_vid=900c6e85f0bf66e41780669219b29b24'
 buttonIcon1: 'fa fa-book'
-buttonText2: 'Buy your zynthian kit V5.1'
+buttonText2: 'Buy your kit V5.1'
 buttonLink2: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5&pk_vid=462c13278f5e30e41781257411b29b24'
 buttonIcon2: 'fa fa-shopping-cart'
 lead: 'The latest official Zynthian V5 is available as a DIY kit.'
