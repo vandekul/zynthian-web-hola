@@ -1680,8 +1680,24 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 
 @media only screen and (max-width: 1000px) {
     .header-logo {
-        left: 40px;
+        left: 30px;
     }
+
+    .header-logo a {
+        margin: 8px 0 0;
+        padding: 8px 0 0px;
+    }
+
+    .header-logo img {
+        width: auto;
+        max-width: none;
+        max-height: 28px;
+    }
+
+    .s-header.sticky .header-logo img {
+        max-height: 28px;
+    }
+
     .header-nav-wrap {
         display: none;
         height: auto;
@@ -2662,8 +2678,8 @@ html.no-csstransitions .home-content__main {
     display: inline-block;
     line-height: 3rem;
     padding-right: 2rem;
-    margin-top: 3rem;
-    margin-bottom: 3rem;
+    margin-top: 5rem;
+    margin-bottom: 0rem;
 }
 
 .engines-content__scroll a:hover {
@@ -3472,7 +3488,7 @@ html.no-csstransitions .home-content__main {
 }
 
 .cta__content span {
-    color: #191A3F;
+    /*color: #191A3F;*/
 }
 
 

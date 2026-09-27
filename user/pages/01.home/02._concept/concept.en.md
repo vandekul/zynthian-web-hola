@@ -8,8 +8,10 @@ lead: 'Zynthian is a compact, self-contained, music-making computer that can be 
 subtitle: ''
 buttonText1: 'Learn More in our Wiki'
 buttonLink1: 'https://wiki.zynthian.org/?pk_vid=900c6e85f0bf66e41780669219b29b24'
+buttonIcon1: 'fa fa-question-circle'
 buttonText2: "Read the User's Guide"
 buttonLink2: 'https://help.zynthian.org/'
+buttonIcon2: 'fa fa-book'
 ---
 
 Zynthian is a [community-driven project](https://discourse.zynthian.org?target=_blank) and it's 100% open source. Free software on Open hardware. Completely configurable and fully hackable! **Free as in Freedom.** You can build your zynthian from scratch or [buy an official kit](https://shop.zynthian.org).<br>

@@ -12,11 +12,11 @@ hardware:
     background: _DSC4623_01_web_specs.jpg
     button:
         -
-            textButton: 'Buy official kits'
+            textButton: 'Get your kit V5'
             linkButton: 'https://shop.zynthian.org/'
             styleButton: 'btn btn--primary'
         -
-            textButton: 'Build Tutorial'
+            textButton: 'Build Tutorials'
             linkButton: 'https://wiki.zynthian.org/index.php/Zynthian_Box_Building'
             styleButton: 'btn btn--stroke'
 software:
@@ -28,7 +28,7 @@ software:
     button:
         -
             linkButton: 'https://os.zynthian.org/zynthianos-last-stable.zip'
-            textButton: 'Download SD-Image'
+            textButton: 'Download Software'
             styleButton: 'btn btn--primary'
 ---
 

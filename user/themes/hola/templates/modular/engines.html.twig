@@ -1,16 +1,10 @@
-<section id="engines"
-        class=" gray-section s-engine {{ page.header.sectionBackground }} target-section">
+<section id="engines" class=" gray-section s-engine {{ page.header.sectionBackground }} target-section">
     {% if not(page.header.noHeader) %}
-        <div class="row narrow section-intro has-bottom-sep">
+        <div class="row narrow section-intro">
             <div class="col-full">
                 <h3>{{ page.header.smallTitle }}</h3>
                 <h1>{{ page.title }}</h1>
                 <div class="header-lead">{{ page.header.lead }}</div>
-                <div class="engines-content__scroll">
-                    <a href="/engines" class="scroll-link ">
-                        <span>Learn more</span>
-                    </a>
-                </div>
             </div>
         </div>
     {%endif%}
@@ -30,4 +24,13 @@
                 {% endfor %}
         </div>
     </div>
+    <div class="row narrow section-intro">
+        <div class="engines-content__scroll">
+            <br/>
+            <a href="/engines" class="scroll-link ">
+                <span>View More Engines</span>
+            </a>
+        </div>
+    </div>
+
 </section> <!-- end engine -->
