@@ -1,0 +1,33 @@
+{#
+Possible values that can be accessed by Twig variables:
+
+sectiontitle: text / opt. title for a heading / usage: {{sectiontitle}}
+postcount: int / number of posts possible to render
+altimage: url / alternative image / usage: {{altimg|first.path}}
+feed: array / holds all fetched posts / usage: {% for post in feed|slice(0, postcount) %}
+-- post.hasimg: boolean / if post has a featured image
+-- post.imgsrc: url / source of the post image
+-- post.authorname: text
+-- post.authorlink: url
+-- post.authordescription: text
+-- post.blogtitle: text
+-- post.bloglink: url
+-- post.blogdate: text
+-- post.blogmodified: text
+-- post.blogexcerpt: text, limited, with HTML markup + "read more" link
+-- post.blogcontent: text with HTML markup
+#}
+
+{% for post in feed|slice(0, postcount) %}
+<div class="row blog_post">
+{% if post.hasimg != 0 %}
+    <figure class="image">
+    <img src="{{ post.imgsrc }}" alt={{post.imgsrc| replace({('.' ~ post.imgsrc | split('.')[post.imgsrc | split('.')|length - 1]): ""})}}>
+    </figure>
+{% endif %}
+    <h3><a href="{{ post.bloglink }}">{{ post.blogtitle }}</a></h3>
+    <p>{{ post.blogexcerpt }}</p>
+</div>
+{% endfor %}
+
+

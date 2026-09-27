@@ -1,0 +1,6 @@
+wordpress_fetch_settings:
+  blogurl: 'https://blog.zynthian.org'
+  enableFMedia: true
+ifFMediaEnabled:
+  wordpress_fetch_settings:
+    qualityFMedia: medium

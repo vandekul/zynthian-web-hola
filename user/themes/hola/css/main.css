@@ -2575,24 +2575,11 @@ html.no-csstransitions .home-content__main {
     align-items: center;
 }
 
-/* ===================================================================
- * # gallery - (_site-layout.scss)
- *
- * ------------------------------------------------------------------- */
-
-
 /* Clear floats after the columns */
 .row:after {
   content: "";
   display: table;
   clear: both;
-}
-
-.s-gallery {
-    padding-top: 15rem;
-    padding-bottom: 9rem;
-    background-color: #f1f1f1;
-    position: relative;
 }
 
 .column {
@@ -2648,6 +2635,17 @@ html.no-csstransitions .home-content__main {
     }
 }
 
+/* ===================================================================
+ * # gallery - (_site-layout.scss)
+ *
+ * ------------------------------------------------------------------- */
+
+.s-gallery {
+    padding-top: 15rem;
+    padding-bottom: 9rem;
+    background-color: #f1f1f1;
+    position: relative;
+}
 
 /* ===================================================================
  * # engine - (_site-layout.scss)
@@ -2660,7 +2658,7 @@ html.no-csstransitions .home-content__main {
     position: relative;
 }
 
-#engines .product-card{
+#engines .product-card {
     background: #efefef;
 }
 
@@ -3451,13 +3449,21 @@ html.no-csstransitions .home-content__main {
  * ------------------------------------------------------------------- */
 
 .s-blog {
-    padding-top: 15rem;
-    padding-bottom: 9.6rem;
-    background-color: #FFFFFF;
+    padding-top: 3rem;
+    padding-bottom: 9rem;
+    background-color: #f1f1f1;
     position: relative;
 }
 
+.s-blog h1 {
+    font-family: var(--font-base-bold);
+}
 
+.s-blog .blog_post {
+    margin-top: 3em;
+    margin-bottom: 2em;
+    text-align: left;
+}
 
 /* ===================================================================
  * # cta - (_site-layout.scss)
