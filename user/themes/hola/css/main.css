@@ -2729,6 +2729,28 @@ html.no-csstransitions .home-content__main {
     }
 }
 
+/* ===================================================================
+ * # blog - (_site-layout.scss)
+ *
+ * ------------------------------------------------------------------- */
+
+.s-blog {
+    padding-top: 3rem;
+    padding-bottom: 9rem;
+    background-color: #f1f1f1;
+    position: relative;
+}
+
+.s-blog h1 {
+    font-family: var(--font-base-bold);
+}
+
+.s-blog .blog_post {
+    margin-top: 3em;
+    margin-bottom: 2em;
+    text-align: left;
+}
+
 
 /* ===================================================================
  * # cta - (_site-layout.scss)
