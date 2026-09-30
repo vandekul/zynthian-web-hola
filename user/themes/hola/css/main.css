@@ -216,6 +216,7 @@ em, i, strong, b {
 }
 
 em, i {
+    font-style: italic;
     /*font-family: var(--font-base-extra-bold);*/
 }
 
@@ -529,6 +530,13 @@ form,
     display: none;
 }
 
+
+a.minilink {
+    display: block;
+    text-align: right;
+    text-transform: uppercase;
+    font-size: 80%;
+}
 
 
 /* ===================================================================
