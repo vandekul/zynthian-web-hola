@@ -85,7 +85,7 @@
             }
             img_src_url = "{{ page.media[page.header.background_mobile].url() }}"
         }
-        img_src_url = img_src_url.slice(0, img_src_url.lastIndexOf("_") + 1) + width + ".jpg"
+        img_src_url = img_src_url.slice(0, img_src_url.lastIndexOf("_") + 1) + width + ".webp"
         hero.setAttribute('data-image-src', img_src_url);
         hero.setAttribute('data-natural-width', width);
         hero.setAttribute('data-natural-height', height);

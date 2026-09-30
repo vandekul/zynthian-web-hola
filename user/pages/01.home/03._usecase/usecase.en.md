@@ -1,15 +1,6 @@
 ---
 title: 'Use Cases'
 subtitle: 'Expand your sound'
-media_order: 'use-cases-1-new.jpg,use-cases-3-new.jpg,always-with-me-always-with-you.wav,use-cases-2-new.jpg,BodySoulByJoostRhodes.mp3,CrunchGuitarByRodrigoAmaral.mp3,night_track.ogg,zcontest23-01-Zynesthesia_by_kosro.mp3,_DSC4481_02_web_use_case_production.jpg,_DSC4578_02_web_use_case_production.jpg,_DSC4534_01_web_use_case_fx_unit.jpg,_DSC4362_01_web_use_case_kb_expander.jpg'
-background: use-cases-1-new.jpg
-bannerOpacity: '0.2'
-music: night_track.ogg
-bullet:
-    -
-        icon: 'fa fa-list-alt'
-button3Text: 'Learn More'
-icon: 'fa fa-th-list'
 menu: 'Use Cases'
 visible: true
 smallTitle: 'Ọ̀pọ̀lọpọ̀ irinṣẹ́.<br/>Ohun èlò orin kan ṣoṣo.'
@@ -22,7 +13,7 @@ usecase:
         learnmoretext: 'Learn more'
         learnmorelink: /use-case/keyboard-expander
         audiourl: night_track.ogg
-        background: _DSC4481_web_use_case_kb_expander2.jpg
+        background: _DSC4481_web_use_case_kb_expander2.webp
     -
         icon: 'fa fa-sliders'
         subtitle: 'Shape your sound'
@@ -31,7 +22,7 @@ usecase:
         learnmoretext: 'Learn More'
         learnmorelink: /use-case/effects-unit
         audiourl: CrunchGuitarByRodrigoAmaral.ogg
-        background: _DSC4534_01_web_use_case_fx_unit.jpg
+        background: _DSC4534_01_web_use_case_fx_unit.webp
     -
         icon: 'fa fa-th'
         subtitle: 'Compose. Produce. Perform.'
@@ -40,7 +31,7 @@ usecase:
         learnmoretext: 'Learn more'
         learnmorelink: /use-case/groovebox-udaw
         audiourl: zcontest23-01-Zynesthesia_by_kosro.ogg
-        background: _DSC4578_02_web_use_case_production.jpg
+        background: _DSC4578_02_web_use_case_production.webp
 ---
 
 Zynthian adapts to the way you create.
