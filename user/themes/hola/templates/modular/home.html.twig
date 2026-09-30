@@ -1,8 +1,8 @@
 
 <section id="{% if page.header.redirect %}{{ page.header.redirect }}{% else %}{{ page.menu|lower }}{% endif %}"
          class="s-home page-hero target-section home-parallax" data-parallax="scroll" data-position-y="center"
-         data-src-desktop="{{ page.media[page.header.background_desktop].url() }}" data-width-desktop="1600" data-height-dektop="1067"
-         data-src-mobile="{{ page.media[page.header.background_mobile].url() }}" data-width-mobile="1304" data-height-mobile="1120">
+         data-src-desktop="{{ page.media[page.header.background_desktop].url() }}"
+         data-src-mobile="{{ page.media[page.header.background_mobile].url() }}">
 
     <div class="overlay" style="opacity:{{ page.header.bannerOpacity }};"></div>
     <div class="shadow-overlay"></div>
@@ -56,17 +56,39 @@
 (function() {
     const hero = document.querySelector('.home-parallax');
     if (hero) {
+        width = 1600;
+        height = 1067;
+        img_src_url = "";
         const isDesktop = window.innerWidth >= 768;
-
         if (isDesktop) {
-            hero.setAttribute('data-image-src', hero.getAttribute('data-src-desktop'));
-            hero.setAttribute('data-natural-width', hero.getAttribute('data-width-desktop'));
-            hero.setAttribute('data-natural-height', hero.getAttribute('data-height-desktop'));
+            if (window.innerWidth > 1420) {
+                width = 1600;
+                height = 1067;
+            } else if (window.innerWidth > 1280) {
+                width = 1420;
+                height = 947;
+            } else if (window.innerWidth > 1024) {
+                width = 1280
+                height = 854;
+            } else {
+                width =1024;
+                height = 683;
+            }
+            img_src_url = "{{ page.media[page.header.background_desktop].url() }}"
         } else {
-            hero.setAttribute('data-image-src', hero.getAttribute('data-src-mobile'));
-            hero.setAttribute('data-natural-width', hero.getAttribute('data-width-mobile'));
-            hero.setAttribute('data-natural-height', hero.getAttribute('data-height-mobile'));
+            if (window.innerWidth > 600) {
+                width = 800;
+                height = 687;
+            } else {
+                width = 600;
+                height = 515;
+            }
+            img_src_url = "{{ page.media[page.header.background_mobile].url() }}"
         }
+        img_src_url = img_src_url.slice(0, img_src_url.lastIndexOf("_") + 1) + width + ".jpg"
+        hero.setAttribute('data-image-src', img_src_url);
+        hero.setAttribute('data-natural-width', width);
+        hero.setAttribute('data-natural-height', height);
     }
 })();
 </script>
