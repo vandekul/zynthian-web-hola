@@ -2,7 +2,7 @@
     <div class="usecase-content">
         <div class="row narrow section-intro has-bottom-sep">
             <div class="col-full text-center">
-                <h3>{{ page.header.smallTitle|raw }}</h3>
+                <p class="h03">{{ page.header.smallTitle|raw }}</p>
                 <h1>{{ page.title|raw }}</h1>
                 <p class="lead">{{ page.content|striptags }}</p>
             </div>
@@ -19,7 +19,7 @@
                                         <i class="fa {{ page.header.hardware.icon }}"></i>
                                     </div>
                                 </div>
-                                <h3>{{ page.header.hardware.subtitle }}</h3>
+                                <p class="h03">{{ page.header.hardware.subtitle }}</p>
                                 <h1> {{ page.header.hardware.title }} </h1>
                                 <p>{{ page.header.hardware.description |markdown }}</p>
 
@@ -42,7 +42,7 @@
                                         <i class="fa {{ page.header.software.icon }}"></i>
                                     </div>
                                 </div>
-                                <h3>{{ page.header.software.subtitle }}</h3>
+                                <p class="h03">{{ page.header.software.subtitle }}</p>
                                 <h1> {{ page.header.software.title }} </h1>
                                 <p>{{ page.header.software.description |markdown }}</p>
                                 {% for button in page.header.software.button %}
@@ -57,7 +57,7 @@
 
         <div class="row narrow section-intro">
             <div class="col-full text-center post-title">
-                <h3>{{ page.header.postTitle }}</h3>
+                <p class="h03">{{ page.header.postTitle }}</p>
             </div>
         </div>
 
