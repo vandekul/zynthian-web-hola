@@ -41,7 +41,7 @@
         <ul class="home-social">
             {% for icon in page.header.social %}
                 <li>
-                    <a href="{{ icon.socialIconLink }}">
+                    <a href="{{ icon.socialIconLink }}" aria-label="{{ icon.socialIconText }}">
                         <i class="fa {{ icon.socialIconClass }}" aria-hidden="true"></i>
                         <span>{{ icon.socialIconText }}</span>
                     </a>
