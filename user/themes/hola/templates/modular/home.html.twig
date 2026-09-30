@@ -1,6 +1,8 @@
+
 <section id="{% if page.header.redirect %}{{ page.header.redirect }}{% else %}{{ page.menu|lower }}{% endif %}"
-         class="s-home page-hero target-section" data-parallax="scroll" data-image-src="{{ page.media[page.header.background].url() }}"
-         data-natural-width="3000" data-natural-height="2000" data-position-y="center">
+         class="s-home page-hero target-section home-parallax" data-parallax="scroll" data-position-y="center"
+         data-src-desktop="{{ page.media[page.header.background_desktop].url() }}" data-width-desktop="1600" data-height-dektop="1067"
+         data-src-mobile="{{ page.media[page.header.background_mobile].url() }}" data-width-mobile="1304" data-height-mobile="1120">
 
     <div class="overlay" style="opacity:{{ page.header.bannerOpacity }};"></div>
     <div class="shadow-overlay"></div>
@@ -11,9 +13,7 @@
 
             <h3>{{ page.title }}</h3>
 
-            <h1>
-                {{ content | raw }}
-            </h1>
+            <h1>{{ content | raw }}</h1>
 
             <div class="home-content__buttons">
                 {% if page.header.button1Text %}
@@ -51,3 +51,22 @@
     {% endif %}
 
 </section> <!-- end s-home -->
+
+<script>
+(function() {
+    const hero = document.querySelector('.home-parallax');
+    if (hero) {
+        const isDesktop = window.innerWidth >= 768;
+
+        if (isDesktop) {
+            hero.setAttribute('data-image-src', hero.getAttribute('data-src-desktop'));
+            hero.setAttribute('data-natural-width', hero.getAttribute('data-width-desktop'));
+            hero.setAttribute('data-natural-height', hero.getAttribute('data-height-desktop'));
+        } else {
+            hero.setAttribute('data-image-src', hero.getAttribute('data-src-mobile'));
+            hero.setAttribute('data-natural-width', hero.getAttribute('data-width-mobile'));
+            hero.setAttribute('data-natural-height', hero.getAttribute('data-height-mobile'));
+        }
+    }
+})();
+</script>

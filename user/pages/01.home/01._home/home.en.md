@@ -1,9 +1,10 @@
 ---
 title: 'Ohun èlò orin òmìnira'
-media_order: 'zynthian-bg.jpg,hero-bg.jpg,_DSC4398_01_web.jpg,_DSC4362_01_web_use_case_kb_expander.jpg'
+media_order: 'zynthian-bg.jpg,_DSC4398_01_web.jpg'
 redirect: home
 visible: false
-background: _DSC4398_01_web.jpg
+background_mobile: zynthian-bg4.jpg
+background_desktop: _DSC4398_01_web.jpg
 bannerOpacity: '0.1'
 button1Text: 'Get your KIT'
 button1Link: 'https://shop.zynthian.org'
