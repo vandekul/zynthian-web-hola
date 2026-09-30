@@ -30,7 +30,7 @@ usecase:
         description: "Access a comprehensive suite of effects including reverb, delay, chorus, flanger, phaser, distortion, compression, EQ, wah-wah, tape & granular delays, vocoders, and auto-tuning. You can also run advanced neural models and impulse responses (IRs) of legendary amplifiers, cabinets, and premium fuzz or overdrive pedals.<br>\n<br>\nDesign custom FX chains by arranging processors in series or parallel configurations, then get infinite fun using the live looping sampler."
         learnmoretext: 'Learn More'
         learnmorelink: /use-case/effects-unit
-        audiourl: CrunchGuitarByRodrigoAmaral.mp3
+        audiourl: CrunchGuitarByRodrigoAmaral.ogg
         background: _DSC4534_01_web_use_case_fx_unit.jpg
     -
         icon: 'fa fa-th'
@@ -39,7 +39,7 @@ usecase:
         description: "Zynthian features multitrack audio recording, synced audio-clip playback, and a powerful step sequencer designed for live performance and song composition.<br>\n<br>\nEnjoy plug-and-play control with a growing list of supported MIDI controllers. Explore deep sonic landscapes and push artistic boundaries using the generative programming capabilities of Pure Data."
         learnmoretext: 'Learn more'
         learnmorelink: /use-case/groovebox-udaw
-        audiourl: zcontest23-01-Zynesthesia_by_kosro.mp3
+        audiourl: zcontest23-01-Zynesthesia_by_kosro.ogg
         background: _DSC4578_02_web_use_case_production.jpg
 ---
 

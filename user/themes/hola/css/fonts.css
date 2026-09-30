@@ -8,11 +8,13 @@
  * libre baskerville
 ================================================================================ */
 
+/*
 @font-face {
     font-family: "librebaskerville-regular";
     src: url("../fonts/librebaskerville/librebaskerville-regular-webfont.woff2") format("woff2"), url("../fonts/librebaskerville/librebaskerville-regular-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -20,6 +22,7 @@
     src: url("../fonts/librebaskerville/librebaskerville-italic-webfont.woff2") format("woff2"), url("../fonts/librebaskerville/librebaskerville-italic-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -27,18 +30,21 @@
     src: url("../fonts/librebaskerville/librebaskerville-bold-webfont.woff2") format("woff2"), url("../fonts/librebaskerville/librebaskerville-bold-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
-
+*/
 
 /*
  * montserrat
 ================================================================================ */
 
+/*
 @font-face {
     font-family: "montserrat-black";
     src: url("../fonts/montserrat/montserrat-black-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-black-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -46,20 +52,25 @@
     src: url("../fonts/montserrat/montserrat-extrabold-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-extrabold-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
+
 
 @font-face {
     font-family: "montserrat-bold";
     src: url("../fonts/montserrat/montserrat-bold-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-bold-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
+*/
 
 @font-face {
     font-family: "montserrat-semibold";
     src: url("../fonts/montserrat/montserrat-semibold-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-semibold-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -67,27 +78,34 @@
     src: url("../fonts/montserrat/montserrat-medium-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-medium-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
+/*
 @font-face {
     font-family: "montserrat-regular";
     src: url("../fonts/montserrat/montserrat-regular-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-regular-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
+*/
 
 @font-face {
     font-family: "montserrat-light";
     src: url("../fonts/montserrat/montserrat-light-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-light-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
+/*
 @font-face {
     font-family: "montserrat-extralight";
     src: url("../fonts/montserrat/montserrat-extralight-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-extralight-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -95,8 +113,10 @@
     src: url("../fonts/montserrat/montserrat-thin-webfont.woff2") format("woff2"), url("../fonts/montserrat/montserrat-thin-webfont.woff") format("woff");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
+*/
 
 /*
  * Space Grotesk
@@ -107,6 +127,7 @@
     src: url("../fonts/spacegrotesk/static/SpaceGrotesk-Regular.ttf") format("ttf");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -114,6 +135,7 @@
     src: url("../fonts/spacegrotesk/static/SpaceGrotesk-Bold.ttf") format("ttf"), url("../fonts/spacegrotesk/static/SpaceGrotesk-Bold.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -121,6 +143,7 @@
     src: url("../fonts/spacegrotesk/static/SpaceGrotesk-Light.ttf") format("ttf");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -128,6 +151,7 @@
     src: url("../fonts/spacegrotesk/static/SpaceGrotesk-SemiBold.ttf") format("ttf");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 /*
@@ -139,6 +163,7 @@
     src: url("../fonts/inter/Inter-Regular.woff") format("woff"), url("../fonts/inter/Inter-Regular.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -146,6 +171,7 @@
     src: url("../fonts/inter/Inter-Italic.woff") format("woff"), url("../fonts/inter/Inter-Italic.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -153,6 +179,7 @@
     src: url("../fonts/inter/Inter-Bold.woff") format("woff"), url("../fonts/inter/Inter-Bold.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -160,6 +187,7 @@
     src: url("../fonts/inter/Inter-ExtraBold.woff") format("woff"), url("../fonts/inter/Inter-ExtraBold.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 /*
@@ -171,6 +199,7 @@
     src: url("../fonts/ibmplexmono/IBMPlexMono-Regular.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -178,6 +207,7 @@
     src: url("../fonts/ibmplexmono/IBMPlexMono-Thin.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -185,6 +215,7 @@
     src: url("../fonts/ibmplexmono/IBMPlexMono-ExtraLight.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -192,6 +223,7 @@
     src: url("../fonts/ibmplexmono/IBMPlexMono-Medium.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -199,6 +231,7 @@
     src: url("../fonts/ibmplexmono/IBMPlexMono-Bold.woff2") format("woff2");
     font-style: normal;
     font-weight: normal;
+    font-display: swap;
 }
 
 

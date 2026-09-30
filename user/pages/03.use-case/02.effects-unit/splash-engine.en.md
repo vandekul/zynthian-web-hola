@@ -15,23 +15,23 @@ background: _DSC4534_01_web_use_case_fx_unit.jpg
 audio:
     -
         audioType: local
-        audioFile: portland_nights.mp3
+        audioFile: portland_nights.ogg
         audioLabel: 'Portland Nights, by TKC (SooperLooper)'
     -
         audioType: local
-        audioFile: always-with-me-always-with-you.wav
+        audioFile: always-with-me-always-with-you.ogg
         audioLabel: 'Always with me, always with you (Joe Satriani, played by Stojos)'
     -
         audioType: local
-        audioFile: CleanGuitarByRodrigoAmaral.mp3
+        audioFile: CleanGuitarByRodrigoAmaral.ogg
         audioLabel: 'Clean Guitar, by Rodrigo Amaral'
     -
         audioType: local
-        audioFile: ''
+        audioFile: CrunchGuitarByRodrigoAmaral.ogg
         audioLabel: 'Crunch Guitar, by Rodrigo Amaral'
     -
         audioType: local
-        audioFile: LeadGuitarByRodrigoAmaral.mp3
+        audioFile: LeadGuitarByRodrigoAmaral.ogg
         audioLabel: 'Lead Guitar, by Rodrigo Amaral'
 video:
     -

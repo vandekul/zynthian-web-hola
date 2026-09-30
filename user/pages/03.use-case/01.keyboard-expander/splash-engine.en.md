@@ -25,60 +25,58 @@ audio:
         audioType: local
         audioFile: night_track.ogg
         audioLabel: 'Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper'
-
     -
         audioType: local
-        audioFile: RadioheadByTkc-SalamanderGrandPianoV3.mp3
+        audioFile: RadioheadByTkc-SalamanderGrandPianoV3.ogg
         audioLabel: 'Everything In Its Right Place, by Radiohead. Solo rendition by tkc.(Salamander Grand Piano V3 + Zynreverb Room)'
     -
         audioType: local
-        audioFile: BodySoulByJoostRhodes.mp3
+        audioFile: BodySoulByJoostRhodes.ogg
         audioLabel: 'Body & Soul, by Joost (Pianoteq Fender Rhodes)'
     -
         audioType: local
-        audioFile: IfIAintGotYou.mp3
+        audioFile: IfIAintGotYou.ogg
         audioLabel: 'If I Aint Got You, by Alicia Keys. Solo rendition by TKC (Salamander Grand Piano V3 + Dragonfly Hall Reverb'
     -
         audioType: local
-        audioFile: PianoteqMidiDemoSteinweyD.mp3
+        audioFile: PianoteqMidiDemoSteinweyD.ogg
         audioLabel: 'Pianoteq MIDI demo (Steinwey D)'
     -
         audioType: local
-        audioFile: SalamanderGrandPianoDemoByHumi.mp3
+        audioFile: SalamanderGrandPianoDemoByHumi.ogg
         audioLabel: 'Salamander Grand Piano demo, by Humi'
     -
         audioType: local
-        audioFile: setBfreeDrawbarsManipulationByBaggypants.mp3
+        audioFile: setBfreeDrawbarsManipulationByBaggypants.ogg
         audioLabel: 'Hammond Drawbars Manipulations, by Baggypants (setBfree)'
     -
         audioType: local
-        audioFile: RhodesHammondByHumi.mp3
+        audioFile: RhodesHammondByHumi.ogg
         audioLabel: 'Rhodes & Hammond, by Humi'
     -
         audioType: local
-        audioFile: MorningSunshineByJTunes.mp3
+        audioFile: MorningSunshineByJTunes.ogg
         audioLabel: 'Morning Sunshine, by JTunes'
     -
         audioType: local
-        audioFile: SpaceChoir1ByJTunes.mp3
+        audioFile: SpaceChoir1ByJTunes.ogg
         audioLabel: 'Space Choir1, by JTunes'
     -
         audioType: local
-        audioFile: CosmicSynthGuitarByJTunes.mp3
+        audioFile: CosmicSynthGuitarByJTunes.ogg
         audioLabel: 'Cosmic Synth Guitar, by JTunes'
     -
         audioType: local
-        audioFile: PatMathenyByMauroBorgadelloRhodesStrings.mp3
+        audioFile: PatMathenyByMauroBorgadelloRhodesStrings.ogg
         audioLabel: 'Pat Metheny, by Mauro Borgadello (Rhodes+Strings)'
     -
         audioType: local
-        audioFile: LovelornManFracescoNutiByMauroBorgadello.mp3
+        audioFile: LovelornManFracescoNutiByMauroBorgadello.ogg
         audioLabel: 'Lovelorn Man (Francesco Nuti), by Mauro Bordello'
     -
         audioType: local
-        audioFile: RelaxingThemeByDhrupadiya.mp3
+        audioFile: RelaxingThemeByDhrupadiya.ogg
         audioLabel: 'Relaxing Theme, by Dhrupadiya'
-
 noHeader: true
 engines: true
 ---

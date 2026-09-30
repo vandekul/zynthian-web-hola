@@ -1,5 +1,5 @@
 ---
-title: 'Groovebox / micro-DAW'
+title: 'Groovebox / Micro-DAW'
 content_position: center
 date: '09:57 09-03-2020'
 margin_top: half
@@ -31,43 +31,43 @@ video:
 audio:
     -
         audioType: local
-        audioFile: zcontest23-01-Zynesthesia_by_kosro.mp3
+        audioFile: zcontest23-01-Zynesthesia_by_kosro.ogg
         audioLabel: 'Zynesthesia, by Kosro'
     -
         audioType: local
-        audioFile: zcontest23-02-Origin_by_danielwine.mp3
+        audioFile: zcontest23-02-Origin_by_danielwine.ogg
         audioLabel: 'Origin, by Daniel Wine'
     -
         audioType: local
-        audioFile: xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3
+        audioFile: xcontest23-01-The_seas_of_Mars_by_Nicolaz.ogg
         audioLabel: 'The Seas of Mars, by Nicolaz'
     -
         audioType: local
-        audioFile: zcontest23-03-Everything_must_flow_by_Nicolaz.mp3
+        audioFile: zcontest23-03-Everything_must_flow_by_Nicolaz.ogg
         audioLabel: 'Everything must flow, by Nicolaz'
     -
         audioType: local
-        audioFile: xcontest23-03-westernbrassband_by_ivaneo.mp3
+        audioFile: xcontest23-03-westernbrassband_by_ivaneo.ogg
         audioLabel: 'Western Brass Band, by Ivaneo'
     -
         audioType: local
-        audioFile: ZynthianicTranceByJtunes.mp3
+        audioFile: ZynthianicTranceByJtunes.ogg
         audioLabel: 'Zynthianic Trance, by JTunes'
     -
         audioType: local
-        audioFile: PPG13ByCanTrell.mp3
+        audioFile: PPG13ByCanTrell.ogg
         audioLabel: 'PPG13, by Can Trell'
     -
         audioType: local
-        audioFile: TheWeightByBaggyPants.mp3
+        audioFile: TheWeightByBaggyPants.ogg
         audioLabel: 'The Weight, by BaggyPants'
     -
         audioType: local
-        audioFile: MonsieurTheActorByRomanGeneralov.mp3
+        audioFile: MonsieurTheActorByRomanGeneralov.ogg
         audioLabel: 'Monsieur The Actor, by R.Generalov'
     -
         audioType: local
-        audioFile: VasculabCOMPDByCanTrell.mp3
+        audioFile: VasculabCOMPDByCanTrell.ogg
         audioLabel: 'Vasculab COMPD, by Can Trell'
 media_thumb: ''
 splash:
