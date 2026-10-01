@@ -43,7 +43,7 @@ For the more powerful formats (**SFZ**, **DS**, and **GIG**), instrument size is
 ### Free extension packages
 Zynthian can be easily extended with packages, installable with just one click. The packages can contain sampled instruments, collection of samples, loops, patterns, and IRs. Users can create their own packages and share with the community.
 
-<a class="minilink" href="https://github.com/zynthian/zynthian-packages">more details on extension packages &nbsp;&nbsp;&gt;</a>
+<a class="minilink" href="https://zynthian.github.io/zynthian-packages/">more details on extension packages &nbsp;&nbsp;&gt;</a>
 
 ### Production Tools
 + **[Zynseq](/use-case/groovebox-udaw)** is a full-featured step sequencer with live capture, quantization, block operations, and swing. It includes velocity and time humanization, step playback frequency and probability, advanced stutter effects, and parameter automation.
