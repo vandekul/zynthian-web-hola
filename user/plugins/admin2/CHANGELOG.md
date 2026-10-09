@@ -1,3 +1,40 @@
+# v2.1.27
+## 10/01/2026
+
+1. [](#improved)
+    * Dark mode now uses dark greys instead of near-black by default, which is easier on the eyes. A new Dark shade setting under Appearance, for each user and as a site default, lets you keep the previous near-black look (Onyx) or pick Midnight, a deep blue-black.
+    * A new Help text setting under Appearance, for each user and as a site default, lets you show field help in a tooltip behind a small info icon next to the label (the default) or below the label. Plugins can follow the setting with a new `<grav-help>` element, described in the admin-next docs
+    * The dashboard's Page Views chart now shows the views and date for any day you point at, anywhere in the chart rather than only on its small dots, and the arrow keys step through the days.
+    * The media manager's filter buttons, sort menu and column headers, root breadcrumb, search label and Delete button now follow the admin language. Thanks @pmoreno-rodriguez [getgrav/grav-admin-next#26](https://github.com/getgrav/grav-admin-next/pull/26)
+    * A Changelog link beside "Update available" on plugins and themes shows what the new version changes before you update. Thanks @pmoreno-rodriguez [getgrav/grav-admin-next#27](https://github.com/getgrav/grav-admin-next/issues/27)
+2. [](#bugfix)
+    * Users can now generate and revoke their own API keys on their profile page, as the API already allowed [#182](https://github.com/getgrav/grav-plugin-admin2/issues/182)
+    * Custom fields from plugins and themes now show the new value after a save or revert on the Configuration page, instead of keeping their old one [#184](https://github.com/getgrav/grav-plugin-admin2/issues/184)
+    * The Taxonomy field in the page editor no longer stays blank on sites that use a number, such as a year, as a tag or category, which includes every site running the Archives plugin [#186](https://github.com/getgrav/grav-plugin-admin2/issues/186)
+    * Editing one taxonomy type no longer rewrites the others, so a single value such as `category: blog` stays as written
+
+# v2.1.26
+## 09/29/2026
+
+1. [](#improved)
+    * On sites with many languages, page rows in the column view now show the current language and a translated count, such as 3/7, instead of one badge per language that squeezed the page title out of view.
+    * The column view's page preview has a Translations section listing which languages a page is translated into and which are still missing, and clicking a language switches to it.
+    * The Page Info and Translations cards in the page editor sidebar can be collapsed, and the admin remembers your choice on that device.
+    * The check that sends visitors to first-run setup when a site has no accounts is now much cheaper on every frontend page. It stops as soon as it finds one account file and only asks the accounts service for a full count when there is none, which matters on sites where a plugin also keeps accounts in a database. The answer is also worked out once per request.
+
+# v2.1.25
+## 09/28/2026
+
+1. [](#improved)
+    * In tag fields such as a page's taxonomy, Tab now adds the existing tag that best matches what you typed, and existing tags are listed alphabetically.
+    * Pasting a comma-separated list into a tag field adds each item as its own tag.
+    * The "Update All" dialogs now show each package's installed version next to the new one. Thanks @abesnier [grav-admin-next#25](https://github.com/getgrav/grav-admin-next/pull/25)
+2. [](#bugfix)
+    * The admin no longer fails to load with a blank page or an error when a host briefly refuses one of its files, which some shared hosts do when many files are requested at once. It now loads about half as many files, fetches a failed one again and reloads once [#181](https://github.com/getgrav/grav-plugin-admin2/issues/181)
+    * Your own account no longer shows an Enable/Disable toggle or a Status field, since disabling yourself locked you out of the admin [getgrav/grav-plugin-api#49](https://github.com/getgrav/grav-plugin-api/issues/49)
+    * Adding a tag that was already on the page no longer leaves the typed text in the box, where the next word was added onto it [#180](https://github.com/getgrav/grav-plugin-admin2/issues/180)
+    * Tag fields no longer act on Enter while an input method is still composing a word, and Backspace no longer removes a tag while text is showing in the box.
+
 # v2.1.24
 ## 09/26/2026
 

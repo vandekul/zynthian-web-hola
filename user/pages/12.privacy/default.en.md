@@ -10,7 +10,7 @@ role: default
 body_classes: 'use-case custom-list legal-page'
 limit_reveal: '0'
 visible: false
-media_order: 'privacy-hero.jpg,_DSC4452_01_web_legal.jpg'
+media_order: _DSC4452_01_web_legal.jpg
 background: _DSC4452_01_web_legal.jpg
 ---
 

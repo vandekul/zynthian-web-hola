@@ -7,12 +7,12 @@ visible: false
 lead: 'Zynthian is a compact, self-contained, music-making device that can be used as a keyboard expander, audio effects unit, MIDI processor & router, groovebox and micro-DAW.'
 subtitle: ''
 buttonText1: 'Learn More in our Wiki'
-buttonLink1: 'https://wiki.zynthian.org/?pk_vid=900c6e85f0bf66e41780669219b29b24'
+buttonLink1: 'https://wiki.zynthian.org'
 buttonText2: "Read the User's Guide"
 buttonLink2: 'https://help.zynthian.org/'
 ---
 
-Zynthian is a [community-driven project](https://discourse.zynthian.org?target=_blank)—100% open-source, featuring free software running on open hardware. It is completely configurable and fully hackable! **Free as in Freedom**. You can build your Zynthian from scratch or [buy an official kit](https://shop.zynthian.org).
+Zynthian is a [community-driven project](https://discourse.zynthian.org)—100% open-source, featuring free software running on open hardware. It is completely configurable and fully hackable! **Free as in Freedom**. You can build your Zynthian from scratch or [buy an official kit](https://shop.zynthian.org).
 
 ### Over 100 virtual instruments
 Zynthian includes a complete collection of virtual instruments and emulators:
@@ -54,6 +54,6 @@ Zynthian can be easily extended with packages, installable with just one click. 
 + **[Native integration with popular MIDI controllers](https://wiki.zynthian.org/index.php/Supported_plug_%26_play_MIDI_controllers)** offers plug-and-play support for industry standards like the Akai APC40, APC Key 25, and MIDI Mix, Novation Launchpads and Launchkeys, the Korg nanoKONTROL, and full Mackie Control Universal (MCU) surfaces.
 + **Multitrack audio recorder** allows you to capture individual instrument and effects chains independently into a pristine multitrack WAV session.
 + **MIDI file recorder/player** lets you easily record, store, and play back standard MIDI files (.MID) on the fly.
-+ **[Pure Data](http://www.pd-tutorial.com/english/index.html?target=_blank)** integrates a powerful visual programming language for custom audio and MIDI sound design.
++ **[Pure Data](http://www.pd-tutorial.com/english/index.html)** integrates a powerful visual programming language for custom audio and MIDI sound design.
 
 <a class="minilink" href="/use-case/groovebox-udaw">more details on production tools &nbsp;&nbsp;&gt;</a>

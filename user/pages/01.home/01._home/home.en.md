@@ -9,14 +9,14 @@ bannerOpacity: '0.1'
 button1Text: 'Get your KIT'
 button1Link: 'https://shop.zynthian.org'
 button2Text: Community
-button2Link: 'https://discourse.zynthian.org/?pk_vid=900c6e85f0bf66e41780669099b29b24'
+button2Link: 'https://discourse.zynthian.org'
 button3Text: 'Learn More'
 button3Link: '#concept'
 social:
     -
         socialIconClass: fa-comment
         socialIconText: Discourse
-        socialIconLink: 'https://discourse.zynthian.org/?pk_vid=900c6e85f0bf66e41780669099b29b24'
+        socialIconLink: 'https://discourse.zynthian.org'
     -
         socialIconClass: fa-github
         socialIconText: Github
@@ -24,11 +24,11 @@ social:
     -
         socialIconClass: fa-wikipedia-w
         socialIconText: Wiki
-        socialIconLink: 'https://wiki.zynthian.org/?pk_vid=900c6e85f0bf66e41780669219b29b24'
+        socialIconLink: 'https://wiki.zynthian.org'
     -
         socialIconClass: fa-wordpress
         socialIconText: Blog
-        socialIconLink: 'https://blog.zynthian.org/?pk_vid=900c6e85f0bf66e41780669541b29b24'
+        socialIconLink: 'https://blog.zynthian.org'
     -
         socialIconClass: fa-youtube-play
         socialIconText: Youtube

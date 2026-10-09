@@ -54,8 +54,6 @@
         {% endif %}
     {% endfor %}
 
-
-
     {% for page in pages.children.visible %}
         {% set current_page = (page.active or page.activeChild) ? 'current' : '' %}
         <li class="{{ current_page }}">
@@ -77,4 +75,8 @@
             <a href={{ theme_var('header.button2Link') }}>{{ theme_var('header.button2Text') }}</a>
         </li>
     {%endif%}
+    <li class="nav_dropdown">
+        <a href="#">{{ langswitcher.current|upper }} <span class="arrow">&#9662;</span></a>
+        {% include 'partials/langswitcher.html.twig' %}
+    </li>
 </ul>

@@ -12,11 +12,11 @@ footer-social:
   -
     socialIconClass: 'fa fa-wikipedia-w'
     socialIconText: Wiki
-    socialIconLink: 'https://wiki.zynthian.org/?pk_vid=900c6e85f0bf66e41780667829b29b24'
+    socialIconLink: 'https://wiki.zynthian.org/'
   -
     socialIconClass: 'fa fa-wordpress'
     socialIconText: Blog
-    socialIconLink: 'https://blog.zynthian.org/?pk_vid=900c6e85f0bf66e41780667897b29b24'
+    socialIconLink: 'https://blog.zynthian.org/'
   -
     socialIconClass: 'fa fa-youtube-play'
     socialIconText: Youtube
@@ -31,7 +31,7 @@ footer-social:
     socialIconLink: 'mailto:info@zynthian.org'
 footer-additional-text: '<a href="/privacy">Privacity Policy </a>'
 header:
-  button1Text: 'Get your KIT'
+  button1Text: Shop
   button1Link: 'https://shop.zynthian.org'
   button2Text: Community
-  button2Link: 'https://discourse.zynthian.org/?pk_vid=900c6e85f0bf66e41780669099b29b24'
+  button2Link: 'https://discourse.zynthian.org'

@@ -3607,3 +3607,81 @@ figure {
         padding-top: 3%;
     }
 }
+
+/* ---------- LANGSWITCHER ---------- */
+
+li.nav_dropdown {
+}
+
+li.nav_dropdown > a {
+}
+
+li.nav_dropdown:hover .arrow {
+    transform: rotate(180deg);
+}
+
+li.nav_dropdown .arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+li.nav_dropdown ul {
+    position: absolute;
+    top: 90%;
+    right: 0;
+    background-color: #00000090;
+    padding: 1em;
+    border-radius: 5px;
+    margin: 0;
+    list-style: none;
+
+    /* Smooth reveal effect */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    z-index: 100;
+}
+
+li.nav_dropdown:hover ul {
+    opacity: 1;
+    visibility: visible;
+}
+
+li.nav_dropdown ul li {
+    display: block;
+}
+
+li.nav_dropdown ul li a {
+    line-height: 4em;
+    padding-left: 1.7em;
+    transition: background-color 0.15s ease;
+}
+
+li.nav_dropdown ul li a:hover {
+}
+
+@media only screen and (max-width: 1000px) {
+    li.nav_dropdown > a {
+        display: none;
+    }
+
+    li.nav_dropdown ul {
+        position: static;
+        background-color: none;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        list-style: none;
+        opacity: 1;
+        visibility: visible;
+        box-shadow: none;
+        z-index: none;
+        transition: none;
+
+    }
+
+    li.nav_dropdown ul li a.active {
+        text-decoration: underline;
+    }
+}
+

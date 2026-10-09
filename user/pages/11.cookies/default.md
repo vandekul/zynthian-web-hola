@@ -11,7 +11,7 @@ body_classes: 'use-case custom-list legal-page'
 limit_reveal: '0'
 background: _DSC4452_01_web_legal.jpg
 visible: false
-media_order: 'privacy-hero.jpg,_DSC4452_01_web_legal.jpg'
+media_order: _DSC4452_01_web_legal.jpg
 ---
 
 This website uses cookies for improving user experience:
