@@ -3,6 +3,8 @@ title: 'Community Videos'
 hidemenu: true
 lead: videos
 subtitle: videos
+learnmoreText: 'More Videos'
+learnmoreLink: 'https://www.youtube.com/channel/UCc9Tv__HdwQjPjKUd5mIhaw'
 visible: false
 cache_enable: false
 noHeader: '1'

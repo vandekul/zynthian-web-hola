@@ -26,8 +26,9 @@
     </div>
     <div class="row narrow section-intro">
         <div class="engines-content__scroll">
-            <a href="/engines" class="scroll-link ">
-                <span>View More Engines</span>
+            {% set localized_url = grav.language.getLanguageURLPrefix() ~ page.header.learnmoreLink %}
+            <a href="{{ localized_url }}" class="scroll-link ">
+                <span>{{ page.header.learnmoreText }}</span>
             </a>
         </div>
     </div>

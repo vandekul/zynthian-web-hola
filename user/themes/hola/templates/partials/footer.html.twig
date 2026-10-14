@@ -24,8 +24,10 @@
         <div class="col-twelve">
             <div class="copyright">
                 <span>{{ theme_var('footer-text') | raw}}</span>
-                <span>{{ theme_var('footer-design') | raw }}</span>
-                <span>{{ theme_var('footer-additional-text') | raw }}</span>
+                {% set localized_url = grav.language.getLanguageURLPrefix() ~ theme_var('footer-link1-url') %}
+                <span><a href="{{ localized_url }}">{{ theme_var('footer-link1-text')|t }}</a></span>
+                {% set localized_url = grav.language.getLanguageURLPrefix() ~ theme_var('footer-link2-url') %}
+                <span><a href="{{ localized_url }}">{{ theme_var('footer-link2-text')|t }}</a></span>
             </div>
 
             <div class="go-top">

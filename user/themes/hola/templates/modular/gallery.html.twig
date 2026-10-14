@@ -16,8 +16,9 @@
     </div>
     <div class="row narrow section-intro">
         <div class="white-content__scroll">
-            <a href="https://www.youtube.com/channel/UCc9Tv__HdwQjPjKUd5mIhaw" class="scroll-link ">
-                <span>More Videos</span>
+            {% set localized_url = grav.language.getLanguageURLPrefix() ~ page.header.learnmoreLink %}
+            <a href="{{ localized_url }}" class="scroll-link ">
+                <span>{{ page.header.learnmoreText }}</span>
             </a>
         </div>
     </div>

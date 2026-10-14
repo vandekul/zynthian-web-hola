@@ -1,5 +1,8 @@
-footer-text: '© Copyright Zynthian 2026'
-footer-design: '<a href="/cookies">Cookie Policy </a>'
+header:
+  button1Text: THEME_ZYNTHIAN.HEADER.MENU_SHOP
+  button1Link: 'https://shop.zynthian.org'
+  button2Text: THEME_ZYNTHIAN.HEADER.MENU_COMMUNITY
+  button2Link: 'https://discourse.zynthian.org'
 footer-social:
   -
     socialIconClass: 'fa fa-comment'
@@ -29,9 +32,8 @@ footer-social:
     socialIconClass: 'fa fa-envelope'
     socialIconText: 'Contact us'
     socialIconLink: 'mailto:info@zynthian.org'
-footer-additional-text: '<a href="/privacy">Privacity Policy </a>'
-header:
-  button1Text: Shop
-  button1Link: 'https://shop.zynthian.org'
-  button2Text: Community
-  button2Link: 'https://discourse.zynthian.org'
+footer-text: '© Copyright Zynthian 2026'
+footer-link1-text: THEME_ZYNTHIAN.FOOTER.COOKIE_POLICY
+footer-link1-url: /cookies
+footer-link2-text: THEME_ZYNTHIAN.FOOTER.PRIVACY_POLICY
+footer-link2-url: /privacy

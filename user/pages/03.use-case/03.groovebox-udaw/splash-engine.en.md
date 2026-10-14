@@ -9,8 +9,7 @@ margin_bottom: none
 role: default
 body_classes: 'use-case custom-list'
 limit_reveal: '0'
-media_order: 'BlueBoxIsRoughlyGreatByNicolaz.mp3,ElectroByHumi.mp3,EpicEnteRByRomanGeneralov.mp3,FirstRealSynthByCanTrell.mp3,ForWyleuByHumi.mp3,MonsieurTheActorByRomanGeneralov.mp3,MrTchaikovskyBySm7x7.mp3,OfCourseMyLordByRomanGeneralov.mp3,PPG13ByCanTrell.mp3,RTPMidiCelebrationByJTunes.mp3,TheWeightByBaggyPants.mp3,TripJazzdemoByHumi.mp3,ui_screenshots_sp.png,v5_mixer.png,VasculabCOMPDByCanTrell.mp3,xcontest23-01-The_seas_of_Mars_by_Nicolaz.mp3,xcontest23-02-Inneremerald_by_Aethermind.mp3,xcontest23-03-westernbrassband_by_ivaneo.mp3,zcontest23-01-Zynesthesia_by_kosro.mp3,zcontest23-02-Origin_by_danielwine.mp3,zcontest23-03-Everything_must_flow_by_Nicolaz.mp3,zynseq_combined.png,ZynthianicTranceByJtunes.mp3,use-cases-3-new.jpg,_DSC4578_02_web_use_case_production.jpg'
-subtitle: 'A powerful production tool in a small container'
+subtitle: 'A well-endowed production tool'
 background: _DSC4578_02_web_use_case_production.jpg
 video:
     -
@@ -78,12 +77,12 @@ tag: ucase-pr
 
 Zynthian is also a powerful tool for production. It includes more than 100 synth-engines with and thousands of presets and over 1000 audio & MIDI effects.
 
-[figure class=""]![zui_vangelis_add_chain](zui_vangelis_add_chain.png "zui_vangelis_add_chain")[/figure]
+![zui_vangelis_add_chain](zui_vangelis_add_chain.png)
 
 It's fully multitimbral, being able to manage up to 16 instrument chains and any number of audio effects, midi processors and mixbuses. It supports the LV2-plugin standard, so the list of available processors is huge and ever growing.
 
-[figure class=""]![01-zui_vangelis_mixerer](01-zui_vangelis_mixerer.png "01-zui_vangelis_mixerer")[/figure]
-[figure class=""]![05-zui_vangelis_chainman](05-zui_vangelis_chainman.png "05-zui_vangelis_chainman")[/figure]
+![01-zui_vangelis_mixerer](01-zui_vangelis_mixer.png)
+![05-zui_vangelis_chainman](05-zui_vangelis_chainman.png)
 
 It features a powerful step-sequencer with live-performing and song-composing features:
 
@@ -98,17 +97,17 @@ It features a powerful step-sequencer with live-performing and song-composing fe
 + parameter automation
 + much more!
 
-[figure class=""]![zui_vangelis_pated_stuter](zui_vangelis_pated_stuter.png "zui_vangelis_pated_stuter")[/figure]
+![zui_vangelis_pated_stuter](zui_vangelis_pated_stuter.png)
 
 It also features an advanced audio clip player capable of loading any audio file format, time-stretch and synchronize audio samples, etc.
 
-[figure class=""]![zui_vangelis_clippy](zui_vangelis_clippy.png "zui_vangelis_clippy")[/figure]
+![zui_clippy_wave](zui_clippy_wave.png)
 
 The launcher view allows to combine step sequencer patterns and audio clips, starting and stopping them in a synced way, allowing different modes  for one-time, loops, etc. Phrases allows you to structure your songs, automating tempo & time signature changes, defining loops and CODA sections, etc.
 
-[figure class=""]![02-zui_vangelis_launcher](02-zui_vangelis_launcher.png "02-zui_vangelis_launcher")[/figure]
+![02-zui_vangelis_launcher](02-zui_vangelis_launcher.png)
 
-A growing list of midi controllers are supported and can be used to control zynthian without extra configuration, totally plug & play:
+A growing list of supported midi controllers can be used to control zynthian out-the-box, totally plug & play:
 
 + **Novation:** LaunchPad Mini / Pro / X. LaunchKey Mini, etc.
 + **Akai:** APC Key-25, APC 40, MPK mini, MIDI Mix
@@ -119,9 +118,8 @@ A growing list of midi controllers are supported and can be used to control zynt
 + **Worlde:** Mini
 + **Foxtex:** Mixtab
 + **Mackie (MCU)**
-+ etc.
 
-[Here](https://wiki.zynthian.org/index.php/Supported_MIDI_controllers) you can check the list of supported MIDI controllers.<br>
+[Click here](https://wiki.zynthian.org/index.php/Supported_MIDI_controllers) to check the full list of supported MIDI controllers.
 
 Zynthian can also be controlled from DAWs and external sequencers. It's plenty of connection options:
 
@@ -130,13 +128,12 @@ Zynthian can also be controlled from DAWs and external sequencers. It's plenty o
 + 1 x USB-B ports (device)
 + Ethernet and WIFI network connectivity
   
-Supporting several _MIDI over network_ protocols:
+and it also supports the more widely used MIDI networking protocols, like:
 
 + NetUMP (MIDI 2.0)
 + RTP (Apple MIDI)
 + QMidiNet (IP-multicast)
 + TouchOSC (tablet as MIDI controller)
-+ etc.
 
 And there is a lot more:
 

@@ -1,5 +1,12 @@
 en:
   TRANSLATION_TEST: Hola!
+  THEME_ZYNTHIAN:
+    HEADER:
+      MENU_SHOP: Shop
+      MENU_COMMUNITY: Community
+    FOOTER:
+      COOKIE_POLICY: Cookie Policy
+      PRIVACY_POLICY: Privacy Policy
   BLOG:
     ITEM:
       CONTINUE_READING: Continue reading...
@@ -32,6 +39,13 @@ en:
 
 de:
   TRANSLATION_TEST: Hola!
+  THEME_ZYNTHIAN:
+    HEADER:
+      MENU_SHOP: Shop
+      MENU_COMMUNITY: Community
+    FOOTER:
+      COOKIE_POLICY: Cookie-Richtlinie
+      PRIVACY_POLICY: Datenschutz
   BLOG:
     ITEM:
       CONTINUE_READING: Weiterlesen...
@@ -62,8 +76,25 @@ de:
     SUMMARY: "Folgendes haben Sie uns mitgeteilt:"
   ERROR: Fehler
 
+pt:
+  TRANSLATION_TEST: Hola!
+  THEME_ZYNTHIAN:
+    HEADER:
+      MENU_SHOP: Loja
+      MENU_COMMUNITY: Comunidade
+    FOOTER:
+      COOKIE_POLICY: Cookies
+      PRIVACY_POLICY: Privacidade
+
 es:
   TRANSLATION_TEST: Hola!
+  THEME_ZYNTHIAN:
+    HEADER:
+      MENU_SHOP: Tienda
+      MENU_COMMUNITY: Comunidad
+    FOOTER:
+      COOKIE_POLICY: Cookies
+      PRIVACY_POLICY: Privacidad
   BLOG:
     ITEM:
       CONTINUE_READING: Continuar leyendo...
@@ -96,6 +127,13 @@ es:
 
 fr:
   TRANSLATION_TEST: Hola !
+  THEME_ZYNTHIAN:
+    HEADER:
+      MENU_SHOP: Shop
+      MENU_COMMUNITY: Community
+    FOOTER:
+      COOKIE_POLICY: Cookie Policy
+      PRIVACY_POLICY: Privacy Policy
   BLOG:
     ITEM:
       CONTINUE_READING: Continuer la lecture...
@@ -123,6 +161,13 @@ fr:
 
 it:
   TRANSLATION_TEST: Hola!
+  THEME_ZYNTHIAN:
+    HEADER:
+      MENU_SHOP: Shop
+      MENU_COMMUNITY: Community
+    FOOTER:
+      COOKIE_POLICY: Cookie Policy
+      PRIVACY_POLICY: Privacy Policy
   BLOG:
     ITEM:
       CONTINUE_READING: Continua a leggere...

@@ -67,12 +67,12 @@
     {% endfor %}
     {% if theme_var('header.button1Text') %}
         <li class=" {{ current_module }} ">
-            <a href={{ theme_var('header.button1Link') }}>{{ theme_var('header.button1Text') }}</a>
+            <a href={{ theme_var('header.button1Link') }}>{{ theme_var('header.button1Text')|t }}</a>
         </li>
     {%endif%}
     {% if theme_var('header.button2Text') %}
         <li class=" {{ current_module }} ">
-            <a href={{ theme_var('header.button2Link') }}>{{ theme_var('header.button2Text') }}</a>
+            <a href={{ theme_var('header.button2Link') }}>{{ theme_var('header.button2Text')|t }}</a>
         </li>
     {%endif%}
     <li class="nav_dropdown">

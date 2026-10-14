@@ -7,6 +7,9 @@ http_x_forwarded:
 languages:
   supported:
     - en
+    - es
+    - de
+    - pt
   include_default_lang: false
 pages:
   theme: hola

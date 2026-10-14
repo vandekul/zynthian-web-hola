@@ -15,7 +15,7 @@ button3Link: '#concept'
 social:
     -
         socialIconClass: fa-comment
-        socialIconText: Discourse
+        socialIconText: Forum
         socialIconLink: 'https://discourse.zynthian.org'
     -
         socialIconClass: fa-github

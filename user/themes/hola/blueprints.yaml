@@ -64,12 +64,19 @@ form:
       type: text
       label: Copyright Bottom Message
 
-    footer-design:
+    footer-link1-text:
       type: text
-      label: About Design And Project Description
-    footer-additional-text:
+      label: Text for the first footer link
+    footer-link1-url:
       type: text
-      label: Additional Text Beneath Footer Copyright Text
+      label: URL for the first footer link
+    footer-link2-text:
+      type: text
+      label: Text for the second footer link
+    footer-link2-url:
+      type: text
+      label: URL for the second footer link
+
     footer-social:
       type: list
       label: Social icons

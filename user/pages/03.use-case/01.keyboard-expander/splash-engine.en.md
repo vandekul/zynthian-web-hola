@@ -19,12 +19,16 @@ tag: ucase-kb
 audio:
     -
         audioType: local
-        audioFile: georgia_on_my_waltzin_mind.ogg
-        audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
+        audioFile: autumn_leaves_low.ogg
+        audioLabel: 'Autum Leaves, by TKC (Accurate Salamander Grand Piano)'
     -
         audioType: local
         audioFile: night_track.ogg
         audioLabel: 'Night Track, by TKC (MDA EPiano + ZASFX + SooperLooper'
+    -
+        audioType: local
+        audioFile: georgia_on_my_waltzin_mind.ogg
+        audioLabel: 'Georgia on my waltzin mind, by TKC (MDA EPiano + setBfree)'
     -
         audioType: local
         audioFile: RadioheadByTkc-SalamanderGrandPianoV3.ogg
@@ -85,21 +89,21 @@ Zynthian is a great tool for keyboardist wanting to expand their playing possibi
 
 Zynthian includes more than 30 synth-engines, hundreds of effects and thousands of presets. You can play the music style you want, recreating vintage instruments or exploring new sounds and textures. You can combine several engines and presets, adjust synth parameters and add effects and filters.
 
-[figure class=""]![zui_vangelis_chain_control_obxd_filter](zui_vangelis_chain_control_obxd_filter.png "zui_vangelis_chain_control_obxd_filter")[/figure]
+![zui_vangelis_chain_control_obxd_filter](zui_vangelis_chain_control_obxd_filter.png)
 
 Zynthian supports the LV2 plugin-format, so the list of synth-engines & effects is ever growing. Most of the available plugins are free software, but some commercial plugins are available, like the amazing [Pianoteq](https://www.modartt.com/pianoteq?target=_blank) physical modeller or TAL-U-NO-LX, an accurate JUNO-60 emulator. Demo versions are included for both of them.
 
 You can easily combine several chains (instruments) to create layered sounds whilst keeping independent control over the parameters you want. You can transpose each one independently and split the keyboard as you like. 
 
-[figure class=""]![zui_vangelis_chain_control_keyrange](zui_vangelis_chain_control_keyrange.png "zui_vangelis_chain_control_keyrange")[/figure]
+![zui_vangelis_chain_control_keyrange](zui_vangelis_chain_control_keyrange.png)
 
-Each MIDI controller (keyboard, etc.) you connect to zynthian can be routed to any number of chains and configured to work in **active** or **multi** mode. **Active** is the default. In **active** mode, the selected chain (active) receives the notes you play, **no matters the MIDI channel**. In the other hand, **multi** mode allows you to **take profit of MIDI channels**, allowing different chains to receive different MIDI channels.
+Each MIDI controller (keyboard, etc.) you connect to zynthian can be routed to any number of chains and configured to work in *active* or *multi* mode. *Active* is the default mode. In *active* mode, the selected chain receives the notes you play, **no matters the MIDI channel**. In the other hand, the *multi* mode allows you to **take profit of MIDI channels**, allowing different chains to receive different MIDI channels.
 
 Sub-snapshots (ZS3s) allow fast preset changes and smooth transitions between instruments. No sound cut when changing instrument. You start playing a new preset while the last notes from the old one are still releasing. Keep some notes pressed or sustained while changing to a new preset and the notes will continue to sound until you release the key/pedal. 
 
-The MIDI-learning workflow is quick & easy, allowing you to manage everything from your keyboards/controllers.  Buttons can be assigned to presets (program-change), knobs & faders, to engine parameters (CC).
+The MIDI-learning workflow is quick and easy, allowing you to manage everything from your keyboards/controllers.  Buttons can be assigned to presets (program-change), knobs and faders, to engine parameters (CC).
 
-[figure class=""]![Zynthian UI](baggypants_on_stage.jpeg)[/figure]
+![Baggypants on Stage](baggypants_on_stage.jpeg)
 
 Zynthian has standard MIDI-IN/THRU/OUT connectors and 4 USB ports ([full specifications](/technical-specifications)). You can configure each keyboard to play a different chain. Or split your keyboard and map several instruments on it. Or you may want the step-sequencer controlling the Drum & Bass line while you play a lead. Possibilities are almost endless ...
 

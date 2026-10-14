@@ -25,7 +25,8 @@
                             <p>{{ usecase.description |raw }}</p>
                             {% if usecase.learnmoretext %}
                                 <div class="usecase-content__scroll">
-                                    <a href="{{ usecase.learnmorelink }}" class="scroll-link ">
+                                    {% set localized_url = grav.language.getLanguageURLPrefix() ~ usecase.learnmorelink %}
+                                    <a href="{{ localized_url }}" class="scroll-link ">
                                         <span>{{ usecase.learnmoretext }}</span>
                                     </a>
                                 </div>

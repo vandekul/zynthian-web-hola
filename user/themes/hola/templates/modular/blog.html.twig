@@ -17,10 +17,10 @@
     </div>
     <div class="row narrow section-intro">
         <div class="white-content__scroll">
-            <a href="https://blog.zynthian.org/?pk_vid=900c6e85f0bf66e41780667897b29b24" class="scroll-link ">
-                <span>More News &amp; Articles</span>
+            {% set localized_url = grav.language.getLanguageURLPrefix() ~ page.header.learnmoreLink %}
+            <a href="{{ localized_url }}" class="scroll-link ">
+                <span>{{ page.header.learnmoreText }}</span>
             </a>
         </div>
     </div>
-
 </section> <!-- end blog -->

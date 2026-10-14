@@ -62,8 +62,8 @@ They bring state-of-the-art, accurate emulation of analog gear like amplifiers, 
 
 If you like looping, SooperLooper is fully integrated, allowing to control up to 6 independent loops with instant record, overdub, reverse, multiply, replace, time-stretch, pitch-shift, and much more.
 
-[figure class=""]![Zynthian UI](ui_screenshots_sl.png)[/figure]
+![Zynthian_UI_SooperLooper](ui_screenshots_sl.png)
 
-The MIDI-learning workflow is quick & easy. You can adjust the parameters you want from your favorite MIDI controller. Buttons can be assigned to presets (program-change), and knobs/faders to parameters (CC).
+The MIDI-learning workflow is quick and easy. You can adjust the parameters you want from your favorite MIDI controller. Buttons can be assigned to presets (program-change), and knobs and faders to parameters (CC).
 
 Regarding latency and jitter, the default configuration (<10ms) is enough for most players, but if you are looking for extra-low latency, audio configuration can be tweaked.
