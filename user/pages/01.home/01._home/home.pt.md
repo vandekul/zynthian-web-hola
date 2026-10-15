@@ -3,10 +3,10 @@ title: Ohun èlò orin òmìnira
 media_order: _DSC4398_01_web_1600.webp, zynthian-bg_800.webp
 redirect: home
 visible: false
-background_mobile: zynthian-bg_800.webp
+background_mobile: zynthian-bg_1024.webp
 background_desktop: _DSC4398_01_web_1600.webp
 bannerOpacity: '0.1'
-button1Text: Pegue seu KIT
+button1Text: Obtém o teu KIT
 button1Link: https://shop.zynthian.org
 button2Text: Comunidade
 button2Link: https://discourse.zynthian.org
@@ -31,8 +31,8 @@ social:
 - socialIconClass: fa-instagram
   socialIconText: Instagram
   socialIconLink: https://www.instagram.com/zynthian/
-- socialIconText: Contato
+- socialIconText: Contacto
   socialIconLink: mailto:info@zynthian.org
   socialIconClass: fa-envelope
 ---
-Qualquer som com que sonhou na palma da sua mão.
+Qualquer som com que sonhaste na palma da tua mão.

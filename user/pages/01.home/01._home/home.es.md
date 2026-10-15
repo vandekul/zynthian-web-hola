@@ -3,14 +3,14 @@ title: Ohun èlò orin òmìnira
 media_order: _DSC4398_01_web_1600.webp, zynthian-bg_800.webp
 redirect: home
 visible: false
-background_mobile: zynthian-bg_800.webp
+background_mobile: zynthian-bg_1024.webp
 background_desktop: _DSC4398_01_web_1600.webp
 bannerOpacity: '0.1'
-button1Text: Obtén tu KIT
+button1Text: Consigue tu KIT
 button1Link: https://shop.zynthian.org
 button2Text: Comunidad
 button2Link: https://discourse.zynthian.org
-button3Text: Más información
+button3Text: Saber más
 button3Link: '#concept'
 social:
 - socialIconClass: fa-comment
