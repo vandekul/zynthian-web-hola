@@ -18,15 +18,15 @@ hardware:
 
     * Multi-Touch-Display
 
-    * Endlos-Drehgeber mit Schalter
+    * Endlos-Drehgeber mit Taster
 
-    * Drucktasten mit RGB-LEDs [[Mehr...]](/technical-specifications)'
+    * Drucktaster mit RGB-LEDs [[Mehr...]](/technical-specifications)'
   background: _DSC4623_01_web_specs.webp
   button:
-  - textButton: Hol dein Kit V5
+  - textButton: Ihr KIT holen
     linkButton: https://shop.zynthian.org/
     styleButton: btn btn--primary
-  - textButton: Build-Anleitungen
+  - textButton: Tutorials
     linkButton: https://wiki.zynthian.org/index.php/Zynthian_Box_Building
     styleButton: btn btn--stroke
 software:
@@ -37,19 +37,19 @@ software:
 
     * Echtzeit-Audioverarbeitung, geringe Latenz & Jitter
 
-    * Multitimbraler Mixer mit mehreren Engines und vollem Funktionsumfang
+    * Multitimbral, mehrere Engines, voll ausgestatteter Mixer
 
     * Step-Sequencer, Looper & Sampler
 
-    * Mehrspur-Audio- & MIDI-Recorder
+    * Mehrspur-Audio- & MIDI-Rekorder
 
     * Native Unterstützung für [Mackie- und MIDI-Controller](https://wiki.zynthian.org/index.php/Supported_plug_%26_play_MIDI_controllers)
 
-    * Fernsteuerung & Web-Konfigurationstool [[Mehr...]](/technical-specifications)'
-  subtitle: Zum Kreieren gemacht
+    * Fernsteuerung & Web-Konfiguration [[Mehr...]](/technical-specifications)'
+  subtitle: Zum Gestalten gemacht
   button:
   - linkButton: https://os.zynthian.org/zynthianos-last-stable.zip
-    textButton: Software downloaden
+    textButton: Software herunterladen
     styleButton: btn btn--primary
 ---
 Zynthian basiert auf offener Hardware und offener Software.

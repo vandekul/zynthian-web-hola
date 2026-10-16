@@ -10,7 +10,7 @@ hardware:
   title: Hardware
   description: '* Basado en Raspberry Pi y hardware abierto
 
-    * Hi-Fi Burr-Brown DAC + ADC
+    * DAC + ADC Burr-Brown Hi-Fi
 
     * Entrada/salida de audio estéreo balanceada
 
@@ -20,13 +20,13 @@ hardware:
 
     * Encoders rotativos sin fin con pulsador
 
-    * Pulsadores con LEDs RGB [[Más...]](/technical-specifications)'
+    * Pulsadores con LED RGB [[Más...]](/technical-specifications)'
   background: _DSC4623_01_web_specs.webp
   button:
-  - textButton: Consigue tu kit V5
+  - textButton: Consigue tu KIT
     linkButton: https://shop.zynthian.org/
     styleButton: btn btn--primary
-  - textButton: Crear tutoriales
+  - textButton: Tutoriales
     linkButton: https://wiki.zynthian.org/index.php/Zynthian_Box_Building
     styleButton: btn btn--stroke
 software:
@@ -37,7 +37,7 @@ software:
 
     * Procesamiento de audio en tiempo real, baja latencia y jitter
 
-    * Mezclador multitímbrico, multimotor y completo
+    * Multitímbrico, multimotor, mezclador completo
 
     * Secuenciador por pasos, looper y sampler
 
@@ -46,7 +46,7 @@ software:
     * Soporte nativo para [controladores Mackie y MIDI](https://wiki.zynthian.org/index.php/Supported_plug_%26_play_MIDI_controllers)
 
     * Control remoto y configuración web [[Más...]](/technical-specifications)'
-  subtitle: Hecho para crear
+  subtitle: Diseñado para crear
   button:
   - linkButton: https://os.zynthian.org/zynthianos-last-stable.zip
     textButton: Descargar software

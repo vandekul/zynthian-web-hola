@@ -12,11 +12,11 @@ hardware:
     background: _DSC4623_01_web_specs.webp
     button:
         -
-            textButton: 'Get your kit V5'
+            textButton: 'Get your KIT'
             linkButton: 'https://shop.zynthian.org/'
             styleButton: 'btn btn--primary'
         -
-            textButton: 'Build Tutorials'
+            textButton: Tutorials
             linkButton: 'https://wiki.zynthian.org/index.php/Zynthian_Box_Building'
             styleButton: 'btn btn--stroke'
 software:

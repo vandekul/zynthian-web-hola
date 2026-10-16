@@ -1,10 +1,10 @@
 ---
-title: 'Get Zynthian'
+title: 'Get your Zynthian'
 hidemenu: true
 titleLink: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5'
-buttonText1: 'Build Instructions'
+buttonText1: 'Assembling Instructions'
 buttonLink1: 'https://wiki.zynthian.org/index.php/Assembling_Zynthian_Kit_V5.1'
-buttonText2: 'Buy your kit V5.1'
+buttonText2: 'Order your KIT v5.1'
 buttonLink2: 'https://shop.zynthian.org/shop/zynthian-v5-1-kit-383?category=5'
 buttonIcon2: 'fa fa-shopping-cart'
 lead: 'The latest official Zynthian V5 is available as a DIY kit.'
