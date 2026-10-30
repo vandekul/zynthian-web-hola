@@ -1,3 +1,128 @@
+# v2.2.3
+## 10/29/2026
+
+1. [](#new)
+    * **Undo a delete**: when a plugin keeps deleted pages (Revisions Pro's trash), the toast after deleting a page or one of its translations, from the editor or the Pages list, has an Undo button. From the editor it opens the page again in the language that was deleted; from the list the list refreshes. Needs API 1.1.3
+    * A plugin sidebar item can sit in the sidebar's bottom group, above Settings (`placement: footer`), for site-wide tools like a trash, so it isn't mixed in with the plugins' own screens
+    * Page media files can be selected and their details edited together, the same way as in Media. Needs API 1.1.3 [getgrav/grav-admin-next#42](https://github.com/getgrav/grav-admin-next/pull/42)
+2. [](#improved)
+    * With a custom logo set, the sign-in screen no longer prints the admin title as a heading under it, since the logo already names the site. The title is still read out by screen readers and still names the browser tab
+    * Deleting a page on a multi-language site says which language goes and that the others are kept ("Delete the German translation of “Rechenoptionen”? The other 6 languages are kept."), and warns when it is the page's only language that the whole folder goes, with its media and child pages. When a plugin keeps deleted pages, the dialog says the page can be restored from Trash instead of "This cannot be undone."
+3. [](#bugfix)
+    * A plugin page drawn by its own component (Crosspost, Forms Pro, KahunaCart's settings) now asks before you leave with unsaved changes through the sidebar or another admin link, the same as a blueprint page. Admin2 already got the page's `dirty` state for the Save button but never checked it before leaving
+    * Saving a form now checks the required fields inside list rows, so a scheduler job added with Add item and saved untouched is stopped with a message naming the row and the missing field instead of being stored with no command [getgrav/grav-plugin-scheduler-webhook#10](https://github.com/getgrav/grav-plugin-scheduler-webhook/issues/10)
+    * With collaboration on, Editor Pro no longer shows old content after the page was edited in Expert mode, and no longer saves that old content over the Expert edit [getgrav/grav-admin-next#43](https://github.com/getgrav/grav-admin-next/issues/43)
+    * A file field's image preview, such as a theme logo, works again when Grav is installed in a subfolder [#203](https://github.com/getgrav/grav-plugin-admin2/issues/203)
+
+# v2.2.2
+## 10/26/2026
+
+1. [](#improved)
+    * On phones the top bar moves plugin buttons, quick links, View site, Clear cache and the dark mode toggle into a single ⋯ menu, so every action stays within reach and the bar no longer runs off the screen
+2. [](#bugfix)
+    * The Media toolbar wraps on phones, so the Folder and Upload buttons are no longer pushed off the screen [#202](https://github.com/getgrav/grav-plugin-admin2/issues/202)
+
+# v2.2.1
+## 10/25/2026
+
+1. [](#improved)
+    * A `selectize` field with `selectize: create: false` only takes the options it lists, as it did in classic admin. Typing filters the list, Enter picks the best match, and text that isn't an option is dropped rather than saved, so a field like a currency list can't hold a typo
+2. [](#bugfix)
+    * The arrow beside a plugin's sidebar item folds its shortcuts away again, and the sidebar now remembers that for your account rather than just this browser. Needs API 1.1.1
+
+# v2.2.0
+## 10/23/2026
+
+1. [](#new)
+    * **Arrange your sidebar**: the pencil at the bottom of the sidebar lets you drag items into the order you want (or move them with the arrow keys), hide the ones you don't use and move the divider. Put KahunaCart right under Dashboard, for example, so it's at the top on a phone. A super admin can save the arrangement for everyone, and anyone can still arrange their own or go back to the site's. Needs API 1.1.0
+    * **Sidebar shortcuts**: a plugin can offer its own screens as shortcuts under its sidebar item (KahunaCart's Orders or Licenses, for example). Star the ones you want when arranging the sidebar, or from the plugin's own page when it offers stars; until you do, the plugin's picks show. A plugin page stars them through `window.__GRAV_SIDEBAR` and hears about changes from the `grav:sidebar:shortcuts` event. Needs API 1.1.0
+    * **Password card on a user's page**: changing your own password asks for the current one and the new one twice, and keeps you signed in while every other browser and app signed in to your account is signed out. Needs API 1.1.0
+2. [](#improved)
+    * An admin who manages users sets someone else's password from the same card with just the new one twice, and an account with no password yet (one made by a sign-in service) sets its first without a current one
+    * [security] Your own 2-Factor Authentication card has a Regenerate button that asks for your current code before it makes a new secret. Needs API 1.1.0
+
+# v2.1.40
+## 10/22/2026
+
+1. [](#new)
+    * **Modules in a modular page's editor**: a modular page now lists its modules above its own form, each with its name, its type, a publish toggle and a link to its editor. Drag a module to reorder it (or focus its handle and press Alt+Up or Alt+Down), the same reordering the Tree and Columns views do. **Add module** opens the new-module form with the page already set as the parent
+    * **Icon sets for the icon picker**: a blueprint's `iconpicker` field can list a theme's or plugin's own icons instead of Font Awesome with `icons: <set>`, and saves the icon's name. The theme registers the set on the API's `onApiIconSets` event. Needs API 1.0.57
+2. [](#improved)
+    * The module type list in Add Module, and a module's Page Template select, show each type's blueprint title instead of its file name. Needs API 1.0.57
+    * A `pagemedia` field's `label` now heads its media box (a module's "Pictures", say) instead of always "Page Media"
+3. [](#bugfix)
+    * Add Module no longer offers the site root as the parent, where a module would never show: the form starts with no parent and says a module goes inside a modular page. API 1.0.57 also refuses one there
+    * A page that uses the `modular` template got the module templates in its own Page Template select when the list had to be fetched separately
+    * A page whose `content.items` is a list (`['@self.modular']`, or a list of selector maps) now counts as a modular page, so its modules panel shows
+    * The modules panel says so, with a Retry button, when the modules could not be loaded, instead of looking like a page with no modules, and keeps the rows it already had when a refresh fails
+    * The icon picker selects on click instead of on mouse press, so Enter or Space on a focused icon picks it (a theme's own set, Font Awesome and the family tabs)
+
+# v2.1.39
+## 10/22/2026
+
+1. [](#improved)
+    * Live collaborative editing works with Mercure 1.x hubs as well as 0.x, and the hub token now travels in a request header instead of the web address. Thanks @Gleydar [getgrav/grav-plugin-sync-mercure#2](https://github.com/getgrav/grav-plugin-sync-mercure/issues/2)
+1. [](#bugfix)
+    * In the Tree view a folder now opens straight away with a loading indicator, offers Retry if its pages fail to load, and stays closed if you close it before they arrive [#200](https://github.com/getgrav/grav-plugin-admin2/issues/200)
+
+# v2.1.38
+## 10/22/2026
+
+1. [](#new)
+    * Media metadata fields set up as a number, date or yes/no toggle now get a number box, a date picker or a checkbox, and required fields are marked and checked before saving. Needs API 1.0.55. Thanks @phmg701 [getgrav/grav-admin-next#41](https://github.com/getgrav/grav-admin-next/pull/41)
+2. [](#bugfix)
+    * Applying metadata to several media files at once no longer shows an error after the files were saved, and Reset works again afterwards
+    * Plugin fields in the page editor can now refresh what they show after the page is saved: Admin2 sends a `grav:invalidate` window event with the API's invalidation tags (such as `pages:update:/<route>`). SEO Magic 7.0.19 uses it to refresh its panels [grav-premium-issues#630](https://github.com/getgrav/grav-premium-issues/issues/630)
+
+# v2.1.37
+## 10/19/2026
+
+1. [](#improved)
+    * Images pasted or dropped into a page's content editor are now uploaded to the page's media and linked, with names like `image-k3x9a2bq.png`, instead of inserting a link to a file that was never uploaded. Editor Pro 2.0.17 uses the same upload [grav-premium-issues#628](https://github.com/getgrav/grav-premium-issues/issues/628)
+2. [](#bugfix)
+    * A Markdown or code (YAML) field now shows its new value when a plugin updates the record and the edit screen refreshes in place, instead of keeping the old text until a page reload. Text typed while a page save is still running is kept in the editor [#198](https://github.com/getgrav/grav-plugin-admin2/issues/198)
+    * Clicking the empty space below the last line of the frontmatter editor in Expert mode now places the cursor there in Firefox and Safari too [#61](https://github.com/getgrav/grav-plugin-admin2/issues/61)
+    * When the web server or a security filter on it (such as mod_security) blocks a save and answers with its own error page, the message now says so instead of only "Request failed with status 418" [getgrav/grav#4362](https://github.com/getgrav/grav/issues/4362)
+
+# v2.1.36
+## 10/17/2026
+
+1. [](#new)
+    * A "Grav was coded with love by Trilby Media" credit at the bottom of the sidebar, which can be turned off under Settings → Branding. Requires API plugin 1.0.52
+2. [](#improved)
+    * The sidebar stays collapsed after a reload once you've collapsed it
+    * The debug button sits beside the sidebar instead of over its footer
+
+# v2.1.35
+## 10/16/2026
+
+1. [](#new)
+    * Label and help text for Grav's new **Remote asset timeout** setting under Configuration → System → Assets
+    * A plugin's own buttons and panels can now update the record you're editing and the form refreshes in place, with no page reload. Plugin code calls the API through the new `window.__GRAV_API` [#197](https://github.com/getgrav/grav-plugin-admin2/issues/197)
+2. [](#bugfix)
+    * The Folder Name field on a page's Advanced tab shows the page's folder again instead of its `slug:` override, and moving or renumbering such a page keeps its folder name. Requires API plugin 1.0.51 for moves made from the page tree [getgrav/grav-admin-next#40](https://github.com/getgrav/grav-admin-next/issues/40)
+    * With live collaboration on, reopening a page after reordering it in the page tree no longer offers to save it, and saving it no longer moves it back to its old position [getgrav/grav#4361](https://github.com/getgrav/grav/issues/4361)
+
+# v2.1.34
+## 10/15/2026
+
+1. [](#new)
+    * A plugin page can now have its own address for each view, such as `/plugin/shop/orders` and `/plugin/shop/customers`, so each view can have its own sidebar entry and bookmarkable link. The plugin's page stays loaded while you move between views and is told which view is showing [#196](https://github.com/getgrav/grav-plugin-admin2/issues/196)
+2. [](#bugfix)
+    * Sidebar links to one plugin page that differ only by a query string, such as `?view=orders` and `?view=customers`, are now highlighted one at a time instead of all at once [#196](https://github.com/getgrav/grav-plugin-admin2/issues/196)
+
+# v2.1.33
+## 10/14/2026
+
+1. [](#new)
+    * Settings that the site's environment folder or a server variable overrides are now marked, with a note at the top of the form, so it's clear when a change saved under Default won't take effect. Saving one of them, or switching a plugin on or off when its environment says otherwise, shows a warning with a Remove override button, and the switch keeps showing what the site actually does. Requires API plugin 1.0.50 [getgrav/grav-plugin-sync-mercure#1](https://github.com/getgrav/grav-plugin-sync-mercure/issues/1)
+    * A user's email change that is waiting for confirmation now shows under the email field with Resend and Cancel buttons, and saving a new address for your own account says a confirmation link was sent
+2. [](#bugfix)
+    * The Add Plugin dialog no longer gets stuck on a spinner when the plugin directory comes back with a plugin listed twice, and the Install button no longer installs a plugin you never saw [getgrav/grav-admin-next#38](https://github.com/getgrav/grav-admin-next/issues/38)
+    * A plugin's sidebar link is no longer highlighted on another plugin's page whose name starts the same way, such as `foo` on `foo-bar` [#195](https://github.com/getgrav/grav-plugin-admin2/issues/195)
+    * The scheduler webhook examples under Tools → Scheduler now use the `X-Webhook-Token` header the Scheduler Webhook plugin expects, so copied commands no longer fail with "Invalid authorization token" [getgrav/grav-plugin-scheduler-webhook#8](https://github.com/getgrav/grav-plugin-scheduler-webhook/issues/8)
+    * In the Pages Columns view, the preview pane updates after you publish or unpublish a page, so the toggle works on every click instead of only the first. Thanks @fdruide [getgrav/grav-admin-next#39](https://github.com/getgrav/grav-admin-next/pull/39)
+
 # v2.1.32
 ## 10/14/2026
 

@@ -14,9 +14,12 @@ use Grav\Framework\Collection\ArrayCollection;
 use Grav\Framework\Flex\FlexDirectory;
 use Grav\Framework\Flex\Interfaces\FlexCollectionInterface;
 use Grav\Plugin\Api\Auth\ApiKeyManager;
+use Grav\Plugin\Api\Auth\JwtAuthenticator;
+use Grav\Plugin\Api\Exceptions\ApiException;
 use Grav\Plugin\Api\Exceptions\ConflictException;
 use Grav\Plugin\Api\Exceptions\ForbiddenException;
 use Grav\Plugin\Api\Exceptions\NotFoundException;
+use Grav\Plugin\Api\Exceptions\TooManyRequestsException;
 use Grav\Plugin\Api\Exceptions\ValidationException;
 use Grav\Plugin\Api\FlexBackend;
 use Grav\Plugin\Api\PermissionResolver;
@@ -68,7 +71,7 @@ class UsersController extends AbstractApiController
         // check a code; a plain PATCH must never switch it on or off.
         'twofa_enabled', 'twofa_secret',
         // Credentials / identity — never mass-assigned through the sweep.
-        'password', 'hashed_password', 'username',
+        'password', 'current_password', 'hashed_password', 'username',
         // Server-managed bookkeeping.
         'authenticated', 'authorized', 'created', 'modified', 'api_tokens_valid_after',
     ];
@@ -946,7 +949,7 @@ class UsersController extends AbstractApiController
         // global setting between fetch and save.
         $etag = $this->generateEtag($data);
 
-        return ApiResponse::create($this->withTwofaCapability($data), 200, ['ETag' => '"' . $etag . '"']);
+        return ApiResponse::create($this->withAccountFlags($data, $user), 200, ['ETag' => '"' . $etag . '"']);
     }
 
     public function create(ServerRequestInterface $request): ResponseInterface
@@ -1151,10 +1154,52 @@ class UsersController extends AbstractApiController
         if ($isSuper) {
             $allowedFields = array_merge($allowedFields, $superFields);
         }
+
+        // A new password must meet the policy, and changing your own takes your
+        // current password too, whatever permissions you hold, so a stolen
+        // session or token can't lock the owner out. An account with no
+        // password yet (one created by a sign-in service) sets its first
+        // without one. An admin setting someone else's password needs only
+        // api.users.write, as before. Checked before anything is written.
+        $passwordChanged = isset($body['password']) && $body['password'] !== '';
+        if ($passwordChanged) {
+            if (!is_string($body['password'])) {
+                throw new ValidationException('The password must be a string.', [
+                    ['field' => 'password', 'message' => 'The password must be a string.'],
+                ]);
+            }
+            PasswordPolicyService::assertValid($this->config, $body['password']);
+            if ($isSelf) {
+                $this->assertCurrentPassword($request, $user, $body['current_password'] ?? null);
+            }
+        }
+
+        // Someone changing their own address has to prove the new one first,
+        // whatever permissions they hold, so it waits as `email_pending` until
+        // the link mailed to it is opened. Checked before anything is written,
+        // so a refused or rate limited change leaves the rest of the request
+        // unsaved too. An admin editing another account saves at once.
+        $oldEmail = mb_strtolower(trim((string) $user->get('email', '')));
+        $pendingEmail = null;
+        if ($isSelf && isset($body['email']) && is_string($body['email'])) {
+            $pendingEmail = $this->screenOwnEmailChange($user, $body['email']);
+        }
+
         foreach ($allowedFields as $field) {
+            if ($field === 'email' && $pendingEmail !== null) {
+                continue;
+            }
             if (array_key_exists($field, $body)) {
                 $user->set($field, $body[$field]);
             }
+        }
+
+        // An address saved straight away makes any waiting change out of date,
+        // and its link would otherwise overwrite this edit when opened.
+        if ($pendingEmail === null && isset($body['email']) && is_string($body['email'])
+            && mb_strtolower(trim($body['email'])) !== $oldEmail
+            && isset($this->grav['login']) && method_exists($this->grav['login'], 'clearEmailChange')) {
+            $this->grav['login']->clearEmailChange($user);
         }
 
         // Same lockout through `access` or `groups`: a super admin who drops
@@ -1171,22 +1216,25 @@ class UsersController extends AbstractApiController
         // this only touches extra, non-reserved blueprint fields (admin2#138).
         $this->applyCustomAccountFields($user, $body);
 
-        // Hash password if provided
-        $passwordChanged = isset($body['password']) && $body['password'] !== '';
+        // Hash password if provided. A plain-text password left in the account
+        // file would otherwise be hashed over the new one when it saves.
         if ($passwordChanged) {
-            PasswordPolicyService::assertValid($this->config, (string) $body['password']);
             $user->set('hashed_password', Authentication::create($body['password']));
+            $user->set('password', null);
         }
 
         // Invalidate every outstanding API token for this account when its
         // password changes or it gets disabled. Stamping the cutoff is the kill
         // switch JwtAuthenticator checks on each request, so a stolen access or
         // refresh token can't outlive a password reset or account lockout.
-        // GHSA-m8g9-wxhx-6f86.
+        // GHSA-m8g9-wxhx-6f86. A password change also signs the account's other
+        // browsers out (Login plugin 3.11.0 or later).
         $disabledNow = in_array('state', $allowedFields, true)
             && array_key_exists('state', $body)
             && $user->get('state') === 'disabled';
-        if ($passwordChanged || $disabledNow) {
+        if ($passwordChanged) {
+            $this->endOtherSessions($user, $isSelf);
+        } elseif ($disabledNow) {
             $user->set('api_tokens_valid_after', time());
         }
 
@@ -1204,6 +1252,23 @@ class UsersController extends AbstractApiController
         $this->fireAdminEvent('onAdminAfterSave', ['object' => $user]);
         $this->fireEvent('onApiUserUpdated', ['user' => $user]);
 
+        // The rest of the request is saved; now start the email change, which
+        // saves the pending address itself and mails the link.
+        $meta = null;
+        if ($pendingEmail !== null) {
+            $meta = ['message' => $this->startEmailChange($user, $pendingEmail)];
+        }
+
+        // The cutoff just stamped also ends the token this request came with,
+        // so someone changing their own password gets a fresh pair and stays
+        // signed in. A browser session was kept by endOtherSessions(), and an
+        // API key isn't affected by the cutoff.
+        if ($passwordChanged && $isSelf && $request->getAttribute('api_auth_method') === 'jwt') {
+            $meta = ($meta ?? []) + [
+                'tokens' => $this->buildTokenPair(new JwtAuthenticator($this->grav, $this->config), $user),
+            ];
+        }
+
         $data = $this->serializeUser($user);
 
         return $this->respondWithEtag(
@@ -1211,10 +1276,184 @@ class UsersController extends AbstractApiController
             // the save response — leave it out and the panel disappears until
             // the next page load. Kept out of the ETag for the reason show()
             // explains.
-            $this->withTwofaCapability($data),
+            $this->withAccountFlags($data, $user),
             200,
             ['users:update:' . $username, 'users:list'],
             $this->generateEtag($data),
+            $meta,
+        );
+    }
+
+    /**
+     * The Login plugin's service when it can confirm email changes (3.10.0 or
+     * later) and the site has that turned on, otherwise null. Older Login
+     * versions and sites without the plugin keep saving an address at once.
+     *
+     * @return object|null
+     */
+    private function emailChangeLogin(): ?object
+    {
+        if (!isset($this->grav['login'])) {
+            return null;
+        }
+
+        $login = $this->grav['login'];
+        if (!method_exists($login, 'requestEmailChange') || !method_exists($login, 'clearEmailChange')
+            || !method_exists($login, 'emailBelongsToAnother') || !method_exists($login, 'getRateLimiter')) {
+            return null;
+        }
+
+        if (!$this->config->get('plugins.login.profile.verify_email_change', true)) {
+            return null;
+        }
+
+        return $login;
+    }
+
+    /**
+     * Decide whether a change to the caller's own address has to wait for
+     * confirmation, and refuse it up front when it can't go ahead. Answers
+     * like the Login plugin's profile form does.
+     *
+     * @return string|null The new address to keep as pending, or null when the
+     *                     address is unchanged or confirmation is not in use.
+     */
+    private function screenOwnEmailChange(UserInterface $user, string $email): ?string
+    {
+        $login = $this->emailChangeLogin();
+        if ($login === null) {
+            return null;
+        }
+
+        $newEmail = trim($email);
+        $oldEmail = trim((string) $user->get('email', ''));
+        if ($newEmail === '' || mb_strtolower($newEmail) === mb_strtolower($oldEmail)) {
+            return null;
+        }
+
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new ValidationException('Invalid email address.', [['field' => 'email', 'message' => 'Invalid email address.']]);
+        }
+
+        $limiter = $login->getRateLimiter('email_changes');
+        if ($limiter->hasReachedLimit($user->username)) {
+            $minutes = (int) $limiter->getInterval();
+            throw new TooManyRequestsException(
+                sprintf('Too many email change requests. Please try again in %d minutes.', $minutes),
+                $minutes * 60,
+            );
+        }
+
+        // With activation by email on, registration doesn't say whether an
+        // address is taken (GHSA-crh8-xm27-j9g9), so neither does this: the
+        // change shows as waiting and no link goes out.
+        $hideTaken = (bool) $this->config->get('plugins.login.user_registration.options.send_activation_email', false);
+        if (!$hideTaken && $login->emailBelongsToAnother($user, $newEmail)) {
+            $message = sprintf('Email address %s already exists, please pick another email address', $newEmail);
+            throw new ValidationException($message, [['field' => 'email', 'message' => $message]]);
+        }
+
+        return $newEmail;
+    }
+
+    /**
+     * Keep a new address as pending and mail the confirmation link to it.
+     *
+     * @return string The message to hand back to the client.
+     */
+    private function startEmailChange(UserInterface $user, string $email): string
+    {
+        $login = $this->emailChangeLogin();
+        if ($login === null) {
+            throw new ApiException(500, 'Email Change Unavailable', 'The Login plugin cannot confirm email changes.');
+        }
+
+        $login->getRateLimiter('email_changes')->registerRateLimitedAction($user->username);
+
+        try {
+            $login->requestEmailChange($user, $email);
+        } catch (\RuntimeException $e) {
+            throw new ApiException(500, 'Email Not Sent', $e->getMessage(), [], $e);
+        }
+
+        return sprintf('We sent a confirmation link to %s. The email address changes once the link is opened.', $email);
+    }
+
+    /**
+     * DELETE /users/{username}/email-change: drop the caller's waiting email
+     * change. The account keeps its current address.
+     */
+    public function cancelEmailChange(ServerRequestInterface $request): ResponseInterface
+    {
+        [$user, $login] = $this->ownPendingEmailChange($request);
+
+        $login->clearEmailChange($user);
+        $user->save();
+
+        return $this->emailChangeResponse($user);
+    }
+
+    /**
+     * POST /users/{username}/email-change/resend: mail the confirmation link
+     * for the caller's waiting email change again, with a fresh day to use it.
+     */
+    public function resendEmailChange(ServerRequestInterface $request): ResponseInterface
+    {
+        [$user, $login] = $this->ownPendingEmailChange($request);
+
+        $limiter = $login->getRateLimiter('email_changes');
+        if ($limiter->hasReachedLimit($user->username)) {
+            $minutes = (int) $limiter->getInterval();
+            throw new TooManyRequestsException(
+                sprintf('Too many email change requests. Please try again in %d minutes.', $minutes),
+                $minutes * 60,
+            );
+        }
+
+        $message = $this->startEmailChange($user, (string) $user->get('email_pending'));
+
+        return $this->emailChangeResponse($user, ['message' => $message]);
+    }
+
+    /**
+     * Shared checks for the cancel and resend routes: the caller's own account
+     * only, with a change actually waiting.
+     *
+     * @return array{0: UserInterface, 1: object}
+     */
+    private function ownPendingEmailChange(ServerRequestInterface $request): array
+    {
+        $this->requirePermission($request, 'api.access');
+
+        $username = $this->getRouteParam($request, 'username');
+        if ($this->getUser($request)->username !== $username) {
+            throw new ForbiddenException('You can only manage the email change on your own account.');
+        }
+
+        $login = $this->emailChangeLogin();
+        if ($login === null) {
+            throw new NotFoundException('Email changes are not confirmed on this site.');
+        }
+
+        $user = $this->loadUserOrFail($username);
+        if ((string) $user->get('email_pending', '') === '') {
+            throw new NotFoundException('There is no email change waiting.');
+        }
+
+        return [$user, $login];
+    }
+
+    /** @param array<string, mixed>|null $meta */
+    private function emailChangeResponse(UserInterface $user, ?array $meta = null): ResponseInterface
+    {
+        $data = $this->serializeUser($user);
+
+        return $this->respondWithEtag(
+            $this->withAccountFlags($data, $user),
+            200,
+            ['users:update:' . $user->username, 'users:list'],
+            $this->generateEtag($data),
+            $meta,
         );
     }
 
@@ -1229,11 +1468,98 @@ class UsersController extends AbstractApiController
      * @param array<string, mixed> $data
      * @return array<string, mixed>
      */
-    private function withTwofaCapability(array $data): array
+    private function withAccountFlags(array $data, UserInterface $user): array
     {
         $data['twofa_global_enabled'] = class_exists(\Grav\Plugin\Login\TwoFactorAuth\TwoFactorAuth::class);
+        // Whether the account has a password of its own. One created by a
+        // sign-in service may not, and then setting your first password needs
+        // no current one.
+        $data['has_password'] = $this->accountHasPassword($user);
 
         return $data;
+    }
+
+    /**
+     * Whether the account has a password: a hash, or a plain-text one still
+     * sitting in the account file (Grav hashes it on the next sign-in).
+     */
+    private function accountHasPassword(UserInterface $user): bool
+    {
+        $hash = $user->get('hashed_password');
+        $plain = $user->get('password');
+
+        return (is_string($hash) && $hash !== '') || (is_string($plain) && $plain !== '');
+    }
+
+    /**
+     * Refuse a change of your own password unless `current_password` is right.
+     * Each try counts against the Login plugin's sign-in limits for the
+     * account and the IP (429 once they are used up), so this can't be used to
+     * guess the password, and a right one clears the count like a sign-in.
+     * An account with no password yet passes without one.
+     */
+    private function assertCurrentPassword(ServerRequestInterface $request, UserInterface $user, mixed $current): void
+    {
+        if (!$this->accountHasPassword($user)) {
+            return;
+        }
+
+        if (!is_string($current) || $current === '') {
+            $message = 'Enter your current password to set a new one.';
+            throw new ValidationException($message, [['field' => 'current_password', 'message' => $message]]);
+        }
+
+        $username = (string) $user->username;
+        $login = isset($this->grav['login']) ? $this->grav['login'] : null;
+        $limited = is_object($login) && method_exists($login, 'checkLoginRateLimit');
+        if ($limited) {
+            $wait = (int) $login->checkLoginRateLimit($username);
+            if ($wait > 0) {
+                throw new TooManyRequestsException(
+                    sprintf('Too many wrong passwords. Try again in %d minutes.', $wait),
+                    $wait * 60,
+                );
+            }
+        }
+
+        if (!$this->passwordMatches($user, $current)) {
+            $this->fireEvent('onApiUserLoginFailure', [
+                'username' => $username,
+                'reason' => 'current_password',
+                'ip' => $this->getRequestIp($request),
+            ]);
+            $message = 'The current password is not correct.';
+            throw new ValidationException($message, [['field' => 'current_password', 'message' => $message]]);
+        }
+
+        if ($limited && method_exists($login, 'resetLoginRateLimit')) {
+            $login->resetLoginRateLimit($username);
+        }
+    }
+
+    /**
+     * Check a password against the account without saving anything, the way
+     * core's authenticate() does: a plain-text password still in the file is
+     * compared as is, and an account with no hash still runs a hash check so
+     * the time taken gives nothing away.
+     */
+    private function passwordMatches(UserInterface $user, string $password): bool
+    {
+        $plain = $user->get('password');
+        if (is_string($plain) && $plain !== '') {
+            return hash_equals($plain, $password);
+        }
+
+        $hash = $user->get('hashed_password');
+        if (!is_string($hash) || $hash === '') {
+            $default = (string) $this->config->get('system.security.default_hash', '');
+            if ($default !== '') {
+                Authentication::verify($password, $default);
+            }
+            return false;
+        }
+
+        return Authentication::verify($password, $hash) > 0;
     }
 
     public function delete(ServerRequestInterface $request): ResponseInterface
@@ -1427,6 +1753,16 @@ class UsersController extends AbstractApiController
             );
         }
 
+        // A new secret also switches 2FA off until a code for it is verified,
+        // so on your own account, with 2FA on, it takes a current code, the
+        // same as POST /2fa/disable. Otherwise a signed-in session could drop
+        // the second factor without it. An admin resetting someone else's
+        // (lost-device recovery) needs no code.
+        if ($currentUser->username === $username && $this->hasActiveTwoFactor($user)) {
+            $body = $this->getRequestBody($request);
+            $this->assertCurrentTwoFactorCode($user, $body['code'] ?? null);
+        }
+
         $twoFa = new \Grav\Plugin\Login\TwoFactorAuth\TwoFactorAuth();
         $secret = $twoFa->createSecret();
 
@@ -1537,11 +1873,12 @@ class UsersController extends AbstractApiController
         $user = $this->loadUserOrFail($username);
         $this->requireNotSuperTarget($request, $user);
 
-        if ($isSelf && !$isAdmin) {
-            // Self-disable without admin privilege requires code verification.
-            $body = $this->getRequestBody($request);
-            $this->requireFields($body, ['code']);
-
+        // Turning off your own 2FA takes a current code, whatever permissions
+        // you hold: user-management rights are for other people's accounts
+        // (lost-device recovery), and skipping the code on your own let a
+        // signed-in session of a manager drop its second factor. Nothing to
+        // prove when 2FA isn't on.
+        if ($isSelf && $this->hasActiveTwoFactor($user)) {
             if (!class_exists(\Grav\Plugin\Login\TwoFactorAuth\TwoFactorAuth::class)) {
                 throw new \Grav\Plugin\Api\Exceptions\ApiException(
                     500,
@@ -1550,11 +1887,8 @@ class UsersController extends AbstractApiController
                 );
             }
 
-            $secret = (string) $user->get('twofa_secret');
-            $twoFa = new \Grav\Plugin\Login\TwoFactorAuth\TwoFactorAuth();
-            if (!$secret || !$twoFa->verifyCode($secret, (string) $body['code'])) {
-                throw new ValidationException('Invalid 2FA code.');
-            }
+            $body = $this->getRequestBody($request);
+            $this->assertCurrentTwoFactorCode($user, $body['code'] ?? null);
         }
 
         $user->set('twofa_enabled', false);
@@ -1567,6 +1901,64 @@ class UsersController extends AbstractApiController
         ]);
 
         return ApiResponse::create(['twofa_enabled' => false]);
+    }
+
+    /** Whether the account has 2FA switched on with a secret to check codes against. */
+    private function hasActiveTwoFactor(UserInterface $user): bool
+    {
+        return (bool) $user->get('twofa_enabled') && (string) $user->get('twofa_secret') !== '';
+    }
+
+    /**
+     * Refuse unless `$code` is a current code for the account's 2FA secret.
+     * Wrong codes count against the Login plugin's 2FA limit for the account
+     * (429 once it is used up), the same counter the sign-in challenge uses,
+     * so the six digits can't be guessed through here.
+     */
+    private function assertCurrentTwoFactorCode(UserInterface $user, mixed $code): void
+    {
+        $code = is_string($code) || is_int($code) ? trim((string) $code) : '';
+        if ($code === '') {
+            $message = 'Enter the current code from your authenticator app.';
+            throw new ValidationException($message, [['field' => 'code', 'message' => $message]]);
+        }
+
+        $username = (string) $user->username;
+        $login = isset($this->grav['login']) ? $this->grav['login'] : null;
+        $limiter = is_object($login) && method_exists($login, 'getRateLimiter')
+            ? $login->getRateLimiter('twofa_attempts')
+            : null;
+
+        if ($limiter && $limiter->hasReachedLimit($username)) {
+            $seconds = method_exists($limiter, 'getRetryAfter')
+                ? (int) $limiter->getRetryAfter($username)
+                : (int) $limiter->getInterval() * 60;
+            $minutes = max(1, (int) ceil($seconds / 60));
+            throw new TooManyRequestsException(
+                sprintf('Too many wrong codes. Try again in %d minutes.', $minutes),
+                $minutes * 60,
+            );
+        }
+
+        if (!$this->verifyTwoFactorCode((string) $user->get('twofa_secret'), $code)) {
+            $limiter?->registerRateLimitedAction($username);
+            $message = 'The code is not correct.';
+            throw new ValidationException($message, [['field' => 'code', 'message' => $message]]);
+        }
+
+        if ($limiter && method_exists($limiter, 'resetRateLimit')) {
+            $limiter->resetRateLimit($username);
+        }
+    }
+
+    /** Check a TOTP code against a secret with the Login plugin's 2FA helper. */
+    protected function verifyTwoFactorCode(string $secret, string $code): bool
+    {
+        if ($secret === '' || !class_exists(\Grav\Plugin\Login\TwoFactorAuth\TwoFactorAuth::class)) {
+            return false;
+        }
+
+        return (bool) (new \Grav\Plugin\Login\TwoFactorAuth\TwoFactorAuth())->verifyCode($secret, $code);
     }
 
     public function apiKeys(ServerRequestInterface $request): ResponseInterface

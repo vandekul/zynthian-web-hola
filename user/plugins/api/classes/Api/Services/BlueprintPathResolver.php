@@ -167,7 +167,7 @@ class BlueprintPathResolver
                 'plugins' => $name ? "plugins/{$name}" : null,
                 'themes' => $name ? "themes/{$name}" : null,
                 'users' => 'accounts',
-                'pages' => $name ? "pages/{$name}" : null,
+                'pages' => $name ? $this->pageLogicalDir($name) : null,
                 default => null,
             };
             if ($parent === null) return null;
@@ -244,8 +244,7 @@ class BlueprintPathResolver
         foreach ($map as $label => $forbidden) {
             $normalizedForbidden = rtrim(str_replace('\\', '/', $forbidden), '/');
             if (
-                $real === $forbidden
-                || str_starts_with($real, $forbidden . '/')
+                PathContainment::isWithin($real, $forbidden, true)
                 || $normalizedTarget === $normalizedForbidden
                 || str_starts_with($normalizedTarget, $normalizedForbidden . '/')
             ) {
@@ -268,7 +267,7 @@ class BlueprintPathResolver
             $probe = $parent;
         }
         $real = realpath($probe !== '' ? $probe : $userRoot);
-        if ($real === false || (!str_starts_with($real, $userRoot . '/') && $real !== $userRoot)) {
+        if ($real === false || !PathContainment::isWithin($real, $userRoot, true)) {
             throw new ValidationException('Path escapes the user directory.');
         }
         return rtrim($path, '/');
@@ -281,7 +280,35 @@ class BlueprintPathResolver
         return is_string($resolved) ? $resolved : null;
     }
 
+    /**
+     * User-rooted folder of the page at `$route`, e.g. `pages/01.home` for the
+     * route `home`. A page's route drops the folder's order prefix, so building
+     * the path from the route pointed uploads at a folder that does not exist
+     * (`pages/home`) while the file itself was written to `pages/01.home`.
+     *
+     * Uses the page's own relativePagePath(), the same value core's `self@`
+     * token and classic admin store, which is not run through realpath so a
+     * symlinked `user/pages` keeps its logical path. Falls back to the
+     * route-based form when the page can't be found.
+     */
+    private function pageLogicalDir(string $route): string
+    {
+        $relative = str_replace('\\', '/', (string) ($this->findPage($route)?->relativePagePath() ?? ''));
+
+        return str_starts_with($relative, 'user/')
+            ? rtrim(substr($relative, 5), '/')
+            : 'pages/' . trim($route, '/');
+    }
+
     private function resolvePageScope(string $route): ?string
+    {
+        return $this->findPage($route)?->path() ?: null;
+    }
+
+    /**
+     * @return PageInterface|null
+     */
+    private function findPage(string $route)
     {
         if ($route === '') return null;
 
@@ -292,7 +319,7 @@ class BlueprintPathResolver
 
         /** @var PageInterface|null $page */
         $page = $pages->find('/' . ltrim($route, '/'));
-        return $page?->path() ?: null;
+        return $page;
     }
 
     /**

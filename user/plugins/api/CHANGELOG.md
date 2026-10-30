@@ -1,3 +1,130 @@
+# v1.1.3
+## 10/29/2026
+
+1. [](#new)
+    * Page records include `uuid`, the page folder's permanent id (Grav 2.2.15 page ids), or null when it has none, and a page copied with the copy action or a batch copy gets its own id instead of sharing the original's
+    * Several media files on one page can have the same details (title, alt text, tags and so on) written in a single request, the page counterpart of the site media batch route. Thanks to @phmg701 [#67](https://github.com/getgrav/grav-plugin-api/pull/67)
+    * **Undo a page delete**: a plugin can attach an undo to a delete by filling the new `undo` slot of `onApiPageDeleted` (`method`, `endpoint` relative to the API, optional `body` and `label`). `DELETE /pages/{route}` then answers `200` with `{"data": {"undo": {...}}}` instead of `204`, and Admin2 offers an Undo button on the delete toast. See "Undo a page delete" in the README
+    * A plugin that keeps deleted pages so they can be restored says so on the new `onApiPageDeleteInfo` event, and page records then carry `delete_recoverable: true`, so Admin2's delete confirmation can say the page can be restored instead of "This cannot be undone"
+    * A sidebar item can set `placement: footer` to show in Admin2's bottom group, above Settings, instead of among the plugin items
+
+# v1.1.2
+## 10/26/2026
+
+1. [](#bugfix)
+    * The Pages list shows a page's `template:` from its frontmatter instead of its file name, and filtering by template finds it [getgrav/grav-plugin-admin2#201](https://github.com/getgrav/grav-plugin-admin2/issues/201)
+    * Translating a page that sets `template:` in its frontmatter saves the translation under the page's own file name, and deleting that translation no longer removes the whole page folder
+    * Site media, icon sets and blueprint uploads work on Windows servers, where every request naming a file or folder was refused with a 422 [#66](https://github.com/getgrav/grav-plugin-api/issues/66)
+
+# v1.1.1
+## 10/25/2026
+
+1. [](#improved)
+    * A new `sidebarFolded` preference remembers, for each user, which plugin items in the Admin2 sidebar have their shortcuts folded away
+
+# v1.1.0
+## 10/23/2026
+
+1. [](#new)
+    * **Arrange the sidebar**: a new `sidebarLayout` preference holds the order of the Admin2 sidebar, the items hidden from it and the shortcuts picked under each plugin item, with a site default and an override for each user, like the other appearance preferences
+    * **Sidebar shortcuts**: a plugin's sidebar item can list `children`, screens of the plugin a user can star to show under it. The ones marked `default` show until the user picks their own, and each is checked against its own `authorize`
+2. [](#improved)
+    * [security] **Changing your own password needs the current one**: `PATCH /users/{username}` on your own account refuses a new `password` without a correct `current_password` (422), and wrong ones count toward the sign-in lockout (429). See "Changing your own password" in the README
+    * An account with no password yet (one made by a sign-in service) sets its first without a current one, and user records now say which accounts have a password with `has_password`
+    * Changing your own password with a JWT returns a fresh token pair in `meta.tokens`, so you stay signed in while every other token stops working
+    * A password change or reset also signs the account out of its other browsers and forgets its remember-me cookies (with Login 3.11.0), and a browser session from before the change can no longer use the API
+    * [security] Making a new 2FA secret for your own account while 2FA is on (`POST /users/{username}/2fa`) now takes the current `code`, and so does turning off your own 2FA when you also manage users, so a signed-in session alone can't drop the second factor; an admin resetting someone else's still needs none
+    * [security] Wrong 2FA codes sent to turn off or replace your own 2FA count toward the same limit as the sign-in challenge (429)
+3. [](#bugfix)
+    * [security] Exchanging one refresh token in several requests at once now yields a single new token pair, and the same holds for a 2FA challenge token. Thanks @yssoe
+    * [security] An invitation can only be accepted once, even when several accept requests arrive at the same moment, and creating or removing invites no longer writes back invites that were already used. Thanks @yssoe
+    * [security] Creating or revoking an API key while other keys are in use can no longer be overwritten by another request, so a revoked key stays revoked. Thanks @yssoe
+    * [security] Creating or copying a page now refuses a route segment of `.` or `..`, so the new page always gets its own folder
+
+# v1.0.57
+## 10/22/2026
+
+1. [](#new)
+    * **Icon sets for the `iconpicker` field**: a theme or plugin that draws its own icons registers them as a set on the new `onApiIconSets` event (SVG markup, IconSpec values, or a YAML file of them), and a blueprint field lists that set instead of Font Awesome with `icons: <set>`. The icons travel with the field as structured SVG data, never as markup. See "Icon sets for the `iconpicker` field" in the README
+2. [](#improved)
+    * **Admin branding honors an environment's own `admin-next.yaml`**: the sign-in card, logo and title are read through Grav's config, so a copy of `admin-next.yaml` in `user/env/<env>/config/` takes the place of the site's one for that environment (a local copy of a demo can name its own sign-ins, for example). Saving from the admin still writes `user/config/admin-next.yaml`
+    * The list of modular templates (`GET /blueprints/pages?modular=true`, and a module's Template select) names each type after the `title` of its own blueprint, instead of its file name made readable. Types with no blueprint title keep the file name
+3. [](#bugfix)
+    * Creating a module at the top level of the site is refused with a clear message: nothing draws a module without a modular page above it, so it only made a folder that never showed
+    * An icon set's `file` is read only when it is a `theme://`, `plugin://`, `user://`, `plugins://` or `themes://` URL for a `.yaml` or `.yml` file inside that stream's folders: plain and absolute paths, `..` segments and symlinks out of the folder are refused
+    * The top-level module refusal covers every way a module can land there: moving a page, renaming one to a `_` name, copying a module and reorganizing it to the top level of the site are refused with the same message as creating one, however the root or the order prefix is spelled
+
+# v1.0.56
+## 10/22/2026
+
+1. [](#bugfix)
+    * Opening a folder with thousands of pages in the admin's Tree or Columns view is now about five times faster and no longer runs out of memory once the cache is warm [getgrav/grav-plugin-admin2#200](https://github.com/getgrav/grav-plugin-admin2/issues/200)
+    * Duplicating a page that has a number in its folder name now numbers the copy too, so it keeps its place in the menu instead of disappearing from navigation [grav#4367](https://github.com/getgrav/grav/issues/4367)
+    * An API key whose ID happens to be all digits no longer fails with a server error on some requests, and new keys never get such an ID. Thanks @srameko and @sandymac [#64](https://github.com/getgrav/grav-plugin-api/issues/64)
+    * Updating a page that only exists in a non-default language now saves that translation when no language is given, the same one reading the page returns, instead of refusing the edit as changed or silently saving nothing
+
+# v1.0.55
+## 10/22/2026
+
+1. [](#new)
+    * Media metadata fields can now be a number (with an optional minimum and maximum), a date or a yes/no toggle, and any field can be marked required so a save can't leave it empty. Thanks @phmg701 [#63](https://github.com/getgrav/grav-plugin-api/pull/63)
+2. [](#improved)
+    * Saving metadata to several media files at once now checks the values first and refuses the whole batch when one is invalid, instead of reporting the same error for every file
+3. [](#bugfix)
+    * A page that only has a translation, and no file in the site's default language, now opens in the editor as that translation, so it can be deleted and its Translations card is right. Saving it in the missing language is refused instead of silently doing nothing [admin2#199](https://github.com/getgrav/grav-plugin-admin2/issues/199)
+
+# v1.0.54
+## 10/20/2026
+
+1. [](#new)
+    * Demo mode can now allow part of an area: create and edit pages but not delete them, upload media but not delete it, and so on, with `api.pages.create`, `api.pages.update`, `api.pages.delete`, `api.media.upload`, `api.media.update` and `api.media.delete`. The old `api.pages.write` and `api.media.write` still mean all three. Admin2 hides the actions that aren't allowed
+    * Demo accounts can now be allowed to change site, plugin or theme settings (`api.config.site`, `api.config.plugins`, `api.config.themes`). The system, security, media, scheduler and backups settings and the API, Admin, Login and Email plugin settings stay refused
+    * `demo.allow_routes` lets a demo account write to a plugin's own API routes, which are refused by default
+    * `bin/plugin api demo:status` shows what demo accounts may change, when the last and next reset are, and which files have changed since the baseline
+    * `demo.include_code` also restores `user/plugins` and `user/themes` on every reset, and `demo.extra_roots` adds more `user://` folders, such as `user://data` for what visitors do on the site itself
+2. [](#improved)
+    * Demo mode is read-only by default. It used to let demo accounts edit pages and media unless `demo.writable` was changed
+    * Pages a demo account saves show raw HTML as text (`demo.escape_html`, on by default), and a demo account can't save a page that runs Twig
+    * The scheduled demo reset now keeps the configured interval exactly. Intervals that don't divide an hour used to reset early, at the top of every hour
+    * A reset only restores the settings a demo account can change, so the owner's own later changes to other settings, the demo settings included, are kept. Settings saved in an environment folder are reset as well
+3. [](#bugfix)
+    * Demo accounts can sign in to Admin2 again. Every request that checked `api.access`, `GET /me` included, was refused as if it were a write
+    * A demo reset no longer rolls back `user/data/api` (API keys, the audit log and the demo's own baseline and safety copies), and leaves symlinked folders alone instead of replacing them with copies
+    * The API only answers at its own address (`/api/v1` by default). Any path starting with `/api` used to reach it, with the start cut off by length, so `/api/v2/users/x` and `/apixy/users/x` were both served as `/users/x`. That let requests past plugins that guard the API by its real address, and took over a site's own pages whose route starts with `/api`, such as `/apiary`
+
+# v1.0.53
+## 10/19/2026
+
+1. [](#bugfix)
+    * On pages, a file removed from a file field no longer comes back after saving, and a new upload to a `self@` file field is recorded with the page's real folder (`01.home`) so it shows on the site. Thanks @sami [#62](https://github.com/getgrav/grav-plugin-api/pull/62)
+
+# v1.0.52
+## 10/17/2026
+
+1. [](#new)
+    * Admin2 branding has a new setting to hide the "Grav was coded with love by Trilby Media" credit at the bottom of the sidebar. It's on by default
+
+# v1.0.51
+## 10/16/2026
+
+1. [](#improved)
+    * Editable Metadata Fields in the API settings can now be set up as Select fields, with their options entered in the form instead of by editing `api.yaml` by hand. Thanks to [@phmg701](https://github.com/phmg701) for finding it and working out the change [#40](https://github.com/getgrav/grav-plugin-api/issues/40)
+2. [](#bugfix)
+    * `bin/plugin api keys:revoke` revokes the key you pick from the list again, instead of failing with "No key ID provided" [#60](https://github.com/getgrav/grav-plugin-api/issues/60)
+    * Moving, renumbering or reordering a page that has a `slug:` in its frontmatter no longer renames its folder after the slug [getgrav/grav-admin-next#40](https://github.com/getgrav/grav-admin-next/issues/40)
+
+# v1.0.50
+## 10/14/2026
+
+1. [](#new)
+    * Settings and plugin details now say when a value is overridden by the site's environment folder or by a server variable, so Admin2 can warn that a change saved under Default won't take effect, and the environment's copy can be removed with the existing revert request [getgrav/grav-plugin-sync-mercure#1](https://github.com/getgrav/grav-plugin-sync-mercure/issues/1)
+    * Plugins with their own settings pages can now save to the environment picked in Admin2 through a shared helper, storing only the values that differ from the layer beneath it
+    * Changing your own email through `PATCH /users/{username}` now waits for confirmation when the Login plugin (3.10.0 or later) confirms email changes. The new address is kept as `email_pending`, a link goes to it, and `email` changes once the link is opened, whatever permissions the account has. The response carries `email_pending` and a `meta.message`. Other fields in the same request still save, an admin changing someone else's address saves it at once, and sites without the Login plugin or with the setting off behave as before. `DELETE /users/{username}/email-change` cancels a waiting change and `POST /users/{username}/email-change/resend` mails the link again
+2. [](#bugfix)
+    * Adding an environment folder such as `user/env/<host>/` no longer signs everyone out of Admin2. The API's signing secret stays in `user/config`, and a copy an earlier version put in an environment folder is moved there
+    * The Add Plugin dialog in Admin2 loads again on sites whose API settings still carry the old 100-item page limit, instead of spinning forever. Each page of the plugin and theme directory now starts where the previous one ended, so no plugin is listed twice [getgrav/grav-admin-next#38](https://github.com/getgrav/grav-admin-next/issues/38)
+    * Admin2 pages no longer fail with "Decoding failed" when a theme or plugin file prints a stray blank line or byte-order mark. The API now sends those responses uncompressed instead of sending compressed data the browser can't read [getgrav/grav-plugin-admin#2524](https://github.com/getgrav/grav-plugin-admin/issues/2524)
+
 # v1.0.49
 ## 10/14/2026
 

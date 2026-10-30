@@ -23,6 +23,7 @@ ICU:
     CONFIRM: Confirm
     CONFIRM_DELETE: Delete "{title}" at {route}?
     DELETE: Delete
+    UNDO: Undo
     DONE: Done
     EDIT: Edit
     HELP: Help
@@ -50,6 +51,9 @@ ICU:
     VALIDATION:
       FIELD_REQUIRED: '{label} is required'
       REQUIRED_GENERIC: This field is required
+      LIST_ROW_REQUIRED: 'Item {row}: {label} is required'
+      LIST_KEY_REQUIRED: '{key}: {label} is required'
+      LIST_NEW_ROW_REQUIRED: 'New item: {label} is required'
       FORM_HAS_ERRORS: '{count, plural, one {# field needs your attention} other {# fields need your attention}}'
     SECURITY_CHECK:
       USER_FOLDER_EXPOSED_TITLE: 'Your web server is not applying Grav''s access rules'
@@ -121,6 +125,17 @@ ICU:
       REORDER_FAILED: Failed to reorder
       DELETED: Deleted "{title}"
       DELETE_FAILED: Failed to delete page
+      DELETE_CANNOT_UNDO: This cannot be undone.
+      DELETE_RECOVERABLE: You can restore it from Trash.
+      DELETE_TRANSLATION_TITLE: Delete Translation
+      DELETE_TRANSLATION_CONFIRM: "Delete the {language} translation of “{title}”? {n, plural, one{The other language is kept.} other{The other # languages are kept.}}"
+      DELETE_LAST_LANGUAGE: This is the page’s only language, so the whole page folder is removed, including its media and any child pages.
+      TRANSLATION_DELETED: "{language} translation deleted"
+      TRANSLATION_DELETED_OF: "Deleted the {language} translation of “{name}”"
+      DELETE_UNDONE: Page restored
+      TRANSLATION_RESTORED: "{language} translation restored"
+      DELETE_UNDONE_NAMED: "Restored “{name}”"
+      DELETE_UNDO_FAILED: "Couldn’t undo the delete: {detail}"
       SAVED: Page saved successfully
       SAVE_FAILED: Failed to save page
       VALIDATION_FAILED_FOR_FIELDS: "Couldn't save — these fields are invalid: {fields}"
@@ -142,6 +157,7 @@ ICU:
       CHUNK_SIZE: Chunk
       CHUNK_SIZE_HELP: Rows to fetch per request as you scroll. Larger values load slower the first time but reduce follow-up requests.
       LOADING_CHUNK: Loading rows {from}–{to}…
+      LOAD_CHILDREN_FAILED: Couldn't load the pages in this folder.
       LOADED_OF: '{n, plural, one {# loaded} other {# loaded}} of {total}'
       NO_MATCH: No pages match your search
       SEARCH_MATCH_COUNT: '{n, plural, one {# match} other {# matches}} across all pages'
@@ -272,6 +288,15 @@ ICU:
         ORDERING_HELP_FOLDER: Adds a numeric prefix that sets this folder's position among its siblings.
         ORDERING_NONE: None
         FOLDER_DETAILS: Folder Details
+        PICK_MODULAR_PAGE: Pick a modular page
+        MODULE_NEEDS_PARENT: A module goes inside a modular page, so pick the page it belongs to.
+      MODULES:
+        TITLE: Modules
+        HELP: The parts this page is built from, in the order the page shows them. Drag a module to move it, or focus its handle and press Alt+Up or Alt+Down. Click its status icon to publish or unpublish it.
+        ADD: Add module
+        EMPTY: No modules yet.
+        LOAD_FAILED: The modules could not be loaded.
+        MOVE: Move "{title}"
       PAGE_COUNT: "{n, plural, one{# page} other{# pages}}"
       SUBTITLE: Manage your site content and structure
     FIELDS:
@@ -336,6 +361,7 @@ ICU:
         FAMILY_SOLID: Solid
         FAMILY_REGULAR: Regular
         FAMILY_BRANDS: Brands
+        SET_MISSING: 'No icon set called "{set}" is registered on this site.'
       PAGE_EXISTS:
         CHECKING_PAGE: Checking page...
       PAGE_MEDIA:
@@ -439,6 +465,8 @@ ICU:
       INVALID_JSON_DETAIL: "The server's reply could not be read because it is not valid JSON. Something on the server may be printing extra output, such as a PHP warning, alongside the API response. The browser console has the details."
       UNEXPECTED_RESPONSE_TITLE: Unexpected response from the server
       UNEXPECTED_RESPONSE_DETAIL: The server replied with data in a format this screen does not expect. The browser console has the details.
+      SERVER_PAGE_TITLE: Blocked by the web server
+      SERVER_PAGE_DETAIL: "Your web server answered this request itself (HTTP {status}) instead of passing it to Grav. A security filter on the server, such as mod_security or a hosting firewall, may have blocked it. Your host or the server's error log can tell you which rule fired."
     API_KEYS_FIELD:
       REVOKE_KEY: Revoke key
       E_G_MY_CLI_TOOL: e.g. My CLI Tool
@@ -465,6 +493,32 @@ ICU:
       CLOSE_MENU: Close menu
       GRAV_VERSION: Grav v{version}
       ADMIN_VERSION: Admin v{version}
+      MADE_BY: Grav was {code} with {love} by {company}.
+      MADE_BY_PLAIN: Grav was coded with love by Trilby Media
+      MORE_ACTIONS: More actions
+    SIDEBAR_EDIT:
+      CUSTOMIZE: Customize sidebar
+      HINT: Drag items to reorder them, or focus a handle and use the arrow keys. The eye hides an item, and the star picks a plugin's shortcuts to show under it.
+      MOVE: Move {label}
+      HIDE: Hide {label}
+      SHOW: Show {label}
+      STAR: Show {label} in the sidebar
+      UNSTAR: Remove {label} from the sidebar
+      DIVIDER: Divider
+      MOVED: "{label} moved to position {position} of {total}"
+      SUB_ITEMS: "Shortcuts ({count} of {total} starred)"
+      FOLD: Collapse {label} shortcuts
+      UNFOLD: Expand {label} shortcuts
+      SAVE_FOR_EVERYONE: Save for everyone
+      SAVE_FOR_EVERYONE_HINT: Make this the sidebar for every user who hasn't arranged their own
+      SAVE_FOR_EVERYONE_TITLE: Make this everyone's sidebar?
+      SAVE_FOR_EVERYONE_MESSAGE: Every user who hasn't arranged their own sidebar will see this order. Anyone can still change their own, and hiding an item doesn't change what they're allowed to open.
+      RESTORE_BUILT_IN: Original order
+      USE_SITE_DEFAULT: Use the site's sidebar
+      SAVED: Sidebar saved
+      SITE_SAVED: Sidebar saved for everyone
+      RESET_DONE: Your sidebar follows the site's again
+      SAVE_FAILED: Couldn't save the sidebar
     NORMAL_MODE: Normal mode
     EXPERT_MODE: Expert mode
     ALLOWED: Allowed
@@ -482,6 +536,10 @@ ICU:
       LEGEND_OVERRIDE: Overrides a group
       LEGEND_SUPER: Granted by super admin
     TWO_FACTOR_FIELD:
+      REGENERATE: Regenerate
+      ENTER_CODE_TO_REGENERATE: Enter your current 6-digit code to make a new secret. 2FA stays off until you scan the new QR code and verify a code from it.
+      CURRENT_CODE_WRONG: That code is not correct.
+      TOO_MANY_CODES: Too many wrong codes. Try again in a few minutes.
       2FA_QR_CODE: 2FA QR Code
       SCAN_THE_QR_CODE_WITH_YOUR: Scan the QR code with your authenticator app
       FAILED_TO_GENERATE_2FA_SECRET: Failed to generate 2FA secret
@@ -607,6 +665,16 @@ ICU:
     FLOATING_WIDGET_LOADER:
       CLOSE_WIDGETS_MENU: Close widgets menu
     MEDIA:
+      # Images pasted or dropped into a page's content editor (markdown or
+      # Editor Pro) are uploaded to the page media (grav-premium-issues#628).
+      PASTE_UPLOAD:
+        UPLOADING: '{count, plural, one {Uploading image…} other {Uploading # images…}}'
+        UPLOADED: '{count, plural, one {Image added to the page media} other {# images added to the page media}}'
+        FAILED: "Couldn't upload {filename}: {message}"
+        UNSUPPORTED_TYPE: "{filename} can't be added here. Paste or drop a PNG, JPEG, GIF, WebP, AVIF or SVG image."
+        SAVE_PAGE_FIRST: Save the page first, then paste or drop images into it.
+        PAGES_ONLY: Pasting or dropping images works in page content only. Upload the image to the media manager and insert it from there.
+        NO_PERMISSION: You don't have permission to upload media, so the image wasn't added.
       FILE_DETAILS:
         TITLE: File details
         PATH: Path
@@ -1065,6 +1133,32 @@ ICU:
         RESET_MESSAGE: "This removes every override on {scope} and restores the inherited values. This cannot be undone."
         RESET_CONFIRM: Reset
         RESET_DONE: Overrides reset
+      SHADOWED:
+        MARKER_ENV: "Overridden by the {env} environment"
+        MARKER_SERVER: Set by a server environment variable
+        EXPLAIN_ENV: "The {env} environment sets this in its own config file, so what you save here won't apply on this site."
+        EXPLAIN_SERVER: A GRAV_CONFIG server environment variable sets this, so what you save here won't apply.
+        ENABLED_ENV: "Set by the {env} environment"
+        ENABLED_SERVER: Set by a server environment variable
+        ENABLED_EXPLAIN_ENV: "The {env} environment turns this plugin on or off in its own config file, so the switch here won't change what the site does."
+        ENABLED_EXPLAIN_SERVER: A GRAV_CONFIG server environment variable turns this plugin on or off, so the switch here won't change what the site does.
+        SITE_USES: This site uses
+        VALUE_ON: 'on'
+        VALUE_OFF: 'off'
+        REMOVE_OVERRIDE: Remove override
+        SWITCH_TO: "Switch to {env}"
+        REMOVED: "Override removed from the {env} environment"
+        REMOVE_FAILED: Could not remove the override
+        BANNER_ENV: "{count, plural, one {# setting here is} other {# settings here are}} overridden by the {env} environment, so changes to {count, plural, one {it} other {them}} won't take effect."
+        BANNER_SERVER: "{count, plural, one {# setting here is} other {# settings here are}} set by server environment variables, so changes to {count, plural, one {it} other {them}} won't take effect."
+        BANNER_MIXED: "{count, plural, one {# setting here is} other {# settings here are}} overridden by the {env} environment or by server environment variables, so changes to {count, plural, one {it} other {them}} won't take effect."
+        SAVED_ENV: "Saved, but {field} is overridden by the {env} environment, so the site still uses \"{value}\"."
+        SAVED_SERVER: "Saved, but {field} is set by a server environment variable, so the site still uses \"{value}\"."
+        SAVED_MANY_ENV: "Saved, but {count} of these changes are overridden by the {env} environment, so the site won't use them."
+        SAVED_MANY_SERVER: "Saved, but {count} of these changes are set by server environment variables, so the site won't use them."
+        SAVED_MANY_MIXED: "Saved, but {count} of these changes are overridden by the {env} environment or by server environment variables, so the site won't use them."
+        TOGGLE_ENV: "Saved, but the {env} environment keeps {name} {state, select, off {disabled} other {enabled}}."
+        TOGGLE_SERVER: "Saved, but a server environment variable keeps {name} {state, select, off {disabled} other {enabled}}."
     FLEX_OBJECTS:
       ADD: Add
       SEARCH: Search...
@@ -1325,11 +1419,13 @@ ICU:
       FAILED_TO_REMOVE_LOGO: Failed to remove logo.
       FAILED_TO_SAVE_BRANDING: Failed to save branding.
       ADMIN_TITLE: Admin title
-      ADMIN_TITLE_DESC: Shown as the sign-in heading and in the browser tab. Leave blank for "Grav Admin".
+      ADMIN_TITLE_DESC: Shown in the browser tab, and as the sign-in heading unless a custom logo is set, since the logo already names the site. Leave blank for "Grav Admin".
       LOGIN_SUBTITLE: Sign-in subtitle
       LOGIN_SUBTITLE_DESC: Optional line shown under the sign-in heading.
       SHOW_POWERED_BY: Show "Powered by Grav"
       SHOW_POWERED_BY_DESC: Show the "Powered by Grav CMS" line on the sign-in and setup screens.
+      SHOW_CREDIT: Show Trilby Media credit
+      SHOW_CREDIT_DESC: Show the "Grav was coded with love by Trilby Media" line at the bottom of the sidebar.
       FAVICON: Favicon
       FAVICON_DESC: Custom browser-tab icon (SVG, PNG, WebP, or ICO). Leave blank for the generated icon.
       FAVICON_UPLOADED: Favicon uploaded.
@@ -1413,8 +1509,34 @@ ICU:
       FAILED_TO_SAVE_USER: Failed to save user.
       YOU_CANNOT_DELETE_YOUR_OWN_ACCOUNT: You cannot delete your own account.
       USER_CHANGED_ELSEWHERE_SAVE_TO: User changed elsewhere — save to overwrite or reload
+      EMAIL_CHANGE_WAITING: 'Waiting for confirmation: {email}'
+      EMAIL_CHANGE_RESEND: Resend
+      EMAIL_CHANGE_SENT: 'We sent a confirmation link to {email}. The email address changes once the link is opened.'
+      EMAIL_CHANGE_CANCELLED: Email change cancelled.
+      EMAIL_CHANGE_RESEND_FAILED: Failed to resend the confirmation link.
+      EMAIL_CHANGE_CANCEL_FAILED: Failed to cancel the email change.
       BACK_TO_USERS: Back to Users
       2_FACTOR_AUTHENTICATION: 2-Factor Authentication
+      PASSWORD:
+        TITLE: Password
+        OWN_HELP: Enter your current password, then the new one twice. You stay signed in here, and every other browser and app signed in to your account is signed out.
+        NO_PASSWORD_HELP: Your account has no password yet because you sign in through another service. Set one to sign in with your username and password as well.
+        OTHER_HELP: "Set a new password for {name}. They are signed out of every browser and app, and sign in again with the new password."
+        CURRENT: Current password
+        NEW: New password
+        CONFIRM: Confirm new password
+        CHANGE: Change password
+        SET: Set password
+        CURRENT_REQUIRED: Enter your current password.
+        CURRENT_WRONG: Your current password is not correct.
+        NEW_REQUIRED: Enter a new password.
+        POLICY: The new password does not meet the requirements.
+        MISMATCH: The passwords do not match.
+        TOO_MANY: Too many wrong passwords. Try again in a few minutes.
+        NOT_ALLOWED: You don't have permission to change this password.
+        FAILED: Failed to change the password.
+        CHANGED_OWN: Your password has been changed. Other browsers and apps signed in to your account have been signed out.
+        CHANGED_OTHER: "The password for {name} has been changed."
       NEW:
         LOWERCASE_3_64_CHARS: "3-64 chars: letters, numbers, . - _"
         NEW_USER_GRAV_ADMIN: New User — Grav Admin
@@ -2023,6 +2145,8 @@ ICU:
     PARENT: Parent
     PASSWORD_VALIDATION_MESSAGE: Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters
     PERMISSIONS: Permissions
+    PIPELINE_REMOTE_TIMEOUT: Remote asset timeout
+    PIPELINE_REMOTE_TIMEOUT_HELP: How long to wait for a remote CSS or JS file (a CDN stylesheet, for example) when building a pipeline. If it doesn't arrive in time, the page renders without bundling that group and tries again on the next request
     PLUGIN_STATUS: Plugin status
     PROCESS: Process
     PROCESS_HELP: Control how pages are processed. Can be set per-page rather than globally

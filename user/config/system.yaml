@@ -10,6 +10,8 @@ languages:
     - es
     - de
     - pt
+    - fr
+    - it
   include_default_lang: false
 pages:
   theme: hola
