@@ -1775,6 +1775,19 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     color: #000000;
 }
 
+.home-content__buttons .btn--highlight {
+    border-color: #70E070;
+    color: #70E070;
+
+}
+
+.home-content__buttons .btn--highlight:hover,
+.home-content__buttons .btn--highlight:focus {
+    background: #70E070 !important;
+    color: #000000;
+}
+
+
 .home-content__scroll {
     position: absolute;
     left: .6rem;
