@@ -6,7 +6,9 @@ visible: false
 background_mobile: zynthian-bg_1024.webp
 background_desktop: _DSC4398_01_web_1600.webp
 bannerOpacity: '0.1'
-button1Text: Prendi il tuo KIT
+buttonText: Provalo!
+buttonLink: https://virtual.zynthian.org
+button1Text: Prendi il KIT
 button1Link: https://shop.zynthian.org
 button2Text: Comunità
 button2Link: https://discourse.zynthian.org

@@ -6,6 +6,8 @@ visible: false
 background_mobile: zynthian-bg_1024.webp
 background_desktop: _DSC4398_01_web_1600.webp
 bannerOpacity: '0.1'
+buttonText: Experimenta!
+buttonLink: https://virtual.zynthian.org
 button1Text: Obtém o teu KIT
 button1Link: https://shop.zynthian.org
 button2Text: Comunidade
@@ -35,4 +37,4 @@ social:
   socialIconLink: mailto:info@zynthian.org
   socialIconClass: fa-envelope
 ---
-Qualquer som com que sonhaste na palma da tua mão.
+Qualquer som com que sonhou na palma da sua mão.

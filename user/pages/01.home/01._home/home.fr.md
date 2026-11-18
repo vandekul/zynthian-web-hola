@@ -6,6 +6,8 @@ visible: false
 background_mobile: zynthian-bg_1024.webp
 background_desktop: _DSC4398_01_web_1600.webp
 bannerOpacity: '0.1'
+buttonText: Essayez !
+buttonLink: https://virtual.zynthian.org
 button1Text: Obtenez votre KIT
 button1Link: https://shop.zynthian.org
 button2Text: Communauté
@@ -35,4 +37,4 @@ social:
   socialIconLink: mailto:info@zynthian.org
   socialIconClass: fa-envelope
 ---
-Tous les sons dont vous avez rêvé dans le creux de votre main.
+Tous les sons dont vous avez rêvé au creux de votre main.
