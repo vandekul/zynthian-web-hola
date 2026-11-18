@@ -16,6 +16,11 @@
             <h1>{{ content | raw }}</h1>
 
             <div class="home-content__buttons">
+                {% if page.header.buttonText %}
+                    <a href="{{ page.header.buttonLink }}" class="btn btn--stroke">
+                        {{ page.header.buttonText }}
+                    </a>
+                {% endif %}
                 {% if page.header.button1Text %}
                     <a href="{{ page.header.button1Link }}" class="btn btn--stroke">
                         {{ page.header.button1Text }}
